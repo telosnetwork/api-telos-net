@@ -1,0 +1,69 @@
+# NOTE: update this with your service name
+service: telos-account-creator-services
+
+# Create an optimized package for our functions 
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle # Package our functions with Webpack
+  - serverless-offline
+
+custom:
+  # Our stage is based on what is passed in when running serverless
+  # commands. Or fallsback to what we have set in the provider section.
+  stage: ${opt:stage, self:provider.stage}
+  # Set the table name here so we can use it while testing locally
+  tableName: ${self:custom.stage}-accounts
+  # Set our DynamoDB throughput for prod and all other non-prod stages.
+  tableThroughputs:
+    prod: 5
+    default: 1
+  tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: us-east-1
+  apiKeys:
+    - ${self:custom.stage}-telosToolkit
+  usagePlan:
+    quota:
+      limit: 1000
+      period: DAY
+    throttle:
+      burstLimit: 200
+      rateLimit: 100
+
+  # 'iamRoleStatements' defines the permission policy for the Lambda function.
+  # In this case Lambda functions are granted with permissions to access DynamoDB.
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+      Resource:
+        - "Fn::GetAtt": [ AccountsTable, Arn ]
+
+functions:
+  register:
+    handler: register.main
+    events:
+      - http:
+          path: register
+          method: post
+          private: true
+          cors: true
+
+  create:
+    handler: create.main
+    events: 
+      - http:
+          path: create
+          method: post
+          private: true
+          cors: true
