@@ -38,6 +38,9 @@ provider:
       burstLimit: 200
       rateLimit: 100
 
+  environment:
+    tableName: ${self:custom.tableName}
+
   # 'iamRoleStatements' defines the permission policy for the Lambda function.
   # In this case Lambda functions are granted with permissions to access DynamoDB.
   iamRoleStatements:
