@@ -16,5 +16,8 @@
     "serverless-bundle": "^1.2.2",
     "serverless-offline": "^5.3.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "twilio": "^3.34.0"
+  }
 }

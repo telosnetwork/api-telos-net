@@ -1,6 +1,6 @@
 export function success(body) {
   body.success = "true";
-  console.log ("Body: ", body);
+  console.log("Body: ", body);
   return buildResponse(200, body);
 }
 
@@ -10,7 +10,6 @@ export function failure(body) {
 }
 
 function buildResponse(statusCode, body) {
-    console.log('Inside of build response')
   return {
     statusCode: statusCode,
     headers: {
