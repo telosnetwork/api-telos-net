@@ -24,7 +24,7 @@ export async function main(event, context) {
 
     let result;
     if (data.smsOtp == accountRecord.smsOtp) {
-        result = await eosioLib.create (accountRecord, data.ownerKey, data.activeKey);
+        result = await eosioLib.create (accountRecord.eosioAccount, data.ownerKey, data.activeKey);
     } else {
         return failure({ message: `The OTP provided does not match: ${data.smsOtp}. Permission denied.`});
     }
