@@ -35,7 +35,7 @@ export async function sendSMS(smsNumber, otp) {
     const client = new twilio(accountSid, authToken);
 
     return await client.messages.create({
-        body: `Your Telos enrollment codee is ${otp}`,
+        body: `Your Telos enrollment code is ${otp}`,
         to: smsNumber,
         from: '+19893683567' // From a valid Twilio number
     });

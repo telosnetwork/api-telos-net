@@ -1,6 +1,7 @@
 import { success, failure } from './libs/response-lib';
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import * as sendLib from "./libs/send-lib";
+import * as cryptoLib from "./libs/crypto-lib";
 
 const CURRENT_VERSION = "v0.1";
 
@@ -20,7 +21,7 @@ export async function main(event, context) {
 
   try {
     const smsNumber = await sendLib.cleanNumberFormat(data.smsNumber);
-    const smsHash = await hash(smsNumber);
+    const smsHash = await cryptoLib.hash(smsNumber);
 
     if (await dynamoDbLib.exists(smsHash)) {
         return failure({ message: `This SMS number ${smsNumber} has already received their Telos account. Use SQRL or another wallet to create another account.`});
