@@ -5,7 +5,7 @@ const { TextEncoder, TextDecoder } = require("util");
 
 
 async function main() {
-    const pk = "5KhanBdzcK6R96zWYg3yVZ5NMF6mV437KBHSZ661aiJCETHf1QP";
+    const pk = "";
     const signatureProvider = new JsSignatureProvider([pk]);
 
     const rpc = new JsonRpc("https://test.telos.kitchen", { fetch });
