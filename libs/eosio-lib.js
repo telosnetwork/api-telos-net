@@ -5,9 +5,14 @@ const { TextEncoder, TextDecoder } = require("util");
 import { getSecret } from "./auth-lib";
 
 export async function create(accountName, ownerKey, activeKey) {
+
+  console.log("ENDPOINT: ", process.env.eosioApiEndPoint);
+  console.log ("SECRET KEY: ", tkOracleSecretKey);
   const secret = await getSecret(process.env.tkOracleSecretKey);
+  console.log ("SECRET: ", secret);
   var secretStringObj = JSON.parse(secret.SecretString);
   const pk = secretStringObj[process.env.tkOracleSecretKey];
+  console.log(" pk: ", pk);
 
   const signatureProvider = new JsSignatureProvider([pk]);
 
@@ -47,12 +52,13 @@ export async function create(accountName, ownerKey, activeKey) {
         blocksBehind: 3,
         expireSeconds: 30
       }
-    )
-    .then(function(result) {
+    ).then(function(result) {
+      console.log()
       console.log(JSON.stringify(result));
       return result;
     })
     .catch(function(e) {
+      console.log ("ERROR CATCH");
       console.log(JSON.stringify(e));
       console.log(e.toString());
       throw new Error("Error submitting transaction to EOSIO:" + e.toString());
