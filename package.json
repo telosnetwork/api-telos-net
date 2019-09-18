@@ -18,6 +18,9 @@
   },
   "dependencies": {
     "crypto": "^1.0.1",
-    "twilio": "^3.34.0"
+    "eosjs": "^20.0.0",
+    "node-fetch": "^2.6.0",
+    "twilio": "^3.34.0",
+    "util": "^0.12.1"
   }
 }
