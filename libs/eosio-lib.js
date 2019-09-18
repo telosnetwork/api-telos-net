@@ -7,7 +7,9 @@ import { getSecret } from "./auth-lib";
 export async function create(accountName, ownerKey, activeKey) {
 
   console.log("ENDPOINT: ", process.env.eosioApiEndPoint);
-  console.log ("SECRET KEY: ", tkOracleSecretKey);
+  console.log ("tkOracle    : ", process.env.tkOracle);
+  console.log("tkAccountCreator: ", process.env.tkAccountCreator);
+  console.log ("SECRET KEY: ", process.env.tkOracleSecretKey);
   const secret = await getSecret(process.env.tkOracleSecretKey);
   console.log ("SECRET: ", secret);
   var secretStringObj = JSON.parse(secret.SecretString);
