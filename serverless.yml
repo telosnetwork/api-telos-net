@@ -53,6 +53,12 @@ provider:
         - dynamodb:UpdateItem
       Resource:
         - "Fn::GetAtt": [ AccountsTable, Arn ]
+    - Effect: Allow
+      Action:
+        - secretsmanager:Describe*
+        - secretsmanager:Get*
+        - secretsmanager:List
+      Resource: "*"
 
 functions:
   register:
