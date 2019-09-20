@@ -40,10 +40,11 @@ export async function main(event, context) {
     console.log("RESULT: ", result);
 
     accountRecord.accountCreatedAt = Date.now();
-    accountRecord.result = result;
+    accountRecord.result = JSON.stringify(result);
+    console.log("CREATE::MAIN:: Account record to save: ", JSON.stringify(accountRecord));
     await dynamoDbLib.save (accountRecord);
 
-    return success({ message: `Account created.`, result: result });
+    return success({ message: `Telos account ${accountRecord.eosioAccount} created.`, result: result });
   } catch (e) {
     return failure({ message: e.message });
   }
