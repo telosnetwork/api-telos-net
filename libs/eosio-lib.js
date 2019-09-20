@@ -27,30 +27,10 @@ export async function create(accountName, ownerKey, activeKey) {
     textEncoder: new TextEncoder()
   });
 
-  const actions = [
-    {
-      account: "eosio.token",
-      name: "transfer",
-      authorization: [
-        {
-          actor: process.env.tkOracle,
-          permission: "active"
-        }
-      ],
-      data: {
-        from: process.env.tkOracle,
-        to: "teloskitchen",
-        quantity: "0.0010 TLOS",
-        memo: "memo"
-      }
-    }
-  ];
-
-
   // const actions = [
   //   {
-  //     account: process.env.tkAccountCreator,
-  //     name: "create",
+  //     account: "eosio.token",
+  //     name: "transfer",
   //     authorization: [
   //       {
   //         actor: process.env.tkOracle,
@@ -58,12 +38,32 @@ export async function create(accountName, ownerKey, activeKey) {
   //       }
   //     ],
   //     data: {
-  //       account_to_create: accountName,
-  //       owner_key: ownerKey,
-  //       active_key: activeKey
+  //       from: process.env.tkOracle,
+  //       to: "teloskitchen",
+  //       quantity: "0.0010 TLOS",
+  //       memo: "memo"
   //     }
   //   }
   // ];
+
+
+  const actions = [
+    {
+      account: process.env.tkAccountCreator,
+      name: "create",
+      authorization: [
+        {
+          actor: process.env.tkOracle,
+          permission: "active"
+        }
+      ],
+      data: {
+        account_to_create: accountName,
+        owner_key: ownerKey,
+        active_key: activeKey
+      }
+    }
+  ];
   console.log("Actions: ", JSON.stringify(actions));
   await api
     .transact(
