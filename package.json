@@ -20,6 +20,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
+    "aws-sdk": "^2.532.0",
     "crypto": "^1.0.1",
     "eosjs": "^20.0.0",
     "node-fetch": "^2.6.0",
