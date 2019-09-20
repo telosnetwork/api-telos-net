@@ -6,7 +6,7 @@ package:
   individually: true
 
 plugins:
-  - serverless-bundle # Package our functions with Webpack
+  - serverless-webpack
   - serverless-offline
 
 custom:
@@ -22,6 +22,9 @@ custom:
     prod: 5
     default: 1
   tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
 
 provider:
   name: aws

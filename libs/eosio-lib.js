@@ -18,7 +18,7 @@ export async function create(accountName, ownerKey, activeKey) {
 
   const signatureProvider = new JsSignatureProvider([pk]);
 
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint, fetch );
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
 
   const api = new Api({
     rpc,
