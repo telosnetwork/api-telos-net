@@ -9,8 +9,8 @@ export async function main(event, context) {
 
   const data = JSON.parse(event.body);
 
-  if (!data.smsNumber || !data.smsOtp || !data.ownerKey || !data.activeKey) {
-    return failure({ message: "smsNumber, smsOtp, ownerKey and activeKey are required"});
+  if (!data.smsNumber || !data.smsOtp) {
+    return failure({ message: "smsNumber and smsOtp are required"});
   }
 
   console.log ("DATA: ", JSON.stringify(data));
@@ -24,7 +24,13 @@ export async function main(event, context) {
 
     let result;
     if (data.smsOtp == accountRecord.smsOtp) {
-        result = await eosioLib.create (accountRecord.eosioAccount, data.ownerKey, data.activeKey);
+      if (data.eosioAccount) { record.eosioAccount = data.eosioAccount; }
+      if (data.activeKey) { record.activeKey = data.activeKey; }
+      if (data.ownerKey) { record.ownerKey = data.ownerKey; }
+      if (!accountRecord.eosioAccount || !accountRecord.activeKey || !accountRecord.ownerKey) {
+        return failure({ message: `eosioAccount, activeKey, or ownerKey is not available. These attributes must be attached to the account record by passing these attributes to either the register or create service`});
+      }
+      result = await eosioLib.create (accountRecord.eosioAccount, data.ownerKey, data.activeKey);
     } else {
         return failure({ message: `The OTP provided does not match: ${data.smsOtp}. Permission denied.`});
     }

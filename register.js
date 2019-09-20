@@ -5,37 +5,36 @@ import * as cryptoLib from "./libs/crypto-lib";
 
 const CURRENT_VERSION = "v0.1";
 
-async function hash (data) {
-    var crypto = require('crypto');
-    var shasum = crypto.createHash('sha256');
-    shasum.update(data);
-    return shasum.digest('hex');
-}
-
 export async function main(event, context) {
   const data = JSON.parse(event.body);
 
-  if (!data.smsNumber || !data.eosioAccount) {
-    return failure({ message: "smsNumber and eosioAccount are required"});
+  if (!data.smsNumber) {
+    return failure({ message: "smsNumber is required"});
   }
 
   try {
     const smsNumber = await sendLib.cleanNumberFormat(data.smsNumber);
     const smsHash = await cryptoLib.hash(smsNumber);
+    let record = {};
 
     if (await dynamoDbLib.exists(smsHash)) {
-        return failure({ message: `This SMS number ${smsNumber} has already received their Telos account. Use SQRL or another wallet to create another account.`});
+      record = await dynamoDbLib.getBySmsHash (smsHash);
+      if (record.accountCreatedAt > 0) {
+        return failure({ message: `This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`});
+      }
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
     const msg = await sendLib.sendSMS(smsNumber, otp);
 
-    const record = {};
     record.smsHash = smsHash;
-    record.eosioAccount = data.eosioAccount;
     record.smsOtp = otp;
     record.smsSid = msg.sid;
     record.version = CURRENT_VERSION;
+
+    if (data.eosioAccount) { record.eosioAccount = data.eosioAccount; }
+    if (data.activeKey) { record.activeKey = data.activeKey; }
+    if (data.ownerKey) { record.ownerKey = data.ownerKey; }
 
     await dynamoDbLib.save(record);
 
