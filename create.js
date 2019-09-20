@@ -24,13 +24,13 @@ export async function main(event, context) {
 
     let result;
     if (data.smsOtp == accountRecord.smsOtp) {
-      if (data.eosioAccount) { record.eosioAccount = data.eosioAccount; }
-      if (data.activeKey) { record.activeKey = data.activeKey; }
-      if (data.ownerKey) { record.ownerKey = data.ownerKey; }
+      if (data.eosioAccount) { accountRecord.eosioAccount = data.eosioAccount; }
+      if (data.activeKey) { accountRecord.activeKey = data.activeKey; }
+      if (data.ownerKey) { accountRecord.ownerKey = data.ownerKey; }
       if (!accountRecord.eosioAccount || !accountRecord.activeKey || !accountRecord.ownerKey) {
         return failure({ message: `eosioAccount, activeKey, or ownerKey is not available. These attributes must be attached to the account record by passing these attributes to either the register or create service`});
       }
-      result = await eosioLib.create (accountRecord.eosioAccount, data.ownerKey, data.activeKey);
+      result = await eosioLib.create (accountRecord.eosioAccount, accountRecord.ownerKey, accountRecord.activeKey);
     } else {
         return failure({ message: `The OTP provided does not match: ${data.smsOtp}. Permission denied.`});
     }
