@@ -27,26 +27,6 @@ export async function create(accountName, ownerKey, activeKey) {
     textEncoder: new TextEncoder()
   });
 
-  // const actions = [
-  //   {
-  //     account: "eosio.token",
-  //     name: "transfer",
-  //     authorization: [
-  //       {
-  //         actor: process.env.tkOracle,
-  //         permission: "active"
-  //       }
-  //     ],
-  //     data: {
-  //       from: process.env.tkOracle,
-  //       to: "teloskitchen",
-  //       quantity: "0.0010 TLOS",
-  //       memo: "memo"
-  //     }
-  //   }
-  // ];
-
-
   const actions = [
     {
       account: process.env.tkAccountCreator,
@@ -65,24 +45,7 @@ export async function create(accountName, ownerKey, activeKey) {
     }
   ];
   console.log("Actions: ", JSON.stringify(actions));
-  await api
-    .transact(
-      {
-        actions: actions
-      },
-      {
-        blocksBehind: 3,
-        expireSeconds: 30
-      }
-    ).then(function(result) {
-      console.log()
-      console.log(JSON.stringify(result));
-      return result;
-    })
-    .catch(function(e) {
-      console.log ("ERROR CATCH");
-      console.log(JSON.stringify(e));
-      console.log(e.toString());
-      throw new Error("Error submitting transaction to EOSIO:" + e.toString());
-    });
+  const result = await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
+  console.log("EOSLIB-CREATE::CREATE-- ", result);
+  return result;
 }
