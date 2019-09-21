@@ -7,16 +7,13 @@ const Sentry = require('@sentry/node');
 
 export async function main(event, context) {
 
-  Sentry.init({ dsn: 'https://4fb0b518dbf74512a27bf8bb24977136@sentry.io/1749694' });
-  console.log ("EVENT BODY : ", event.body);
+  Sentry.init({ dsn: process.env.sentryDsn });
 
   const data = JSON.parse(event.body);
 
   if (!data.smsNumber || !data.smsOtp) {
     return failure({ message: "smsNumber and smsOtp are required"});
   }
-
-  console.log ("DATA: ", JSON.stringify(data));
 
   try {
     const smsNumber = await sendLib.cleanNumberFormat(data.smsNumber);
@@ -37,7 +34,6 @@ export async function main(event, context) {
     } else {
         return failure({ message: `The OTP provided does not match: ${data.smsOtp}. Permission denied.`});
     }
-    console.log("RESULT: ", result);
 
     accountRecord.accountCreatedAt = Date.now();
     accountRecord.result = JSON.stringify(result);

@@ -7,7 +7,7 @@ import * as Sentry from '@sentry/node';
 const CURRENT_VERSION = "v0.1";
 
 export async function main(event, context) {
-  Sentry.init({ dsn: 'https://4fb0b518dbf74512a27bf8bb24977136@sentry.io/1749694' });
+  Sentry.init({ dsn: process.env.sentryDsn });
 
   const data = JSON.parse(event.body);
 

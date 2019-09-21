@@ -32,6 +32,7 @@ curl -X POST \
 NOTE: The services can receive ```eosioAccount```, ```ownerKey```, and ```activeKey``` as parameters in either request.
 
 ## TODO
+- Enable Sentry config / move DSN to ENV VARS
 - Enable integration with Google Firebase
 - Add service to check if Telos account name is available
 - Enable support for Dapps to fund account creation and service hosting using TLOS 

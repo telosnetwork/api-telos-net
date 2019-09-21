@@ -6,15 +6,9 @@ import { getSecret } from "./auth-lib";
 
 export async function create(accountName, ownerKey, activeKey) {
 
-  console.log("ENDPOINT: ", process.env.eosioApiEndPoint);
-  console.log ("tkOracle    : ", process.env.tkOracle);
-  console.log("tkAccountCreator: ", process.env.tkAccountCreator);
-  console.log ("SECRET KEY: ", process.env.tkOracleSecretKey);
   const secret = await getSecret(process.env.tkOracleSecretKey);
-  console.log ("SECRET: ", secret);
   var secretStringObj = JSON.parse(secret.SecretString);
   const pk = secretStringObj[process.env.tkOracleSecretKey];
-  console.log(" pk: ", pk);
 
   const signatureProvider = new JsSignatureProvider([pk]);
 
@@ -44,8 +38,8 @@ export async function create(accountName, ownerKey, activeKey) {
       }
     }
   ];
-  console.log("Actions: ", JSON.stringify(actions));
+  console.log("EOSLIB-CREATE::CREATE-- Actions: ", JSON.stringify(actions));
   const result = await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
-  console.log("EOSLIB-CREATE::CREATE-- ", result);
+  console.log("EOSLIB-CREATE::CREATE-- Result:", JSON.stringify(result));
   return result;
 }
