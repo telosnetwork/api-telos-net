@@ -35,11 +35,11 @@ provider:
     - ${self:custom.stage}-telosToolkit
   usagePlan:
     quota:
-      limit: 1000
+      limit: 50
       period: DAY
     throttle:
-      burstLimit: 200
-      rateLimit: 100
+      burstLimit: 20
+      rateLimit: 10
 
   environment:
     tableName: ${self:custom.tableName}

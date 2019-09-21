@@ -4,10 +4,10 @@ import * as sendLib from "./libs/send-lib";
 import * as cryptoLib from "./libs/crypto-lib";
 import * as eosioLib from "./libs/eosio-lib";
 const Sentry = require('@sentry/node');
-Sentry.init({ dsn: 'https://4fb0b518dbf74512a27bf8bb24977136@sentry.io/1749694' });
 
 export async function main(event, context) {
 
+  Sentry.init({ dsn: 'https://4fb0b518dbf74512a27bf8bb24977136@sentry.io/1749694' });
   console.log ("EVENT BODY : ", event.body);
 
   const data = JSON.parse(event.body);
@@ -46,6 +46,8 @@ export async function main(event, context) {
 
     return success({ message: `Telos account ${accountRecord.eosioAccount} created.`, result: result });
   } catch (e) {
+    Sentry.captureException(new Error(e));
+    await Sentry.flush();
     return failure({ message: e.message });
   }
 }
