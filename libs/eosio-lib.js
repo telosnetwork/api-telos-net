@@ -1,5 +1,5 @@
 const { Api, JsonRpc, RpcError } = require("eosjs");
-const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig"); // development only
+const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig"); 
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 import { getSecret } from "./auth-lib";
