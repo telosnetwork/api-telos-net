@@ -3,10 +3,10 @@
 Web services for creating free Telos accounts by verifying SMS number.
 
 ## TODO
-[ ] Enable Sentry config / move DSN to ENV VARS
-[ ] Enable integration with Google Firebase
-[ ] Enable support for Dapps to fund account creation and service hosting using TLOS 
-[ ] Add additional security, such as JWT
+- [ ] Enable Sentry config / move DSN to ENV VARS
+- [ ] Enable integration with Google Firebase
+- [ ] Enable support for Dapps to fund account creation and service hosting using TLOS 
+- [ ] Add additional security, such as JWT
 
 
 ### Step 1: Request Verification
