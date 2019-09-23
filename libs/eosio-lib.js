@@ -3,7 +3,7 @@ const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 import { getSecret } from "./auth-lib";
-import ecc from 'eosjs-ecc';
+import { generateKeyPair } from "crypto";
 
 export async function create(accountName, ownerKey, activeKey) {
 
@@ -46,12 +46,19 @@ export async function create(accountName, ownerKey, activeKey) {
 }
 
 export async function genRandomKey () {
+  const ecc = require ("eosjs-ecc");
   let key = {};
-  ecc.randomKey().then(privateKey => {
-    key.privateKey = privateKey;
-    key.publicKey = ecc.privateToPublic(privateKey);
-    return key;
-  });
+  key.privateKey = await ecc.randomKey();
+  key.publicKey = await ecc.privateToPublic(key.privateKey);
+  return key;
+}
+
+export async function genRandomKeys (numKeys = 2) {
+  let keys = [];
+  for (var i=0; i < numKeys; i++) {
+    keys.push (await genRandomKey());
+  }
+  return keys;
 }
 
 export async function accountExists (accountName) {
