@@ -5,9 +5,13 @@ export async function keygen(event, context) {
   // Sentry.init({ dsn: process.env.sentryDsn });
 
   try {
-    let numKeys = event.queryStringParameters.numKeys || 2;
+
+    let numKeys = 2;
+    if (event.queryStringParameters && event.queryStringParameters.numKeys) {
+      numKeys = event.queryStringParameters.numKeys;
+    }
+
     let keys = await eosioLib.genRandomKeys(numKeys);
-    
     return success({ message: `See attached keys`, keys: keys });
   } catch (e) {
     // Sentry.captureException(new Error(e));
