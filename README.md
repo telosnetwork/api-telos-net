@@ -2,6 +2,13 @@
 ## Telos Kitchen SMS Account Creator
 Web services for creating free Telos accounts by verifying SMS number.
 
+## TODO
+[ ] Enable Sentry config / move DSN to ENV VARS
+[ ] Enable integration with Google Firebase
+[ ] Enable support for Dapps to fund account creation and service hosting using TLOS 
+[ ] Add additional security, such as JWT
+
+
 ### Step 1: Request Verification
 This request will send an SMS one-time passcode (Telos Enrollment Code) to the SMS number provided. 
 ```
@@ -49,7 +56,8 @@ Account exists:
     "accountName": "teloskitchen",
     "exists": true,
     "success": "true"
-}```
+}
+```
 
 Account does not exist:
 ```
@@ -57,7 +65,8 @@ Account does not exist:
     "accountName": "sdskflsdj",
     "exists": false,
     "success": "true"
-}```
+}
+```
 
 ### Key Pair Generator
 It is recommended that clients use a local library to generate key pairs and pass the public key to one of the services above. However, clients may use a service that we provide. 
@@ -116,12 +125,3 @@ Four keys in ```keys``` array in response:
     "success": "true"
 }
 ```
-
-
-## TODO
-- Enable Sentry config / move DSN to ENV VARS
-- Enable integration with Google Firebase
-- Add service to check if Telos account name is available
-- Enable support for Dapps to fund account creation and service hosting using TLOS 
-- Add additional security, such as JWT
-- Host at custom domain
