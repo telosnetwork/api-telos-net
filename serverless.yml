@@ -82,6 +82,24 @@ functions:
           private: true
           cors: true
 
+  keygen:
+    handler: util.keygen
+    events:
+      - http:
+          path: keygen
+          method: get
+          cors: true
+          private: false
+
+  exists:
+    handler: util.accountExists
+    events:
+      - http:
+          path: exists
+          method: get
+          cors: true
+          private: false
+
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}

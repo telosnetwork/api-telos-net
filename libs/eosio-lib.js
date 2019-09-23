@@ -3,6 +3,7 @@ const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 import { getSecret } from "./auth-lib";
+import ecc from 'eosjs-ecc';
 
 export async function create(accountName, ownerKey, activeKey) {
 
@@ -42,4 +43,23 @@ export async function create(accountName, ownerKey, activeKey) {
   const result = await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
   console.log("EOSLIB-CREATE::CREATE-- Result:", JSON.stringify(result));
   return result;
+}
+
+export async function genRandomKey () {
+  let key = {};
+  ecc.randomKey().then(privateKey => {
+    key.privateKey = privateKey;
+    key.publicKey = ecc.privateToPublic(privateKey);
+    return key;
+  });
+}
+
+export async function accountExists (accountName) {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+  try {
+    await rpc.get_account(accountName);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
