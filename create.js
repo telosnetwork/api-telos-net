@@ -3,11 +3,11 @@ import * as dynamoDbLib from "./libs/dynamodb-lib";
 import * as sendLib from "./libs/send-lib";
 import * as cryptoLib from "./libs/crypto-lib";
 import * as eosioLib from "./libs/eosio-lib";
-// const Sentry = require('@sentry/node');
+import * as Sentry from '@sentry/node'
 
 export async function main(event, context) {
-
-  // Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
   const data = JSON.parse(event.body);
 
@@ -42,8 +42,8 @@ export async function main(event, context) {
 
     return success({ message: `Telos account ${accountRecord.eosioAccount} created.`, result: result });
   } catch (e) {
-    // Sentry.captureException(new Error(e));
-    // await Sentry.flush();
+    Sentry.captureException(e);
+    await Sentry.flush(2500);
     return failure({ message: e.message });
   }
 }

@@ -2,12 +2,13 @@ import { success, failure } from './libs/response-lib';
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import * as sendLib from "./libs/send-lib";
 import * as cryptoLib from "./libs/crypto-lib";
-// import * as Sentry from '@sentry/node';
+import * as Sentry from '@sentry/node'
 
 const CURRENT_VERSION = "v0.1";
 
 export async function main(event, context) {
-  // Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
   const data = JSON.parse(event.body);
 
@@ -43,8 +44,8 @@ export async function main(event, context) {
 
     return success({ status: true, message: `SMS sent successfully - please locate your enrollment code there to proceed. SID: ${msg.sid}` });
   } catch (e) {
-    // Sentry.captureException(new Error(e));
-    // await Sentry.flush();
+    Sentry.captureException(e);
+    await Sentry.flush(2500);
     return failure({ message: e.message });
   }
 }
