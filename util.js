@@ -32,18 +32,18 @@ export async function checkAccount(event, context) {
 
   try {
     if (!event.queryStringParameters.eosioAccount) {
-      return respond(400, { message: "accountName query string parameters is required"});
+      return respond(400, { message: "eosioAccount query string parameters is required"});
     }
 
     if (!await eosioLib.validAccountFormat(event.queryStringParameters.eosioAccount)) {
-      return respond(400, { message: `Requested Telos account name (${event.queryStringParameters.eosioAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+      return respond(400, { message: `Requested Telos account name ${event.queryStringParameters.eosioAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
     }
 
-    if (!await eosioLib.accountExists(event.queryStringParameters.eosioAccount)) {
-      return respond(400, { message: `Requested Telos account name (${event.queryStringParameters.eosioAccount} already exists.`});
+    if (await eosioLib.accountExists(event.queryStringParameters.eosioAccount)) {
+      return respond(400, { message: `Requested Telos account name ${event.queryStringParameters.eosioAccount} already exists.`});
     }
    
-    return respond(200, { message: `Requested Telos account name (${event.queryStringParameters.eosioAccount} is valid and available.`});
+    return respond(200, { message: `Requested Telos account name ${event.queryStringParameters.eosioAccount} is valid and available.`});
   } catch (e) {
     Sentry.captureException(e);
     await Sentry.flush(2500);

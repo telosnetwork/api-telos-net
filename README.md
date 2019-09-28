@@ -2,6 +2,17 @@
 # Telos Kitchen SMS Account Creator
 Web services for creating free Telos accounts by verifying SMS number.
 
+## Features
+- Creates free account for user after verifying SMS
+- Hashes SMS number to prevent repeat account creation
+- Protects privacy by not saving SMS number or putting SMS hash on chain
+- Detects if SMS number is VOIP and responds with error
+- Allows client to set both ```active``` and ```owner``` keys
+- If requested, can generate keys during creation step or as a separate service (see security note below)
+- If requested, can send the private key generated to the user via SMS as a backup (see security note below)
+- Utility service can be used to check account name format and availability
+- Complete and operational test environment connected to Telos Testnet
+
 ### TODO
 - [ ] Enable integration with Google Firebase
 - [ ] Enable support for Dapps to fund account creation and service hosting using TLOS 
@@ -64,7 +75,7 @@ The client may also request that the ```private key``` that is generated be sent
 *NOTE: The recommended approach is to generate the key pair on the client and only send the public keys to the service. However, we have provided this feature as a convenience to be used in certain situations. The private key is not saved in the telos-account-creator backend database. That said, it is possible that the private key could be sniffed from the HTTP packets or logged somewhere during processing or in transit. SMS messages are not secure. It is likely that the content of the message is logged by our SMS service provider (Twilio, Firebase, etc) and also by the users' carrier. Use at your own risk. We accept no responsibility for the security of the accounts created using service.*
 
 ## Utilities
-### Account Exists Checker
+### Account Checker
 Clients can use this web service to check if Telos accounts exist or not. This endpoint does not require the API key. 
 
 ```
@@ -164,3 +175,12 @@ curl -X POST \
 	"smsNumber": "<smsNumber>"
 }  '
 ```
+
+## Issues / Questions
+Please create Gitlab issue.
+
+## Contributing
+Please submit pull request.
+
+## Appreciation
+To show appreciation, please vote for Telos Kitchen for Block Producer, and/or you may send token contributions to Telos account ```teloskitchen``` to support hosting and SMS expenses of this service.
