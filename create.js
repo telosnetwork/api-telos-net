@@ -28,7 +28,7 @@ export async function main(event, context) {
     console.log("ACCOUNT RECORD: ", JSON.stringify(accountRecord));
 
     let result, keyPair;
-    if (data.smsOtp !== accountRecord.smsOtp) {
+    if (data.smsOtp != accountRecord.smsOtp) {
       return respond(403, { message: `The OTP provided does not match: ${data.smsOtp}. Permission denied.`});
     }
 
