@@ -11,9 +11,6 @@ export async function main(event, context) {
   Sentry.init({ dsn: process.env.sentryDsn });
   Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
-  const envvars = JSON.stringify(process.env);
-  console.log ("REGISTER::ENVVARS:: ", envvars);
-
   const data = JSON.parse(event.body);
 
   if (!data.smsNumber) {

@@ -1,5 +1,6 @@
 import * as eosioLib from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
+import * as Sentry from '@sentry/node';
 
 export async function keygen(event, context) {
   Sentry.init({ dsn: process.env.sentryDsn });
