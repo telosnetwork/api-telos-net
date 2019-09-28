@@ -1,9 +1,9 @@
 import * as eosioLib from "./libs/eosio-lib";
-import { success, failure } from './libs/response-lib';
+import { respond } from './libs/response-lib';
 
 export async function keygen(event, context) {
-  // Sentry.init({ dsn: process.env.sentryDsn });
-
+  Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
   try {
 
     let numKeys = 2;
@@ -12,30 +12,55 @@ export async function keygen(event, context) {
     }
 
     let keys = await eosioLib.genRandomKeys(numKeys);
-    return success({ message: `See attached keys`, keys: keys });
+    return respond(200, { message: `See attached keys`, keys: keys });
   } catch (e) {
-    // Sentry.captureException(new Error(e));
-    // await Sentry.flush();
-    return failure({ message: e.message });
+    Sentry.captureException(e);
+    await Sentry.flush(2500);
+    return respond(500, { message: e.message });
   }
 }
 
 
 export async function accountExists(event, context) {
-  // Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
   try {
     if (!event.queryStringParameters.accountName) {
-      return failure({ message: "accountName query string parameters is required"});
+      return respond(400, { message: "accountName query string parameters is required"});
     }
 
     const exists = await eosioLib.accountExists (event.queryStringParameters.accountName);
     
-    return success({ accountName: event.queryStringParameters.accountName, exists: exists });
+    return respond(200, { accountName: event.queryStringParameters.accountName, exists: exists });
   } catch (e) {
-    // Sentry.captureException(new Error(e));
-    // await Sentry.flush();
-    return failure({ message: e.message });
+    Sentry.captureException(e);
+    await Sentry.flush(2500);
+    return respond(500, { message: e.message });
   }
 }
-  
+
+
+export async function deleteRecord(event, context) {
+  Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
+
+  try {
+    if (!process.env.allowDeleteNumber || process.env.allowDeleteNumber !== "Y") {
+      return respond(403, { message: "Deleting records is not allowed in this environment."});
+    }
+
+    if (!data.smsNumber) {
+      return respond(400, { message: "smsNumber is required"});
+    }
+    const smsNumber = await sendLib.cleanNumberFormat(data.smsNumber);
+    const smsHash = await cryptoLib.hash(smsNumber);
+    await dynamoDbLib.deleteAccount (smsHash);
+
+    return respond(200, { message: `Record matching ${data.smsNumber} has been removed.` });
+  } catch (e) {
+    Sentry.captureException(e);
+    await Sentry.flush(2500);
+    return respond(500, { message: e.message });
+  }
+}

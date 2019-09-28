@@ -100,6 +100,15 @@ functions:
           cors: true
           private: false
 
+  delete:
+    handler: util.deleteRecord
+    events:
+      - http:
+          path: delete
+          method: post
+          cors: true
+          private: true
+
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}
