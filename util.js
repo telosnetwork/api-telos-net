@@ -47,6 +47,8 @@ export async function deleteRecord(event, context) {
   Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
   try {
+    const data = JSON.parse(event.body);
+
     if (!process.env.allowDeleteNumber || process.env.allowDeleteNumber !== "Y") {
       return respond(403, { message: "Deleting records is not allowed in this environment."});
     }
