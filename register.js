@@ -4,6 +4,7 @@ import * as sendLib from "./libs/send-lib";
 import * as cryptoLib from "./libs/crypto-lib";
 import * as Sentry from '@sentry/node'
 import { VoipError } from './libs/voip-error';
+import * as eosioLib from "./libs/eosio-lib";
 
 const CURRENT_VERSION = "v0.1";
 
@@ -37,7 +38,16 @@ export async function main(event, context) {
     record.smsSid = msg.sid;
     record.version = CURRENT_VERSION;
 
-    if (data.eosioAccount) { record.eosioAccount = data.eosioAccount; }
+    if (data.eosioAccount) { 
+      if (!await eosioLib.validAccountFormat(data.eosioAccount)) {
+        return respond(400, { message: `Requested Telos account name (${data.eosioAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+      }
+      if (!await eosioLib.accountExists(data.eosioAccount)) {
+        return respond(400, { message: `Requested Telos account name (${data.eosioAccount} already exists.`});
+      }
+      record.eosioAccount = data.eosioAccount; 
+    }
+    
     if (data.activeKey) { record.activeKey = data.activeKey; }
     if (data.ownerKey) { record.ownerKey = data.ownerKey; }
 

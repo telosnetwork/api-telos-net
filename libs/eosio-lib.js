@@ -70,3 +70,14 @@ export async function accountExists (accountName) {
     return false;
   }
 }
+
+
+
+export async function validAccountFormat (accountName) {
+
+  var eosioAccountRegex = RegExp("^([a-z]|[1-5]|[\.]){1,12}$", "g"); // does it match EOSIO account format?
+  if (!eosioAccountRegex.test(accountName)) {
+    return false;
+  }
+  return true;
+}
