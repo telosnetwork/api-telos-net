@@ -9,6 +9,10 @@ export function failure(body) {
   return buildResponse(500, body);
 }
 
+export function respond (httpCode, body) {
+  return buildResponse(httpCode, body);
+}
+
 function buildResponse(statusCode, body) {
   return {
     statusCode: statusCode,

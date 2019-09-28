@@ -1,8 +1,9 @@
-import { success, failure } from './libs/response-lib';
+import { respond } from './libs/response-lib';
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import * as sendLib from "./libs/send-lib";
 import * as cryptoLib from "./libs/crypto-lib";
 import * as Sentry from '@sentry/node'
+import { VoipError } from './libs/voip-error';
 
 const CURRENT_VERSION = "v0.1";
 
@@ -10,10 +11,13 @@ export async function main(event, context) {
   Sentry.init({ dsn: process.env.sentryDsn });
   Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
+  const envvars = JSON.stringify(process.env);
+  console.log ("REGISTER::ENVVARS:: ", envvars);
+
   const data = JSON.parse(event.body);
 
   if (!data.smsNumber) {
-    return failure({ message: "smsNumber is required"});
+    return respond(400, { message: "smsNumber is required"});
   }
 
   try {
@@ -24,7 +28,7 @@ export async function main(event, context) {
     if (await dynamoDbLib.exists(smsHash)) {
       record = await dynamoDbLib.getBySmsHash (smsHash);
       if (record.accountCreatedAt > 0) {
-        return failure({ message: `This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`});
+        return respond(403, { message: `This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`});
       }
     }
 
@@ -42,10 +46,13 @@ export async function main(event, context) {
 
     await dynamoDbLib.save(record);
 
-    return success({ status: true, message: `SMS sent successfully - please locate your enrollment code there to proceed. SID: ${msg.sid}` });
+    return respond(200, { message: `SMS sent successfully - please locate your enrollment code there to proceed. SID: ${msg.sid}` });
   } catch (e) {
     Sentry.captureException(e);
     await Sentry.flush(2500);
-    return failure({ message: e.message });
+    if (e instanceof VoipError || e.name === 'VoipError'){
+      return respond(401, { message: e.message });
+    }
+    return respond(500, { message: e.message });
   }
 }
