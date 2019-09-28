@@ -1,6 +1,9 @@
 import * as eosioLib from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
 import * as Sentry from '@sentry/node';
+import * as sendLib from "./libs/send-lib";
+import * as cryptoLib from "./libs/crypto-lib";
+import * as dynamoDbLib from "./libs/dynamodb-lib";
 
 export async function keygen(event, context) {
   Sentry.init({ dsn: process.env.sentryDsn });
