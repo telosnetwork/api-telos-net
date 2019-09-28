@@ -5,6 +5,7 @@ import * as sendLib from "./libs/send-lib";
 import * as cryptoLib from "./libs/crypto-lib";
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 
+
 export async function keygen(event, context) {
   Sentry.init({ dsn: process.env.sentryDsn });
   Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
