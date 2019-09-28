@@ -26,18 +26,24 @@ export async function keygen(event, context) {
 }
 
 
-export async function accountExists(event, context) {
+export async function checkAccount(event, context) {
   Sentry.init({ dsn: process.env.sentryDsn });
   Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
 
   try {
-    if (!event.queryStringParameters.accountName) {
+    if (!event.queryStringParameters.eosioAccount) {
       return respond(400, { message: "accountName query string parameters is required"});
     }
 
-    const exists = await eosioLib.accountExists (event.queryStringParameters.accountName);
-    
-    return respond(200, { accountName: event.queryStringParameters.accountName, exists: exists });
+    if (!await eosioLib.validAccountFormat(event.queryStringParameters.eosioAccount)) {
+      return respond(400, { message: `Requested Telos account name (${event.queryStringParameters.eosioAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+    }
+
+    if (!await eosioLib.accountExists(event.queryStringParameters.eosioAccount)) {
+      return respond(400, { message: `Requested Telos account name (${event.queryStringParameters.eosioAccount} already exists.`});
+    }
+   
+    return respond(200, { message: `Requested Telos account name (${event.queryStringParameters.eosioAccount} is valid and available.`});
   } catch (e) {
     Sentry.captureException(e);
     await Sentry.flush(2500);
