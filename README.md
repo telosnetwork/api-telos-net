@@ -39,7 +39,6 @@ curl -X POST \
 NOTE: The services can receive ```eosioAccount```, ```ownerKey```, and ```activeKey``` as parameters in either request.
 
 ## Utilities
-
 ### Account Exists Checker
 Clients can use this web service to check if Telos accounts exist or not. This endpoint does not require the API key. 
 

@@ -35,7 +35,7 @@ provider:
     - ${self:custom.stage}-telosToolkit
   usagePlan:
     quota:
-      limit: 50
+      limit: 150
       period: DAY
     throttle:
       burstLimit: 20
