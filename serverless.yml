@@ -93,10 +93,10 @@ functions:
           private: false
 
   exists:
-    handler: util.accountExists
+    handler: util.checkAccount
     events:
       - http:
-          path: exists
+          path: check
           method: get
           cors: true
           private: false
