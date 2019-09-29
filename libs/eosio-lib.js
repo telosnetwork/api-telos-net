@@ -73,8 +73,8 @@ export async function accountExists (accountName) {
 
 export async function validAccountFormat (accountName) {
 
-  var eosioAccountRegex = RegExp("^([a-z]|[1-5]|[\.]){1,12}$", "g"); // does it match EOSIO account format?
-  if (!eosioAccountRegex.test(accountName)) {
+  var telosAccountRegex = RegExp("^([a-z]|[1-5]|[\.]){1,12}$", "g"); // does it match EOSIO account format?
+  if (!telosAccountRegex.test(accountName)) {
     return false;
   }
   return true;

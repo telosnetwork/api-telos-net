@@ -51,13 +51,13 @@ curl -X POST \
   -d '{
     "smsNumber": "<smsNumber>",
     "smsOtp": "<telosEnrollmentCode>",
-    "eosioAccount": "<requestedAccountName>",
+    "telosAccount": "<requestedAccountName>",
     "ownerKey": "EOS6YK2nm32KPtojJ8YziNMhU3Tmk3wt3czXTbehtrUyEiyUvub4Y",
     "activeKey": "EOS6YK2nm32KPtojJ8YziNMhU3Tmk3wt3czXTbehtrUyEiyUvub4Y"
 }'
 ```
 
-NOTE: The services can receive ```eosioAccount```, ```ownerKey```, and ```activeKey``` as parameters in either request.
+NOTE: The services can receive ```telosAccount```, ```ownerKey```, and ```activeKey``` as parameters in either request.
 
 #### Optional Parameters
 The ```create``` service also supports generating a key pair directly in the request using the parameter ```generateKeys``` set to a value of ```Y```.  If this parameter is set the keys will be generated and returned using the keyPair attribute in the response. 
@@ -76,30 +76,31 @@ The client may also request that the ```private key``` that is generated be sent
 
 ## Utilities
 ### Account Checker
-Clients can use this web service to check if Telos accounts exist or not. This endpoint does not require the API key. 
+Clients can use this web service to check if requested Telos accounts have the right format and are available. This endpoint does not require the API key. 
 
 ```
 curl \
-https://dev.accounts.telosapi.com/exists\?accountName\=teloskitchen
+https://dev.accounts.telosapi.com/check\?accountName\=invalidname9
 ```
 
-The response contains an attribute for ```exists```, which is either true or false.
-
-Account exists:
+The first check is whether the account is the correct format. Since the name ```invalidname9``` is not valid, the service returns ```HTTP 400``` and the following message.
 ```
 {
-    "accountName": "teloskitchen",
-    "exists": true,
-    "success": "true"
+    "message": "Requested Telos account name invalidname9 is not a valid format. It must match ^([a-z]|[1-5]|[.]){1,12}$"
 }
 ```
 
-Account does not exist:
+If the requested name is the correct format, the service will then check to see if it is available. If it is not available, the service returns ```HTTP 400``` and the following message:
 ```
 {
-    "accountName": "sdskflsdj",
-    "exists": false,
-    "success": "true"
+    "message": "Requested Telos account name teloskitchen already exists."
+}
+```
+
+If both checks pass, the service returns ```HTTP 200``` and the following message.
+```
+{
+    "message": "Requested Telos account name solidaccount is valid and available."
 }
 ```
 

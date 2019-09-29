@@ -38,14 +38,14 @@ export async function main(event, context) {
     record.smsSid = msg.sid;
     record.version = CURRENT_VERSION;
 
-    if (data.eosioAccount) { 
-      if (!await eosioLib.validAccountFormat(data.eosioAccount)) {
-        return respond(400, { message: `Requested Telos account name (${data.eosioAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+    if (data.telosAccount) { 
+      if (!await eosioLib.validAccountFormat(data.telosAccount)) {
+        return respond(400, { message: `Requested Telos account name (${data.telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
       }
-      if (!await eosioLib.accountExists(data.eosioAccount)) {
-        return respond(400, { message: `Requested Telos account name (${data.eosioAccount} already exists.`});
+      if (!await eosioLib.accountExists(data.telosAccount)) {
+        return respond(400, { message: `Requested Telos account name (${data.telosAccount} already exists.`});
       }
-      record.eosioAccount = data.eosioAccount; 
+      record.telosAccount = data.telosAccount; 
     }
     
     if (data.activeKey) { record.activeKey = data.activeKey; }
