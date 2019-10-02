@@ -34,10 +34,10 @@ export async function main(event, context) {
 
     if (data.telosAccount) { 
       if (!await eosioLib.validAccountFormat(data.telosAccount)) {
-        return respond(400, { message: `Requested Telos account name (${data.telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+        return respond(400, { message: `Requested Telos account name (${data.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
       }
-      if (!await eosioLib.accountExists(data.telosAccount)) {
-        return respond(400, { message: `Requested Telos account name (${data.telosAccount} already exists.`});
+      if (await eosioLib.accountExists(data.telosAccount)) {
+        return respond(400, { message: `Requested Telos account name (${data.telosAccount}) already exists.`});
       }
       record.telosAccount = data.telosAccount; 
     }
