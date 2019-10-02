@@ -30,20 +30,12 @@ export async function main(event, context) {
       }
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const msg = await sendLib.sendSMS(smsNumber, otp);
-
-    record.smsHash = smsHash;
-    record.smsOtp = otp;
-    record.smsSid = msg.sid;
-    record.version = CURRENT_VERSION;
-
     if (data.telosAccount) { 
       if (!await eosioLib.validAccountFormat(data.telosAccount)) {
-        return respond(400, { message: `Requested Telos account name (${data.telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+        return respond(400, { message: `Requested Telos account name (${data.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
       }
-      if (!await eosioLib.accountExists(data.telosAccount)) {
-        return respond(400, { message: `Requested Telos account name (${data.telosAccount} already exists.`});
+      if (await eosioLib.accountExists(data.telosAccount)) {
+        return respond(400, { message: `Requested Telos account name (${data.telosAccount}) already exists.`});
       }
       record.telosAccount = data.telosAccount; 
     }
@@ -51,6 +43,14 @@ export async function main(event, context) {
     if (data.activeKey) { record.activeKey = data.activeKey; }
     if (data.ownerKey) { record.ownerKey = data.ownerKey; }
 
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const msg = await sendLib.sendSMS(smsNumber, otp);
+
+    record.smsHash = smsHash;
+    record.smsOtp = otp;
+    record.smsSid = msg.sid;
+    record.version = CURRENT_VERSION;
+    
     await dynamoDbLib.save(record);
 
     return respond(200, { message: `SMS sent successfully - please locate your enrollment code there to proceed. SID: ${msg.sid}` });
