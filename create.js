@@ -39,7 +39,7 @@ export async function main(event, context) {
       if (await eosioLib.accountExists(data.telosAccount)) {
         return respond(400, { message: `Requested Telos account name (${data.telosAccount}) already exists.`});
       }
-      record.telosAccount = data.telosAccount; 
+      accountRecord.telosAccount = data.telosAccount; 
     }
     
     if (data.activeKey) { accountRecord.activeKey = data.activeKey; }
