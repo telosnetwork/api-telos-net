@@ -26,20 +26,50 @@ custom:
     webpackConfig: ./webpack.config.js
     includeModules: true
 
+ apiKeys:
+    - free:
+        - myFreeKey
+        - ${opt:stage}-myFreeKey
+    - paid:
+        - myPaidKey
+        - ${opt:stage}-myPaidKey
+  usagePlan:
+    - free:
+        quota:
+          limit: 5000
+          offset: 2
+          period: MONTH
+        throttle:
+          burstLimit: 200
+          rateLimit: 100
+
 provider:
   name: aws
   runtime: nodejs10.x
   stage: dev
   region: us-east-1
   apiKeys:
-    - ${self:custom.stage}-telosToolkit
+    telosWallet:
+      - telosWallet
+      - ${self:custom.stage}-telosWallet
+    standard:
+      - standardKey
+      - ${self:custom.stage}-standard
   usagePlan:
-    quota:
-      limit: 150
-      period: DAY
-    throttle:
-      burstLimit: 20
-      rateLimit: 10
+    - standard:
+        quota:
+          limit: 150
+          period: DAY
+        throttle:
+          burstLimit: 20
+          rateLimit: 10
+    - telosWallet:
+        quota:
+          limit: 2500
+          period: DAY
+        throttle:
+          burstLimit: 20
+          rateLimit: 10
 
   environment:
     tableName: ${self:custom.tableName}
