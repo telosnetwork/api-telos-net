@@ -26,23 +26,6 @@ custom:
     webpackConfig: ./webpack.config.js
     includeModules: true
 
- apiKeys:
-    - free:
-        - myFreeKey
-        - ${opt:stage}-myFreeKey
-    - paid:
-        - myPaidKey
-        - ${opt:stage}-myPaidKey
-  usagePlan:
-    - free:
-        quota:
-          limit: 5000
-          offset: 2
-          period: MONTH
-        throttle:
-          burstLimit: 200
-          rateLimit: 100
-
 provider:
   name: aws
   runtime: nodejs10.x
