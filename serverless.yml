@@ -32,10 +32,10 @@ provider:
   stage: dev
   region: us-east-1
   apiKeys:
-    telosWallet:
+    - telosWallet:
       - telosWallet
       - ${self:custom.stage}-telosWallet
-    standard:
+    - standard:
       - standardKey
       - ${self:custom.stage}-standard
   usagePlan:
@@ -48,7 +48,7 @@ provider:
           rateLimit: 10
     - telosWallet:
         quota:
-          limit: 2500
+          limit: 1000
           period: DAY
         throttle:
           burstLimit: 20

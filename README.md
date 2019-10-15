@@ -80,7 +80,7 @@ Clients can use this web service to check if requested Telos accounts have the r
 
 ```
 curl \
-https://dev.accounts.telosapi.com/check\?accountName\=invalidname9
+https://dev.accounts.telosapi.com/check\?telosAccount\=invalidname9
 ```
 
 The first check is whether the account is the correct format. Since the name ```invalidname9``` is not valid, the service returns ```HTTP 400``` and the following message.
