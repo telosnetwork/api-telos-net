@@ -60,7 +60,7 @@ export async function genRandomKeys (numKeys = 2) {
 }
 
 export async function accountExists (accountName) {
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint);
   try {
     await rpc.get_account(accountName);
     return true;
