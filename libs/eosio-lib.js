@@ -1,8 +1,9 @@
-const { Api, JsonRpc } = require("eosjs");
+const { Api, JsonRpc, RpcError } = require("eosjs");
 const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig"); 
-// const fetch = require("fetch"); // node only; not needed in browsers
-// const { TextEncoder, TextDecoder } = require("util");
+const fetch = require("node-fetch"); // node only; not needed in browsers
+const { TextEncoder, TextDecoder } = require("util");
 import { getSecret } from "./auth-lib";
+import { generateKeyPair } from "crypto";
 
 export async function create(accountName, ownerKey, activeKey) {
 
@@ -11,13 +12,14 @@ export async function create(accountName, ownerKey, activeKey) {
   const pk = secretStringObj[process.env.tkOracleSecretKey];
 
   const signatureProvider = new JsSignatureProvider([pk]);
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint);
+
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+
   const api = new Api({
     rpc,
-    signatureProvider
-    // ,
-    // textDecoder: new TextDecoder(),
-    // textEncoder: new TextEncoder()
+    signatureProvider,
+    textDecoder: new TextDecoder(),
+    textEncoder: new TextEncoder()
   });
 
   const actions = [
@@ -60,7 +62,7 @@ export async function genRandomKeys (numKeys = 2) {
 }
 
 export async function accountExists (accountName) {
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint);
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
   try {
     await rpc.get_account(accountName);
     return true;
