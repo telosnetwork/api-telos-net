@@ -26,6 +26,9 @@ export async function main(event, context) {
 
     const accountRecord = await dynamoDbLib.getBySmsHash (smsHash);
     console.log("ACCOUNT RECORD: ", JSON.stringify(accountRecord));
+    if (accountRecord.accountCreatedAt > 0) {
+      return respond(403, { message: `This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`});
+    }
 
     let result, keyPair;
     if (data.smsOtp != accountRecord.smsOtp) {
