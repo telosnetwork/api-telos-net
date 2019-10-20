@@ -74,3 +74,31 @@ export async function deleteRecord(event, context) {
     return respond(500, { message: e.message });
   }
 }
+
+
+export async function checkAccount2(event, context) {
+  Sentry.init({ dsn: process.env.sentryDsn });
+  Sentry.configureScope(scope => scope.setExtra('Request Body', event.body));
+
+  try {
+    let telosAccount = event.pathParameters.telosAccount;
+
+    if (!telosAccount) {
+      return respond(400, { message: "telosAccount path parameter is required"});
+    }
+
+    if (!await eosioLib.validAccountFormat(telosAccount)) {
+      return respond(400, { message: `Requested Telos account name ${telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`});
+    }
+
+    if (await eosioLib.accountExists(telosAccount)) {
+      return respond(200, { message: `Requested Telos account name ${telosAccount} already exists.`});
+    }
+   
+    return respond(404, { message: `Requested Telos account name ${telosAccount} is valid and available.`});
+  } catch (e) {
+    Sentry.captureException(e);
+    await Sentry.flush(2500);
+    return respond(500, { message: e.message });
+  }
+}

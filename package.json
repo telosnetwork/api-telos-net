@@ -1,23 +1,20 @@
 {
   "name": "telos-account-creator-services",
-  "version": "1.1.0",
-  "description": "A Node.js starter for the Serverless Framework with async/await and unit test support",
-  "main": "handler.js",
+  "version": "0.0.1",
+  "description": "Backend services for Telos account creator",
+  "main": "",
   "scripts": {
     "test": "serverless-bundle test"
   },
-  "author": "",
+  "author": "Telos Kitchen",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AnomalyInnovations/serverless-nodejs-starter.git"
+    "url": "https://gitlab.com/telos-kitchen/telos-account-creator-services.git"
   },
   "devDependencies": {
-    "serverless-bundle": "^1.2.2",
-    "serverless-offline": "^5.3.3",
-    "serverless-webpack": "^5.3.1",
-    "webpack": "^4.40.2",
-    "webpack-node-externals": "^1.7.2"
+    "serverless-bundle": "^1.2.5",
+    "serverless-offline": "^5.3.3"
   },
   "dependencies": {
     "@sentry/node": "^5.6.2",
