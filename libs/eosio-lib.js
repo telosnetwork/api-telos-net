@@ -12,6 +12,8 @@ export async function create(accountName, ownerKey, activeKey) {
   const pk = secretStringObj[process.env.tkOracleSecretKey];
 
   const signatureProvider = new JsSignatureProvider([pk]);
+  console.log (process.env.eosioApiEndPoint);
+  console.log (pk);
 
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
 
