@@ -31,16 +31,6 @@ provider:
   runtime: nodejs10.x
   stage: dev
   region: us-east-1
-  apiKeys:
-    - ${self:custom.stage}-standard
-    - ${self:custom.stage}-telosWallet
-  usagePlan:
-    quota:
-      limit: 1500
-      period: DAY
-    throttle:
-      burstLimit: 200
-      rateLimit: 100
 
   environment:
     tableName: ${self:custom.tableName}
@@ -70,75 +60,46 @@ functions:
     handler: register.main
     events:
       - http:
-          path: register
-          method: post
-          private: true
-          cors: true
-      - http:
           path: v1/registrations
           method: post
-          private: true
+          private: false
           cors: true
 
   create:
     handler: create.main
     events: 
       - http:
-          path: create
-          method: post
-          private: true
-          cors: true
-      - http:
           path: v1/accounts
           method: post
-          private: true
+          private: false
           cors: true
 
   keygen:
     handler: util.keygen
     events:
       - http:
-          path: keygen
-          method: get
-          cors: true
-          private: true
-      - http:
           path: v1/keys
           method: get
           cors: true
-          private: true
+          private: false
 
   exists:
-    handler: util.checkAccount
-    events:
-      - http:
-          path: check
-          method: get
-          cors: true
-          private: true
-
-  exists2:
     handler: util.checkAccount2
     events:
       - http:
           path: v1/accounts/{telosAccount}
           method: get
           cors: true
-          private: true
+          private: false
   
   delete:
     handler: util.deleteRecord
     events:
       - http:
-          path: delete
-          method: post
-          cors: true
-          private: true
-      - http:
           path: v1/registrations
           method: delete
           cors: true
-          private: true
+          private: false
 
 resources:
   # API Gateway Errors
