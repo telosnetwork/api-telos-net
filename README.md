@@ -34,8 +34,7 @@ Once you have completed integration testing, you may apply for a production API 
 This request will send an SMS one-time passcode (Telos Enrollment Code) to the SMS number provided. 
 ```
 curl -X POST \
-  https://dev.accounts.telosapi.com/register \
-  -H 'x-api-key: ABK19jhYsW12Wny6LglV895szlG2QtOHang93J1T' \
+  https://bqmc4sh9fe.execute-api.us-east-1.amazonaws.com/dev/register \
   -d '{
 	"smsNumber": "<smsNumber>"
 }  '
@@ -46,8 +45,7 @@ This request confirms the enrollment code and creates the account based on the a
 
 ```
 curl -X POST \
-  https://dev.accounts.telosapi.com/create \
-  -H 'x-api-key: ABK19jhYsW12Wny6LglV895szlG2QtOHang93J1T' \
+  https://bqmc4sh9fe.execute-api.us-east-1.amazonaws.com/dev/create \
   -d '{
     "smsNumber": "<smsNumber>",
     "smsOtp": "<telosEnrollmentCode>",
@@ -70,7 +68,7 @@ The ```create``` service also supports generating a key pair directly in the req
 }
 ```
 
-The client may also request that the ```private key``` that is generated be sent to the user via SMS by setting the ```sendPrivateKeyViaSms``` paramter to ```Y```.
+The client may also request that the ```private key``` that is generated be sent to the user via SMS by setting the ```sendPrivateKeyViaSms``` parameter to ```Y```.
 
 *NOTE: The recommended approach is to generate the key pair on the client and only send the public keys to the service. However, we have provided this feature as a convenience to be used in certain situations. The private key is not saved in the telos-account-creator backend database. That said, it is possible that the private key could be sniffed from the HTTP packets or logged somewhere during processing or in transit. SMS messages are not secure. It is likely that the content of the message is logged by our SMS service provider (Twilio, Firebase, etc) and also by the users' carrier. Use at your own risk. We accept no responsibility for the security of the accounts created using service.*
 
@@ -80,7 +78,7 @@ Clients can use this web service to check if requested Telos accounts have the r
 
 ```
 curl \
-https://dev.accounts.telosapi.com/check\?telosAccount\=invalidname9
+https://bqmc4sh9fe.execute-api.us-east-1.amazonaws.com/dev/check\?telosAccount\=invalidname9
 ```
 
 The first check is whether the account is the correct format. Since the name ```invalidname9``` is not valid, the service returns ```HTTP 400``` and the following message.
@@ -108,7 +106,7 @@ If both checks pass, the service returns ```HTTP 200``` and the following messag
 It is recommended that clients use a local library to generate key pairs and pass the public key to one of the services above. However, clients may use a service that we provide. 
 
 ```
-curl https://dev.accounts.telosapi.com/keygen
+curl https://bqmc4sh9fe.execute-api.us-east-1.amazonaws.com/dev/keygen
 ```
 
 Reponse: 
@@ -133,7 +131,7 @@ Reponse:
 The default number of keys to generate is two (2).  A client can pass an optional query string parameter ```numKeys``` to generate more or less.
 
 ```
-curl https://dev.accounts.telosapi.com/keygen\?numKeys\=4
+curl https://bqmc4sh9fe.execute-api.us-east-1.amazonaws.com/dev/keygen\?numKeys\=4
 ```
 
 Four keys in ```keys``` array in response:
@@ -170,8 +168,7 @@ However, during testing, developers will obviously want to use their number mult
 You may delete an SMS number from the used hash table like this: 
 ```
 curl -X POST \
-  https://dev.accounts.telosapi.com/delete \
-  -H 'x-api-key: ABK19jhYsW12Wny6LglV895szlG2QtOHang93J1T' \
+  https://bqmc4sh9fe.execute-api.us-east-1.amazonaws.com/dev/delete \
   -d '{
 	"smsNumber": "<smsNumber>"
 }  '
