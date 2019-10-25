@@ -101,6 +101,15 @@ functions:
           cors: true
           private: false
 
+  circulatingSupply:
+    handler: chaininfo.circulatingSupply
+    events:
+      - http:
+          path: v1/supply/circulating
+          method: get
+          private: false
+          cors: true
+
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}

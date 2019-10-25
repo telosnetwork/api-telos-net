@@ -74,10 +74,29 @@ export async function accountExists (accountName) {
 }
 
 export async function validAccountFormat (accountName) {
-
   var telosAccountRegex = RegExp("^([a-z]|[1-5]|[\.]){1,12}$", "g"); // does it match EOSIO account format?
   if (!telosAccountRegex.test(accountName)) {
     return false;
   }
   return true;
+}
+
+export async function getCurrencyBalance (accountName, code = "eosio.token", symbol = "1.0000 TLOS") {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+  let balanceResponse = await rpc.get_account(accountName);
+  return balanceResponse.hasOwnProperty('core_liquid_balance') ?
+     balanceResponse.core_liquid_balance.split(' ')[0] :
+     '0';
+}
+
+export async function getCurrencyStats (code = "eosio.token", symbol = "1.0000 TLOS") {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+  let symbolName = symbol.split(" ")[1];
+  let statRow = await rpc.get_table_rows({
+    json: true,
+    code: code,
+    scope: symbolName,
+    table: 'stat'
+  });
+  return statRow.rows[0];
 }
