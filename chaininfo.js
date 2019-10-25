@@ -30,5 +30,5 @@ export async function circulatingSupply(event, context) {
     }
 
     console.log('supply: ' + supply + ' was ' + stats.supply);
-    respond(200, supply);
+    return respond(200, supply);
 }
