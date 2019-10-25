@@ -83,10 +83,14 @@ export async function validAccountFormat (accountName) {
 
 export async function getCurrencyBalance (accountName, code = "eosio.token", symbol = "1.0000 TLOS") {
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+  try {
   let balanceResponse = await rpc.get_account(accountName);
   return balanceResponse.hasOwnProperty('core_liquid_balance') ?
      balanceResponse.core_liquid_balance.split(' ')[0] :
      '0';
+  } catch (e) {
+    return '0';
+  }
 }
 
 export async function getCurrencyStats (code = "eosio.token", symbol = "1.0000 TLOS") {
