@@ -36,5 +36,5 @@ export async function circulatingSupply(event, context) {
 export async function totalSupply(event, context) {
     const stats = await getCurrencyStats();
     console.log('total supply from stats: ' + stats.supply);
-    return respond(200, stats.supply.split(' ')[0]);
+    return respond(200, parseFloat(stats.supply, 10));
 }
