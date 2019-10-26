@@ -110,6 +110,15 @@ functions:
           private: false
           cors: true
 
+  totalSupply:
+    handler: chaininfo.totalSupply
+    events:
+      - http:
+          path: v1/supply/total
+          method: get
+          private: false
+          cors: true
+
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}
