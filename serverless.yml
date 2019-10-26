@@ -1,5 +1,5 @@
 # NOTE: update this with your service name
-service: telos-account-creator-services
+service: api-telos-net
 
 # Create an optimized package for our functions 
 package:

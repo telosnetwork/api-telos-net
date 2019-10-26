@@ -1,7 +1,7 @@
 {
-  "name": "telos-account-creator-services",
+  "name": "api-telos-net",
   "version": "0.0.1",
-  "description": "Backend services for Telos account creator",
+  "description": "Backend services running at api.telos.net",
   "main": "",
   "scripts": {
     "test": "serverless-bundle test"
@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/telos-kitchen/telos-account-creator-services.git"
+    "url": "https://gitlab.com/telos-kitchen/api-telos-net.git"
   },
   "devDependencies": {
     "serverless-bundle": "^1.2.2",
