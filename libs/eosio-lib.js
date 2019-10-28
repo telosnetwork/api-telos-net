@@ -7,9 +7,9 @@ import { generateKeyPair } from "crypto";
 
 export async function create(accountName, ownerKey, activeKey) {
 
-  const secret = await getSecret(process.env.tkOracleSecretKey);
+  const secret = await getSecret(process.env.accountCreatorKey);
   var secretStringObj = JSON.parse(secret.SecretString);
-  const pk = secretStringObj[process.env.tkOracleSecretKey];
+  const pk = secretStringObj[process.env.accountCreatorKey];
 
   const signatureProvider = new JsSignatureProvider([pk]);
   console.log (process.env.eosioApiEndPoint);
@@ -26,11 +26,11 @@ export async function create(accountName, ownerKey, activeKey) {
 
   const actions = [
     {
-      account: process.env.tkAccountCreator,
+      account: process.env.accountCreatorAccount,
       name: "create",
       authorization: [
         {
-          actor: process.env.tkOracle,
+          actor: process.env.accountCreatorContract,
           permission: "active"
         }
       ],
