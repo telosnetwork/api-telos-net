@@ -116,7 +116,7 @@ function getRPC() {
 }
 
 function getApi(privateKey) {
-    const signatureProvider = new JsSignatureProvider([pk]);
+    const signatureProvider = new JsSignatureProvider([privateKey]);
     const rpc = getRPC();
 
     return new Api({
