@@ -26,5 +26,5 @@ export async function autorotate(event, context) {
 }
 
 export async function getRotationSchedule(event, context) {
-    return respond(200, {schedule: await getLastVoted()});
+    return respond(200, {schedule: JSON.parse(await getLastVoted())});
 }
