@@ -28,7 +28,7 @@ export async function getLastVoted() {
         return "[]";
     }
 
-    return request.Item.rotationSchedule;
+    return result.Item.rotationSchedule;
 }
 
 async function setLastVoted(rotationSchedule) {
