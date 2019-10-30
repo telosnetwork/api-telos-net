@@ -15,7 +15,7 @@ export async function account(event, context) {
         let result = await create(data.accountName, data.ownerKey, data.activeKey);
         return respond(200, { result: result });
     } catch (e) {
-        return respond(200, { message: e.message });
+        return respond(400, { message: e.message });
     }
 }
 

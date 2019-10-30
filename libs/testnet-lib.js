@@ -47,6 +47,7 @@ export async function faucet(accountName) {
 }
 
 export async function create(accountName, ownerKey, activeKey) {
+    console.log(`Creating testnet account with name ${accountName} and keys ${ownerKey} ${activeKey}`);
     const pk = getKeyBySecretName(process.env.testnetFaucetKey);
     const api = getApi(pk);
     const faucetAccount = process.env.testnetFaucetAccount;
