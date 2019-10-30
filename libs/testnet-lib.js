@@ -58,6 +58,10 @@ export async function rotate(accountName) {
         
     let lastVotedString = await getLastVoted();
     let lastVoted = JSON.parse(lastVotedString);
+
+    if (accountName && lastVoted.indexOf(accountName) < 21)
+        return {success: false, message: `Cannot rotate ${accountName} in to the schedule, they are already active`};
+
     let mergedList = [];
     let newBps = [];
     // first find a list of new BPs
