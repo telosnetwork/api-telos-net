@@ -1,0 +1,33 @@
+Resources:
+  TestnetRotationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.testnetRotationTableName}
+      AttributeDefinitions:
+        - AttributeName: tableKey
+          AttributeType: S
+        - AttributeName: rotationSchedule
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tableKey
+          KeyType: S
+      # Set the capacity based on the stage
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.testnetRotationTableThroughput}
+        WriteCapacityUnits: ${self:custom.testnetRotationTableThroughput}
+  TestnetFaucetHistory:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.testnetFaucetTableName} 
+      AttributeDefinitions:
+        - AttributeName: accountName
+          AttributeType: S
+        - AttributeName: history
+          AttributeType: S
+      KeySchema:
+        - AttributeName: accountName
+          KeyType: S
+      # Set the capacity based on the stage
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.testnetFaucetTableThroughput}
+        WriteCapacityUnits: ${self:custom.testnetFaucetTableThroughput}

@@ -22,6 +22,10 @@ custom:
     prod: 5
     default: 1
   tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
+  testnetRotationTableName: testnet-rotation
+  testnetFaucetTableName: testnet-faucet-history
+  testnetRotationTableThroughput: 5
+  testnetFaucetTableThroughput: 5
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
@@ -34,6 +38,8 @@ provider:
 
   environment:
     tableName: ${self:custom.tableName}
+    testnetFaucetTableName: ${self:custom.testnetFaucetTableName}
+    testnetRotationTableName: ${self:custom.testnetRotationTableName}
 
   # 'iamRoleStatements' defines the permission policy for the Lambda function.
   # In this case Lambda functions are granted with permissions to access DynamoDB.
@@ -115,6 +121,33 @@ functions:
     events:
       - http:
           path: v1/supply/total
+          method: get
+          private: false
+          cors: true
+  
+  getTestnetRotation:
+    handler: testnet.getRotationSchedule
+    events:
+      - http:
+          path: v1/testnet/rotation_schedule
+          method: get
+          private: false
+          cors: true
+
+  rotateTestnet:
+    handler: testnet.rotate
+    events:
+      - http:
+          path: v1/testnet/rotate
+          method: get
+          private: false
+          cors: true
+
+  addToRotation:
+    handler: testnet.addToRotation
+    events:
+      - http:
+          path: v1/testnet/produce/{bpAccount}
           method: get
           private: false
           cors: true
