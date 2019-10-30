@@ -8,7 +8,7 @@ Resources:
           AttributeType: S
       KeySchema:
         - AttributeName: tableKey
-          KeyType: S
+          KeyType: HASH
       # Set the capacity based on the stage
       ProvisionedThroughput:
         ReadCapacityUnits: ${self:custom.testnetRotationTableThroughput}
@@ -22,7 +22,7 @@ Resources:
           AttributeType: S
       KeySchema:
         - AttributeName: accountName
-          KeyType: S
+          KeyType: HASH
       # Set the capacity based on the stage
       ProvisionedThroughput:
         ReadCapacityUnits: ${self:custom.testnetFaucetTableThroughput}
