@@ -21,7 +21,7 @@ export async function addToRotation(event, context) {
         return respond(400, {message: rotationResult.message});
 }
 
-export async function rotate(event, context) {
+export async function autorotate(event, context) {
     return respond(200, await rotate());
 }
 

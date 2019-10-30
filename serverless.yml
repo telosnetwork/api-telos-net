@@ -135,7 +135,7 @@ functions:
           cors: true
 
   rotateTestnet:
-    handler: testnet.rotate
+    handler: testnet.autorotate
     events:
       - http:
           path: v1/testnet/rotate
