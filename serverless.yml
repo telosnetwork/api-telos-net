@@ -159,3 +159,4 @@ resources:
   - ${file(resources/api-gateway-errors.yml)}
   # DynamoDB
   - ${file(resources/dynamodb-table.yml)}
+  - ${file(resources/dynamodb-testnet-tables.yml)}
