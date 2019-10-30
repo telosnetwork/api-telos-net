@@ -53,7 +53,9 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - "Fn::GetAtt": [ AccountsTable, TestnetRotationTable, TestnetFaucetTable, Arn ]
+        - "Fn::GetAtt": [ AccountsTable, Arn ]
+        - "Fn::GetAtt": [ TestnetRotationTable, Arn ]
+        - "Fn::GetAtt": [ TestnetFaucetTable, Arn ]
     - Effect: Allow
       Action:
         - secretsmanager:Describe*
