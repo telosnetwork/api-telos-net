@@ -6,8 +6,6 @@ Resources:
       AttributeDefinitions:
         - AttributeName: tableKey
           AttributeType: S
-        - AttributeName: rotationSchedule
-          AttributeType: S
       KeySchema:
         - AttributeName: tableKey
           KeyType: S
@@ -21,8 +19,6 @@ Resources:
       TableName: ${self:custom.testnetFaucetTableName} 
       AttributeDefinitions:
         - AttributeName: accountName
-          AttributeType: S
-        - AttributeName: history
           AttributeType: S
       KeySchema:
         - AttributeName: accountName
