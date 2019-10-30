@@ -154,6 +154,15 @@ functions:
           private: false
           cors: true
 
+  testnetCreate:
+    handler: testnet.account
+    events: 
+      - http:
+          path: v1/testnet/account
+          method: post
+          private: false
+          cors: true
+
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}
