@@ -15,7 +15,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: ${self:custom.testnetRotationTableThroughput}
         WriteCapacityUnits: ${self:custom.testnetRotationTableThroughput}
-  TestnetFaucetHistory:
+  TestnetFaucetTable:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: ${self:custom.testnetFaucetTableName} 

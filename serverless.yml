@@ -23,7 +23,7 @@ custom:
     default: 1
   tableThroughput: ${self:custom.tableThroughputs.${self:custom.stage}, self:custom.tableThroughputs.default}
   testnetRotationTableName: testnet-rotation
-  testnetFaucetTableName: testnet-faucet-history
+  testnetFaucetTableName: testnet-faucet
   testnetRotationTableThroughput: 5
   testnetFaucetTableThroughput: 5
   webpack:
@@ -53,7 +53,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - "Fn::GetAtt": [ AccountsTable, Arn ]
+        - "Fn::GetAtt": [ AccountsTable, TestnetRotationTable, TestnetFaucetTable, Arn ]
     - Effect: Allow
       Action:
         - secretsmanager:Describe*
