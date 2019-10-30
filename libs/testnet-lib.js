@@ -32,11 +32,10 @@ export async function getLastVoted() {
 }
 
 async function setLastVoted(rotationSchedule) {
-    record.updatedAt = Date.now();
-
     await call("put", {
         TableName: process.env.testnetRotationTableName,
         Item: {
+            updatedAt: Date.now(),
             tableKey: rotationTableKey,
             rotationSchedule: rotationSchedule
         }
