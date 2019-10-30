@@ -47,20 +47,96 @@ export async function faucet(accountName) {
 }
 
 export async function create(accountName, ownerKey, activeKey) {
+    const pk = getKeyBySecretName(process.env.testnetFaucetKey);
+    const api = getApi(pk);
+    const faucetAccount = process.env.testnetFaucetAccount;
 
+    const actions = [{
+        account: 'eosio',
+        name: 'newaccount',
+        authorization: [{
+            actor: faucetAccount,
+            permission: 'active',
+        }],
+        data: {
+            creator: faucetAccount,
+            name: accountName,
+            owner: {
+                threshold: 1,
+                keys: [{
+                    key: ownerKey,
+                    weight: 1
+                }],
+                accounts: [],
+                waits: []
+            },
+            active: {
+                threshold: 1,
+                keys: [{
+                    key: activeKey,
+                    weight: 1
+                }],
+                accounts: [],
+                waits: []
+            },
+        },
+    }, {
+        account: 'eosio',
+        name: 'buyrambytes',
+        authorization: [{
+            actor: faucetAccount,
+            permission: 'active',
+        }],
+        data: {
+            payer: faucetAccount,
+            receiver: accountName,
+            bytes: 128000,
+        },
+    }, {
+        account: 'eosio',
+        name: 'delegatebw',
+        authorization: [{
+            actor: faucetAccount,
+            permission: 'active',
+        }],
+        data: {
+            from: faucetAccount,
+            receiver: accountName,
+            stake_net_quantity: '20.0000 TLOS',
+            stake_cpu_quantity: '20.0000 TLOS',
+            transfer: true,
+        }
+    },{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+            actor: faucetAccount,
+            permission: 'active',
+        }],
+        data: {
+            from: faucetAccount,
+            to: accountName,
+            quantity: '1000.0000 TLOS',
+            memo: 'Testnet account creation'
+        }
+    }];
+    console.log("TESTNET-CREATE::CREATE-- Actions: ", JSON.stringify(actions));
+    const result = await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
+    console.log("TESTNET-CREATE::CREATE-- Result:", JSON.stringify(result));
+    return result;
 }
 
 export async function rotate(accountName) {
     let currentProducers = await getProducers();
     console.log(`Current producers: ${currentProducers}`);
     if (accountName && currentProducers.indexOf(accountName) < 0)
-        return {success: false, message: `Cannot rotate ${accountName} in to the schedule, they are not an active producer`};
-        
+        return { success: false, message: `Cannot rotate ${accountName} in to the schedule, they are not an active producer` };
+
     let lastVotedString = await getLastVoted();
     let lastVoted = JSON.parse(lastVotedString);
 
     if (accountName && lastVoted.indexOf(accountName) < 21)
-        return {success: false, message: `Cannot rotate ${accountName} in to the schedule, they are already active`};
+        return { success: false, message: `Cannot rotate ${accountName} in to the schedule, they are already active` };
 
     let mergedList = [];
     let newBps = [];
@@ -102,7 +178,7 @@ export async function rotate(accountName) {
     lastVoted = organizeProducers(lastVoted);
     await voteProducers(lastVoted);
     console.log("Done with rotation");
-    return {success: true};
+    return { success: true };
 }
 
 function organizeProducers(producers) {
