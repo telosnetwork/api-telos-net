@@ -129,7 +129,7 @@ function getApi(privateKey) {
 
 async function voteProducers(producersArray) {
     await setLastVoted(JSON.stringify(producersArray));
-    const eosApi = getApi(getKeyBySecretName(process.env.testnetAutorotateKey));
+    const eosApi = getApi(await getKeyBySecretName(process.env.testnetAutorotateKey));
     if (producersArray.length > 21)
         producersArray = producersArray.slice(0, 21);
 
