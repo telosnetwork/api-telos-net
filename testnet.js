@@ -7,10 +7,10 @@ export async function pourFaucet(event, context) {
         return respond(400, { message: "Please specify an account to recevie from the faucet" });
 
     try {
-        let faucetResult = await faucet(event.pathParameters.accountName);
-        return respond(200, { success: true, result });
+        let result = await faucet(event.pathParameters.accountName);
+        return respond(200, { success: true, result: result, transactionId: result.transaction_id });
     } catch (e) {
-        return respond(400, { message: e.message });
+        return respond(400, { success: false, message: e.message });
     }
 }
 
@@ -21,21 +21,21 @@ export async function account(event, context) {
 
     try {
         let result = await create(data.accountName, data.ownerKey, data.activeKey);
-        return respond(200, { success: true, result });
+        return respond(200, { success: true, result: result, transactionId: result.transaction_id  });
     } catch (e) {
-        return respond(400, { message: e.message });
+        return respond(400, { success: false, message: e.message });
     }
 }
 
 export async function addToRotation(event, context) {
     if (!event.pathParameters || !event.pathParameters.bpAccount)
-        return respond(400, { message: "Please specify a BP account to add to the schedule" });
+        return respond(400, { success: false, message: "Please specify a BP account to add to the schedule" });
 
     let rotationResult = await rotate(event.pathParameters.bpAccount);
     if (rotationResult.success)
-        return respond(200, { message: `Successfully rotated ${event.pathParameters.bpAccount} into the testnet schedule` });
+        return respond(200, { success: true, message: `Successfully rotated ${event.pathParameters.bpAccount} into the testnet schedule` });
     else
-        return respond(400, { message: rotationResult.message });
+        return respond(400, { success: false, message: rotationResult.message });
 }
 
 export async function autorotate(event, context) {
@@ -43,5 +43,5 @@ export async function autorotate(event, context) {
 }
 
 export async function getRotationSchedule(event, context) {
-    return respond(200, { schedule: JSON.parse(await getLastVoted()) });
+    return respond(200, { success: true, schedule: JSON.parse(await getLastVoted()) });
 }
