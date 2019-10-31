@@ -163,6 +163,16 @@ functions:
           private: false
           cors: true
 
+
+  testnetFaucet:
+    handler: testnet.faucet
+    events: 
+      - http:
+          path: v1/testnet/faucet/{accountName}
+          method: get
+          private: false
+          cors: true
+
 resources:
   # API Gateway Errors
   - ${file(resources/api-gateway-errors.yml)}

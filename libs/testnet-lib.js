@@ -7,6 +7,7 @@ import AWS from "aws-sdk";
 import { request } from "https";
 AWS.config.update({ region: "us-east-1" });
 
+const tlosPerFaucet = '1000.0000 TLOS';
 const rotationTableKey = 'rotation';
 
 async function call(action, params) {
@@ -43,13 +44,30 @@ async function setLastVoted(rotationSchedule) {
 }
 
 export async function faucet(accountName) {
-
+    console.log(`Faucet being called for ${accountName}`);
+    const faucetAccount = process.env.testnetFaucetAccount;
+    const actions = [{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+            actor: faucetAccount,
+            permission: 'active',
+        }],
+        data: {
+            from: faucetAccount,
+            to: accountName,
+            quantity: tlosPerFaucet,
+            memo: 'Testnet account creation'
+        }
+    }];
+    console.log("TESTNET-FAUCET-- Actions: ", JSON.stringify(actions));
+    const result = await faucetActions(actions);
+    console.log("TESTNET-FAUCET-- Result:", JSON.stringify(result));
+    return result;
 }
 
 export async function create(accountName, ownerKey, activeKey) {
     console.log(`Creating testnet account with name ${accountName} and keys ${ownerKey} ${activeKey}`);
-    const pk = await getKeyBySecretName(process.env.testnetFaucetKey);
-    const api = getApi(pk);
     const faucetAccount = process.env.testnetFaucetAccount;
 
     const actions = [{
@@ -117,12 +135,12 @@ export async function create(accountName, ownerKey, activeKey) {
         data: {
             from: faucetAccount,
             to: accountName,
-            quantity: '1000.0000 TLOS',
+            quantity: tlosPerFaucet,
             memo: 'Testnet account creation'
         }
     }];
     console.log("TESTNET-CREATE::CREATE-- Actions: ", JSON.stringify(actions));
-    const result = await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
+    const result = await faucetActions(actions);
     console.log("TESTNET-CREATE::CREATE-- Result:", JSON.stringify(result));
     return result;
 }
@@ -206,6 +224,12 @@ function getApi(privateKey) {
         textDecoder: new TextDecoder(),
         textEncoder: new TextEncoder()
     });
+}
+
+async function faucetActions(actions) {
+    const pk = await getKeyBySecretName(process.env.testnetFaucetKey);
+    const api = getApi(pk);
+    return await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
 }
 
 async function voteProducers(producersArray) {

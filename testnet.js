@@ -1,19 +1,27 @@
 import { getCurrencyStats, getCurrencyBalance } from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
-import { getLastVoted, rotate, create } from "./libs/testnet-lib";
+import { getLastVoted, rotate, create, faucet } from "./libs/testnet-lib";
 
 export async function faucet(event, context) {
+    if (!event.pathParameters || !event.pathParameters.accoutName)
+        return respond(400, { message: "Please specify an account to recevie from the faucet" });
 
+    try {
+        let faucetResult = await faucet(event.pathParameters.accountName);
+        return respond(200, { success: true, result });
+    } catch (e) {
+        return respond(400, { message: e.message });
+    }
 }
 
 export async function account(event, context) {
     const data = JSON.parse(event.body);
     if (!data.ownerKey || !data.activeKey || !data.accountName)
-        return respond(400, { message: "Please provide ownerKey, activeKey and accountName in the post body" });
+        return respond(400, { success: false, message: "Please provide ownerKey, activeKey and accountName in the post body" });
 
     try {
         let result = await create(data.accountName, data.ownerKey, data.activeKey);
-        return respond(200, { result: result });
+        return respond(200, { success: true, result });
     } catch (e) {
         return respond(400, { message: e.message });
     }
