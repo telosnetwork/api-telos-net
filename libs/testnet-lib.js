@@ -57,7 +57,7 @@ export async function faucet(accountName) {
             from: faucetAccount,
             to: accountName,
             quantity: tlosPerFaucet,
-            memo: 'Testnet account creation'
+            memo: 'Testnet faucet'
         }
     }];
     console.log("TESTNET-FAUCET-- Actions: ", JSON.stringify(actions));
