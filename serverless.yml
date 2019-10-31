@@ -165,7 +165,7 @@ functions:
 
 
   testnetFaucet:
-    handler: testnet.faucet
+    handler: testnet.pourFaucet
     events: 
       - http:
           path: v1/testnet/faucet/{accountName}

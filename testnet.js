@@ -2,7 +2,7 @@ import { getCurrencyStats, getCurrencyBalance } from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
 import { getLastVoted, rotate, create, faucet } from "./libs/testnet-lib";
 
-export async function faucet(event, context) {
+export async function pourFaucet(event, context) {
     if (!event.pathParameters || !event.pathParameters.accoutName)
         return respond(400, { message: "Please specify an account to recevie from the faucet" });
 
