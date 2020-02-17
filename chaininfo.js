@@ -42,5 +42,5 @@ export async function totalSupply(event, context) {
 export async function rexApr(event, context) {
     const rex = await getRexStats();
     const totalLendable = parseFloat(rex.total_lendable);
-    return ((12000000 / total_lendable) * 100).toFixed(2);
+    return ((12000000 / totalLendable) * 100).toFixed(2);
 }
