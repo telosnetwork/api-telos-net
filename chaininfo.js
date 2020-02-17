@@ -1,4 +1,4 @@
-import { getCurrencyStats, getCurrencyBalance, getRexData } from "./libs/eosio-lib";
+import { getCurrencyStats, getCurrencyBalance, getRexStats } from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
 
 const cmcCirculationExclusions = ["exrsrv.tf", "tf", "eosio.saving", "free.tf", "eosio.names",
