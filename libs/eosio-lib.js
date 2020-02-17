@@ -113,6 +113,6 @@ export async function getRexStats() {
     'scope': 'eosio',
     'table': 'rexpool'
   });
-  return statRows.rows[0];
+  return rexRows.rows[0];
 }
 
