@@ -118,6 +118,15 @@ functions:
           private: false
           cors: true
 
+  rexStaked:
+    handler: chaininfo.rexStaked
+    events:
+      - http:
+          path: v1/rex/staked
+          method: get
+          private: false
+          cors: true
+
   circulatingSupply:
     handler: chaininfo.circulatingSupply
     events:

@@ -44,3 +44,9 @@ export async function rexApr(event, context) {
     const totalLendable = parseFloat(rex.total_lendable);
     return respond(200, ((12000000 / totalLendable) * 100).toFixed(2));
 }
+
+export async function rexStaked(event, context) {
+    const rex = await getRexStats();
+    const totalLendable = parseFloat(rex.total_lendable);
+    return respond(200, totalLendable);
+}
