@@ -1,5 +1,5 @@
 const { Api, JsonRpc, RpcError } = require("eosjs");
-const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig"); 
+const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 import { getSecret } from "./auth-lib";
@@ -12,10 +12,10 @@ export async function create(accountName, ownerKey, activeKey) {
   const pk = secretStringObj[process.env.accountCreatorKey];
 
   const signatureProvider = new JsSignatureProvider([pk]);
-  console.log (process.env.eosioApiEndPoint);
-  console.log (pk);
+  console.log(process.env.eosioApiEndPoint);
+  console.log(pk);
 
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
 
   const api = new Api({
     rpc,
@@ -47,24 +47,24 @@ export async function create(accountName, ownerKey, activeKey) {
   return result;
 }
 
-export async function genRandomKey () {
-  const ecc = require ("eosjs-ecc");
+export async function genRandomKey() {
+  const ecc = require("eosjs-ecc");
   let key = {};
   key.privateKey = await ecc.randomKey();
   key.publicKey = await ecc.privateToPublic(key.privateKey);
   return key;
 }
 
-export async function genRandomKeys (numKeys = 2) {
+export async function genRandomKeys(numKeys = 2) {
   let keys = [];
-  for (var i=0; i < numKeys; i++) {
-    keys.push (await genRandomKey());
+  for (var i = 0; i < numKeys; i++) {
+    keys.push(await genRandomKey());
   }
   return keys;
 }
 
-export async function accountExists (accountName) {
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+export async function accountExists(accountName) {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   try {
     await rpc.get_account(accountName);
     return true;
@@ -73,7 +73,7 @@ export async function accountExists (accountName) {
   }
 }
 
-export async function validAccountFormat (accountName) {
+export async function validAccountFormat(accountName) {
   var telosAccountRegex = RegExp("^([a-z]|[1-5]|[\.]){1,12}$", "g"); // does it match EOSIO account format?
   if (!telosAccountRegex.test(accountName)) {
     return false;
@@ -81,20 +81,20 @@ export async function validAccountFormat (accountName) {
   return true;
 }
 
-export async function getCurrencyBalance (accountName, code = "eosio.token", symbol = "1.0000 TLOS") {
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+export async function getCurrencyBalance(accountName, code = "eosio.token", symbol = "1.0000 TLOS") {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   try {
-  let balanceResponse = await rpc.get_account(accountName);
-  return balanceResponse.hasOwnProperty('core_liquid_balance') ?
-     balanceResponse.core_liquid_balance.split(' ')[0] :
-     '0';
+    let balanceResponse = await rpc.get_account(accountName);
+    return balanceResponse.hasOwnProperty('core_liquid_balance') ?
+      balanceResponse.core_liquid_balance.split(' ')[0] :
+      '0';
   } catch (e) {
     return '0';
   }
 }
 
-export async function getCurrencyStats (code = "eosio.token", symbol = "1.0000 TLOS") {
-  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch } );
+export async function getCurrencyStats(code = "eosio.token", symbol = "1.0000 TLOS") {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   let symbolName = symbol.split(" ")[1];
   let statRow = await rpc.get_table_rows({
     json: true,
@@ -104,3 +104,15 @@ export async function getCurrencyStats (code = "eosio.token", symbol = "1.0000 T
   });
   return statRow.rows[0];
 }
+
+export async function getRexStats() {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
+  let rexRows = await rpc.get_table_rows({
+    json: true,
+    'code': 'eosio',
+    'scope': 'eosio',
+    'table': 'rexpool'
+  });
+  return statRows.rows[0];
+}
+

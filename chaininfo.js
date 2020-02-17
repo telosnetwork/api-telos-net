@@ -1,4 +1,4 @@
-import { getCurrencyStats, getCurrencyBalance } from "./libs/eosio-lib";
+import { getCurrencyStats, getCurrencyBalance, getRexData } from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
 
 const cmcCirculationExclusions = ["exrsrv.tf", "tf", "eosio.saving", "free.tf", "eosio.names",
@@ -37,4 +37,10 @@ export async function totalSupply(event, context) {
     const stats = await getCurrencyStats();
     console.log('total supply from stats: ' + stats.supply);
     return respond(200, parseFloat(stats.supply, 10));
+}
+
+export async function rexApr(event, context) {
+    const rex = getRexStats();
+    const totalLendable = parseFloat(rex.total_lendable);
+    return ((12000000 / total_lendable) * 100).toFixed(2);
 }
