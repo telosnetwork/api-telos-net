@@ -48,6 +48,7 @@ async function rexStaked() {
 module.exports = async (fastify, options) => {
     fastify.get('supply/total', {
         schema: {
+            tags: ['stats'],
             response: {
                 200: {
                     example: 123456.7890,
@@ -61,6 +62,7 @@ module.exports = async (fastify, options) => {
 
     fastify.get('supply/circulating', {
         schema: {
+            tags: ['stats'],
             querystring: {
                 requestor: {
                     default: 'any',
@@ -80,6 +82,7 @@ module.exports = async (fastify, options) => {
 
     fastify.get('/rex/staked', {
         schema: {
+            tags: ['stats'],
             response: {
                 200: {
                     example: 123456.7890,
@@ -93,6 +96,7 @@ module.exports = async (fastify, options) => {
 
     fastify.get('/rex/apr', {
         schema: {
+            tags: ['stats'],
             response: {
                 200: {
                     example: 12.3,

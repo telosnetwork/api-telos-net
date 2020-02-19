@@ -12,6 +12,10 @@ module.exports = {
         },
         host: 'localhost:3000',
         schemes: ['http'],
+        tags: [
+            { name: 'stats', description: 'Chain statistics endpoints' },
+            { name: 'create', description: 'Account creation endpoints' }
+        ],
         consumes: ['application/json'],
         produces: ['application/json']
     },
