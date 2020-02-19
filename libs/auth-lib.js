@@ -1,4 +1,4 @@
-export async function getSecret(secret) {
+async function getSecret(secret) {
   const AWS = require("aws-sdk");
   var secretsmanager = new AWS.SecretsManager({ region: "us-east-1" });
 
@@ -19,7 +19,7 @@ export async function getSecret(secret) {
     });
 }
 
-export async function authenticate(confirmAuthSecretName, confirmAuthSecret) {
+async function authenticate(confirmAuthSecretName, confirmAuthSecret) {
   if (!confirmAuthSecretName || !confirmAuthSecret) {
     throw new Error(
       "Access denied. confirmAuthSecretName and confirmAuthSecret are both required."
@@ -34,3 +34,5 @@ export async function authenticate(confirmAuthSecretName, confirmAuthSecret) {
     );
   }
 }
+
+module.exports = { getSecret, authenticate }
