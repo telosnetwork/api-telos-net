@@ -1,7 +1,7 @@
 # NOTE: update this with your service name
 service: api-telos-net
 
-# Create an optimized package for our functions 
+# Create an optimized package for our functions
 package:
   individually: true
 
@@ -53,9 +53,9 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - "Fn::GetAtt": [ AccountsTable, Arn ]
-        - "Fn::GetAtt": [ TestnetRotationTable, Arn ]
-        - "Fn::GetAtt": [ TestnetFaucetTable, Arn ]
+        - "Fn::GetAtt": [AccountsTable, Arn]
+        - "Fn::GetAtt": [TestnetRotationTable, Arn]
+        - "Fn::GetAtt": [TestnetFaucetTable, Arn]
     - Effect: Allow
       Action:
         - secretsmanager:Describe*
@@ -75,7 +75,7 @@ functions:
 
   create:
     handler: create.main
-    events: 
+    events:
       - http:
           path: v1/accounts
           method: post
@@ -99,7 +99,7 @@ functions:
           method: get
           cors: true
           private: false
-  
+
   delete:
     handler: util.deleteRecord
     events:
@@ -136,6 +136,15 @@ functions:
           private: false
           cors: true
 
+  totalStaked:
+    handler: chaininfo.totalStaked
+    events:
+      - http:
+          path: v1/supply/staked
+          method: get
+          private: false
+          cors: true
+
   totalSupply:
     handler: chaininfo.totalSupply
     events:
@@ -144,7 +153,7 @@ functions:
           method: get
           private: false
           cors: true
-  
+
   getTestnetRotation:
     handler: testnet.getRotationSchedule
     events:
@@ -174,7 +183,7 @@ functions:
 
   testnetCreate:
     handler: testnet.account
-    events: 
+    events:
       - http:
           path: v1/testnet/account
           method: post
@@ -183,7 +192,7 @@ functions:
 
   testnetFaucet:
     handler: testnet.pourFaucet
-    events: 
+    events:
       - http:
           path: v1/testnet/faucet/{accountName}
           method: get

@@ -39,6 +39,12 @@ export async function totalSupply(event, context) {
     return respond(200, parseFloat(stats.supply, 10));
 }
 
+export async function totalStaked(event, context) {
+    const rex = await getRexStats();
+    const stakeBalance = await getCurrencyBalance('eosio.stake');
+    return respond(200, (parseFloat(rex.total_lendable) + parseFloat(stakeBalance)));
+}
+
 export async function rexApr(event, context) {
     const rex = await getRexStats();
     const totalLendable = parseFloat(rex.total_lendable);
