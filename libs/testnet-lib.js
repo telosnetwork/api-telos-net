@@ -227,9 +227,13 @@ function getApi(privateKey) {
 }
 
 async function faucetActions(actions) {
-    const pk = await getKeyBySecretName(process.env.testnetFaucetKey);
-    const api = getApi(pk);
-    return await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
+    try {
+        const pk = await getKeyBySecretName(process.env.testnetFaucetKey);
+        const api = getApi(pk);
+        return await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
+    } catch (e)  {
+        console.log(`TESTNET-FAUCET ACTIONS ERROR-- : ${e}`);
+    }
 }
 
 async function voteProducers(producersArray) {
