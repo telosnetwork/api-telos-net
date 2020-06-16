@@ -19,6 +19,12 @@ async function getSecret(secret) {
     });
 }
 
+async function getKeyBySecretName(secretName) {
+  const secret = await getSecret(secretName);
+  var secretStringObj = JSON.parse(secret.SecretString);
+  return secretStringObj[secretName];
+}
+
 async function authenticate(confirmAuthSecretName, confirmAuthSecret) {
   if (!confirmAuthSecretName || !confirmAuthSecret) {
     throw new Error(
@@ -35,4 +41,4 @@ async function authenticate(confirmAuthSecretName, confirmAuthSecret) {
   }
 }
 
-module.exports = { getSecret, authenticate }
+module.exports = { getSecret, authenticate, getKeyBySecretName }

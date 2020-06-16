@@ -1,12 +1,12 @@
-import AWS from "aws-sdk";
+const AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-1" });
 
-export function call(action, params) {
+function call(action, params) {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
   return dynamoDb[action](params).promise();
 }
 
-export async function save(record) {
+async function save(record) {
   record.updatedAt = Date.now();
 
   await call("put", {
@@ -15,22 +15,22 @@ export async function save(record) {
   });
 }
 
-export async function deleteAccount(smsHash) {
+async function deleteAccount(smsHash) {
   const delParams = {
     TableName: process.env.tableName,
     Key: {
-        smsHash: smsHash
+      smsHash: smsHash
     }
   };
 
   await call("delete", delParams);
 }
 
-export async function exists (smsHash) {
+async function exists(smsHash) {
   const readParams = {
     TableName: process.env.tableName,
     Key: {
-        smsHash: smsHash
+      smsHash: smsHash
     }
   };
 
@@ -42,11 +42,11 @@ export async function exists (smsHash) {
   return true;
 }
 
-export async function getBySmsHash(smsHash) {
+async function getBySmsHash(smsHash) {
   const readParams = {
     TableName: process.env.tableName,
     Key: {
-        smsHash: smsHash
+      smsHash: smsHash
     }
   };
 
@@ -57,3 +57,5 @@ export async function getBySmsHash(smsHash) {
 
   return result.Item;
 }
+
+module.exports = { call, save, deleteAccount, exists, getBySmsHash }

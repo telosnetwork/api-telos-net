@@ -2,9 +2,9 @@ const { Api, JsonRpc, RpcError } = require("eosjs");
 const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
-import { getSecret } from "./auth-lib";
-import AWS from "aws-sdk";
-import { request } from "https";
+const { getKeyBySecretName } = require("./auth-lib");
+const AWS = require("aws-sdk");
+const { request } = require("https");
 AWS.config.update({ region: "us-east-1" });
 
 const tlosPerFaucet = '1000.0000 TLOS';
@@ -15,7 +15,7 @@ async function call(action, params) {
     return dynamoDb[action](params).promise();
 }
 
-export async function getLastVoted() {
+async function getLastVoted() {
     const readParams = {
         TableName: process.env.testnetRotationTableName,
         Key: {
@@ -29,7 +29,7 @@ export async function getLastVoted() {
         return "[]";
     }
 
-    return result.Item.rotationSchedule;
+    return JSON.parse(result.Item.rotationSchedule);
 }
 
 async function setLastVoted(rotationSchedule) {
@@ -43,7 +43,7 @@ async function setLastVoted(rotationSchedule) {
     });
 }
 
-export async function faucet(accountName) {
+async function faucet(accountName) {
     console.log(`Faucet being called for ${accountName}`);
     const faucetAccount = process.env.testnetFaucetAccount;
     const actions = [{
@@ -66,7 +66,7 @@ export async function faucet(accountName) {
     return result;
 }
 
-export async function create(accountName, ownerKey, activeKey) {
+async function create(accountName, ownerKey, activeKey) {
     console.log(`Creating testnet account with name ${accountName} and keys ${ownerKey} ${activeKey}`);
     const faucetAccount = process.env.testnetFaucetAccount;
     accountName = accountName.trim();
@@ -128,7 +128,7 @@ export async function create(accountName, ownerKey, activeKey) {
             stake_cpu_quantity: '20.0000 TLOS',
             transfer: true,
         }
-    },{
+    }, {
         account: 'eosio.token',
         name: 'transfer',
         authorization: [{
@@ -148,14 +148,13 @@ export async function create(accountName, ownerKey, activeKey) {
     return result;
 }
 
-export async function rotate(accountName) {
+async function rotate(accountName) {
     let currentProducers = await getProducers();
     console.log(`Current producers: ${currentProducers}`);
     if (accountName && currentProducers.indexOf(accountName) < 0)
         return { success: false, message: `Cannot rotate ${accountName} in to the schedule, they are not an active producer` };
 
-    let lastVotedString = await getLastVoted();
-    let lastVoted = JSON.parse(lastVotedString);
+    let lastVoted = await getLastVoted();
 
     if (accountName && lastVoted.indexOf(accountName) < 21)
         return { success: false, message: `Cannot rotate ${accountName} in to the schedule, they are already active` };
@@ -207,12 +206,6 @@ function organizeProducers(producers) {
     return Array.from(new Set(producers));
 }
 
-async function getKeyBySecretName(secretName) {
-    const secret = await getSecret(secretName);
-    var secretStringObj = JSON.parse(secret.SecretString);
-    return secretStringObj[secretName];
-}
-
 function getRPC() {
     return new JsonRpc(process.env.testnetApiEndPoint, { fetch });
 }
@@ -234,7 +227,7 @@ async function faucetActions(actions) {
         const pk = await getKeyBySecretName(process.env.testnetFaucetKey);
         const api = getApi(pk);
         return await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
-    } catch (e)  {
+    } catch (e) {
         console.log(`TESTNET-FAUCET ACTIONS ERROR-- : ${e}`);
         throw e;
     }
@@ -281,3 +274,5 @@ async function getProducers() {
     });
     return producers;
 }
+
+module.exports = { getLastVoted, rotate, create, faucet };

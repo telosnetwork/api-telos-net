@@ -1,0 +1,65 @@
+          path: register
+          method: post
+--
+          path: send-msg
+          method: post
+--
+      #    path: send-msg-prv
+       #   method: post
+--
+          path: get-profiles
+          method: post
+--
+          path: get-messages
+          method: post
+--
+          path: verify-sms
+          method: post
+--
+          path: verify-email
+          method: post
+--
+          path: get-profile
+          method: post
+--
+          path: get-profile-oauth
+          method: post
+--
+          path: get-profile-oauth
+          method: get
+--
+          path: get-chats
+          method: post
+--
+          path: register-app
+          method: post
+--
+          path: delete-app
+          method: post
+--
+          path: get-apps
+          method: post
+--
+          path: get-my-apps
+          method: post
+--
+          path: get-authorized-apps
+          method: post
+--
+          path: revoke-access
+          method: post
+--
+          path: update-app-oauth-status
+          method: post
+--
+          path: search-profiles
+          method: post
+--
+          path: oauth-auth-context
+          method: get
+--
+          path: oauth-auth-code
+          method: post
+--
+          path: oauth-token
+          method: post

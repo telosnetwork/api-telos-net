@@ -1,15 +1,15 @@
-export function success(body) {
+function success(body) {
   body.success = "true";
   console.log("Body: ", body);
   return buildResponse(200, body);
 }
 
-export function failure(body) {
+function failure(body) {
   body.success = "false";
   return buildResponse(500, body);
 }
 
-export function respond (httpCode, body) {
+function respond (httpCode, body) {
   return buildResponse(httpCode, body);
 }
 
@@ -24,11 +24,11 @@ function buildResponse(statusCode, body) {
   };
 }
 
-export function twilioSuccess(body) {
+function twilioSuccess(body) {
   return buildTwilioResponse(200, body);
 }
 
-export function twilioError(body) {
+function twilioError(body) {
   return buildTwilioResponse(500, body);
 }
 
@@ -42,3 +42,5 @@ function buildTwilioResponse(statusCode, body) {
     body: body
   };
 }
+
+module.exports = { success, failure, respond, twilioSuccess, twilioError }

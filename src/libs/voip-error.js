@@ -1,5 +1,4 @@
-
-export function VoipError(message, extra) {
+function VoipError(message, extra) {
     const error  = new Error(message);
     error.name = 'VoipError';
     if (extra) {
@@ -8,3 +7,5 @@ export function VoipError(message, extra) {
 
     return error;
 }
+
+module.exports = { VoipError }

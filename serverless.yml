@@ -63,6 +63,7 @@ provider:
         - secretsmanager:List
       Resource: "*"
 
+<<<<<<< HEAD
 functions:
   register:
     handler: register.main
@@ -92,20 +93,23 @@ functions:
           private: false
 
   exists:
+=======
+>>>>>>> Finish refactor for fastify
     handler: util.checkAccount2
-    events:
-      - http:
           path: v1/accounts/{telosAccount}
           method: get
+<<<<<<< HEAD
           cors: true
           private: false
 
   delete:
+=======
+  
+>>>>>>> Finish refactor for fastify
     handler: util.deleteRecord
-    events:
-      - http:
           path: v1/registrations
           method: delete
+<<<<<<< HEAD
           cors: true
           private: false
 
@@ -181,6 +185,8 @@ functions:
           method: get
           private: false
           cors: true
+=======
+>>>>>>> Finish refactor for fastify
 
 resources:
   # API Gateway Errors

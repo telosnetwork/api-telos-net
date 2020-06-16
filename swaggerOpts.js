@@ -14,7 +14,8 @@ module.exports = {
         schemes: ['http'],
         tags: [
             { name: 'stats', description: 'Chain statistics endpoints' },
-            { name: 'create', description: 'Account creation endpoints' }
+            { name: 'testnet', description: 'Testnet endpoints' },
+            { name: 'accounts', description: 'Account creation endpoints' }
         ],
         consumes: ['application/json'],
         produces: ['application/json']

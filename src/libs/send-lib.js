@@ -1,23 +1,24 @@
-import twilio from 'twilio';
-import * as Sentry from '@sentry/node'
-import { VoipError } from './voip-error';
+const twilio = require('twilio');
+const Sentry = require('@sentry/node');
+const { getKeyBySecretName } = require("./auth-lib");
+const { VoipError } = require('./voip-error');
 
-export async function cleanNumberFormat (smsNumber) {
-    const accountSid = process.env.twilioAccountSid; // Your Account SID from www.twilio.com/console
-    const authToken = process.env.twilioAuthToken;   // Your Auth Token from www.twilio.com/console
-  
+async function cleanNumberFormat(smsNumber) {
+    const accountSid = getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
+    const authToken = getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
+
     const client = new twilio(accountSid, authToken);
 
     let numberLookupResult = {};
     let cleanNumber = smsNumber;
     await client.lookups.phoneNumbers(smsNumber)
-        .fetch({addOns: ['twilio_carrier_info']})
+        .fetch({ addOns: ['twilio_carrier_info'] })
         .then(phone_number => {
             Sentry.configureScope(scope => scope.setExtra('Twilio Lookup Result', phone_number));
             cleanNumber = phone_number.phoneNumber;
             numberLookupResult = phone_number;
-        }); 
-    
+        });
+
     if (numberLookupResult.addOns.results.twilio_carrier_info.result.carrier.type === "voip") {
         throw VoipError(`Service does not support numbers from your carrier: ${numberLookupResult.addOns.results.twilio_carrier_info.result.carrier.name}`,
             numberLookupResult.addOns.results.twilio_carrier_info.result);
@@ -26,9 +27,9 @@ export async function cleanNumberFormat (smsNumber) {
     return cleanNumber;
 }
 
-export async function genSendSMS(smsNumber, message) {
-    const accountSid = process.env.twilioAccountSid; // Your Account SID from www.twilio.com/console
-    const authToken = process.env.twilioAuthToken;   // Your Auth Token from www.twilio.com/console
+async function genSendSMS(smsNumber, message) {
+    const accountSid = getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
+    const authToken = getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
 
     const client = new twilio(accountSid, authToken);
 
@@ -39,9 +40,9 @@ export async function genSendSMS(smsNumber, message) {
     });
 }
 
-export async function sendSMS(smsNumber, otp) {
-    const accountSid = process.env.twilioAccountSid; // Your Account SID from www.twilio.com/console
-    const authToken = process.env.twilioAuthToken;   // Your Auth Token from www.twilio.com/console
+async function sendSMS(smsNumber, otp) {
+    const accountSid = getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
+    const authToken = getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
 
     const client = new twilio(accountSid, authToken);
 
@@ -52,6 +53,8 @@ export async function sendSMS(smsNumber, otp) {
     });
 }
 
-export async function sendError (message) {
+async function sendError(message) {
     await genSendSMS('19196738460', message);
 }
+
+module.exports = { cleanNumberFormat, genSendSMS, sendSMS, sendError }
