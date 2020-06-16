@@ -1,5 +1,7 @@
 require('dotenv').config()
 const AutoLoad = require('fastify-autoload')
+const fastifyCors = require('fastify-cors')
+const fastifyGracefulShutdown = require('fastify-graceful-shutdown')
 const LoggerFactory = require('./LoggerFactory')
 const path = require('path')
 
@@ -9,7 +11,11 @@ const fastify = require('fastify')({
     logger
 })
 
+fastify.register(fastifyGracefulShutdown)
+
 fastify.register(require('fastify-oas'), require('../swaggerOpts.js'))
+
+fastify.register(fastifyCors, { origin: true })
 
 fastify.register(AutoLoad, { dir: path.join(__dirname, 'v1-routes'), options: { prefix: '/v1/' } });
 
