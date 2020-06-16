@@ -13,6 +13,10 @@ fastify.register(require('fastify-oas'), require('../swaggerOpts.js'))
 
 fastify.register(AutoLoad, { dir: path.join(__dirname, 'v1-routes'), options: { prefix: '/v1/' } });
 
+fastify.get('/', (request, reply) => {
+    reply.code(307).redirect('/v1/docs')
+});
+
 fastify.ready(err => {
     if (err) {
         logger.info(`Error starting fastify - ${err.message}`)
