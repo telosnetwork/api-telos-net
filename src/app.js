@@ -18,7 +18,7 @@ fastify.get('/', (request, reply) => {
 });
 
 fastify.get('/v1/health', { logLevel: 'fatal' }, (request, reply) => {
-    reply.code(204)
+    reply.code(200).send("Ok!")
 });
 
 
