@@ -69,6 +69,9 @@ export async function faucet(accountName) {
 export async function create(accountName, ownerKey, activeKey) {
     console.log(`Creating testnet account with name ${accountName} and keys ${ownerKey} ${activeKey}`);
     const faucetAccount = process.env.testnetFaucetAccount;
+    accountName = accountName.trim();
+    ownerKey = ownerKey.trim();
+    activeKey = activeKey.trim()
 
     const actions = [{
         account: 'eosio',
@@ -233,6 +236,7 @@ async function faucetActions(actions) {
         return await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
     } catch (e)  {
         console.log(`TESTNET-FAUCET ACTIONS ERROR-- : ${e}`);
+        throw e;
     }
 }
 
