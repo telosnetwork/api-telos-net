@@ -17,6 +17,11 @@ fastify.get('/', (request, reply) => {
     reply.code(307).redirect('/v1/docs')
 });
 
+fastify.get('/v1/health', { logLevel: 'fatal' }, (request, reply) => {
+    reply.code(204)
+});
+
+
 fastify.ready(err => {
     if (err) {
         logger.info(`Error starting fastify - ${err.message}`)
