@@ -4,8 +4,8 @@ const { getKeyBySecretName } = require("./auth-lib");
 const { VoipError } = require('./voip-error');
 
 async function cleanNumberFormat(smsNumber) {
-    const accountSid = getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
-    const authToken = getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
+    const accountSid = await getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
+    const authToken = await getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
 
     const client = new twilio(accountSid, authToken);
 
@@ -28,8 +28,8 @@ async function cleanNumberFormat(smsNumber) {
 }
 
 async function genSendSMS(smsNumber, message) {
-    const accountSid = getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
-    const authToken = getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
+    const accountSid = await getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
+    const authToken = await getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
 
     const client = new twilio(accountSid, authToken);
 
@@ -41,8 +41,8 @@ async function genSendSMS(smsNumber, message) {
 }
 
 async function sendSMS(smsNumber, otp) {
-    const accountSid = getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
-    const authToken = getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
+    const accountSid = await getKeyBySecretName(process.env.twilioAccountSid); // Your Account SID from www.twilio.com/console
+    const authToken = await getKeyBySecretName(process.env.twilioAuthToken); // Your Auth Token from www.twilio.com/console
 
     const client = new twilio(accountSid, authToken);
 
