@@ -36,6 +36,6 @@ fastify.ready(err => {
     fastify.oas()
 })
 
-fastify.listen(3000, '0.0.0.0', err => {
+fastify.listen(process.env.SERVER_PORT, '0.0.0.0', err => {
     if (err) throw err
 })
