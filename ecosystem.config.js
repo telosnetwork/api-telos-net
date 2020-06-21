@@ -35,7 +35,6 @@ const envProd = Object.assign({}, envDev, {
   MODE: 'prod',
   SERVER_HOSTNAME: 'api-dev.telos.net',
   SERVER_PORT: 4000
-}
 })
 
 const dev = {
