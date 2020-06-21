@@ -69,7 +69,7 @@ async function registrationHandler(request, reply) {
             if (!await eosioLib.validAccountFormat(request.body.telosAccount)) {
                 return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
             }
-            if (await eosioLib.accountExists(data.telosAccount)) {
+            if (await eosioLib.accountExists(request.body.telosAccount)) {
                 return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) already exists.`);
             }
             record.telosAccount = request.body.telosAccount;
