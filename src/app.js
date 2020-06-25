@@ -7,6 +7,8 @@ const path = require('path')
 
 const logger = LoggerFactory.create('TelosAPI')
 
+logger.info(`Starting API with mode ${process.env.MODE} and SERVER_HOSTNAME ${process.env.SERVER_HOSTNAME} and SERVER_PORT ${process.env.SERVER_PORT}`)
+
 const fastify = require('fastify')({
     logger
 })
