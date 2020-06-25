@@ -33,7 +33,7 @@ const envProd = Object.assign({}, envDev, {
   testnetFaucetTableName: 'prod-testnet-faucet',
   API_LOG_LEVEL: 'debug',
   MODE: 'prod',
-  SERVER_HOSTNAME: 'api-dev.telos.net',
+  SERVER_HOSTNAME: 'api.telos.net',
   SERVER_PORT: 4000
 })
 
