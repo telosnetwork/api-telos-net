@@ -10,7 +10,7 @@ module.exports = {
             url: 'https://docs.telos.net',
             description: 'Find more info here'
         },
-        host: process.env.SERVER_HOSTNAME,
+        host: process.env.SERVER_ENDPOINT,
         schemes: ['https', 'http'],
         tags: [
             { name: 'stats', description: 'Chain statistics endpoints' },

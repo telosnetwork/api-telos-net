@@ -19,7 +19,7 @@ const envDev = {
   testnetFaucetTableName: 'dev-testnet-faucet',
   API_LOG_LEVEL: 'debug',
   MODE: 'dev',
-  SERVER_HOSTNAME: 'api-dev.telos.net',
+  SERVER_ENDPOINT: 'api-dev.telos.net',
   SERVER_PORT: 3000
 }
 
@@ -47,7 +47,7 @@ const envProd = {
   testnetFaucetTableName: 'dev-testnet-faucet',
   API_LOG_LEVEL: 'debug',
   MODE: 'prod',
-  SERVER_HOSTNAME: 'api.telos.net',
+  SERVER_ENDPOINT: 'api.telos.net',
   SERVER_PORT: 4000
 }
 
@@ -58,18 +58,18 @@ const dev = {
   autorestart: true,
   watch: false,
   max_memory_restart: '1G',
-  env_dev: envDev
+  env: envDev
+}
+const prod = {
+  name: 'api-prod',
+  script: 'src/app.js',
+  instances: 1,
+  autorestart: true,
+  watch: false,
+  max_memory_restart: '1G',
+  env: envProd
 }
 
 module.exports = {
-    apps: [{
-      name: 'api-telos-net',
-      script: 'src/app.js',
-      instances: 1,
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
-      env_prod: envProd,
-      env_dev: envDev
-    }]
+  apps: [dev, prod]
 };
