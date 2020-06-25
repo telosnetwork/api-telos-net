@@ -45,6 +45,14 @@ async function rexStaked() {
     return totalLendable;
 }
 
+async function rexPrice() {
+    const rex = await getRexStats();
+    const totalLendable = parseFloat(rex.total_lendable);
+    const totalRex = parseFloat(rex.total_rex);
+    const rexTelosPrice = (totalLendable / totalRex);
+    return rexTelosPrice;
+}
+
 module.exports = async (fastify, options) => {
     fastify.get('supply/total', {
         schema: {
@@ -106,5 +114,19 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await rexApr()
+    })
+
+    fastify.get('/rex/price', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    example: 0.0123456,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await rexPrice()
     })
 }
