@@ -11,7 +11,7 @@ module.exports = {
             description: 'Find more info here'
         },
         host: process.env.SERVER_HOSTNAME,
-        schemes: ['http', 'https'],
+        schemes: ['https', 'http'],
         tags: [
             { name: 'stats', description: 'Chain statistics endpoints' },
             { name: 'testnet', description: 'Testnet endpoints' },
