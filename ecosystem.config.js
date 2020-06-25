@@ -58,19 +58,18 @@ const dev = {
   autorestart: true,
   watch: false,
   max_memory_restart: '1G',
-  env: envDev
-}
-
-const prod = {
-  name: 'api-prod',
-  script: 'src/app.js',
-  instances: 1,
-  autorestart: true,
-  watch: false,
-  max_memory_restart: '1G',
-  env: envProd
+  env_dev: envDev
 }
 
 module.exports = {
-  apps: [dev, prod]
+    apps: [{
+      name: 'api-telos-net',
+      script: 'src/app.js',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      env_prod: envProd,
+      env_dev: envDev
+    }]
 };
