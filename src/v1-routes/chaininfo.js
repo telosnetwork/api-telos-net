@@ -33,6 +33,12 @@ async function totalSupply() {
     return parseFloat(stats.supply, 10);
 }
 
+async function totalStaked(event, context) {
+    const rex = await getRexStats();
+    const stakeBalance = await getCurrencyBalance('eosio.stake');
+    return parseFloat(rex.total_lendable) + parseFloat(stakeBalance);
+}
+
 async function rexApr() {
     const rex = await getRexStats();
     const totalLendable = parseFloat(rex.total_lendable);
@@ -54,7 +60,7 @@ async function rexPrice() {
 }
 
 module.exports = async (fastify, options) => {
-    fastify.get('supply/total', {
+    fastify.get('supply/staked', {
         schema: {
             tags: ['stats'],
             response: {
@@ -65,7 +71,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await totalSupply()
+        return await totalStaked()
     })
 
     fastify.get('supply/circulating', {
@@ -86,6 +92,20 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await circulatingSupply(request.query.requestor)
+    })
+
+    fastify.get('supply/total', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await totalSupply()
     })
 
     fastify.get('/rex/staked', {
