@@ -61,7 +61,7 @@ async function registrationHandler(request, reply) {
         if (await dynamoDbLib.exists(smsHash)) {
             record = await dynamoDbLib.getBySmsHash(smsHash);
             if (record.accountCreatedAt > 0) {
-                reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
+                return reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
             }
         }
 
