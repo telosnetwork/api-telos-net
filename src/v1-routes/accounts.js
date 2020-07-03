@@ -93,6 +93,7 @@ async function registrationHandler(request, reply) {
     } catch (e) {
         Sentry.captureException(e);
         await Sentry.flush(2500);
+        request.log.error(e.message)
         if (e instanceof VoipError || e.name === 'VoipError') {
             reply.code(401).send(e.message);
         }
@@ -199,7 +200,12 @@ async function createHandler(request, reply) {
         const smsHash = await cryptoLib.hash(smsNumber);
 
         const accountRecord = await dynamoDbLib.getBySmsHash(smsHash);
-        request.log.info("ACCOUNT RECORD: ", JSON.stringify(accountRecord));
+
+        if (!accountRecord) {
+            return reply.code(403).send(`This SMS number ${smsNumber} has not been registered yet.`);
+        }
+
+        request.log.info(`ACCOUNT RECORD: ${JSON.stringify(accountRecord)}`);
         if (accountRecord.accountCreatedAt > 0) {
             return reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
         }
@@ -256,6 +262,7 @@ async function createHandler(request, reply) {
         response.result = result;
         return reply.code(200).send(response);
     } catch (e) {
+        request.log.error(e.message)
         Sentry.captureException(e);
         await Sentry.flush(2500);
         return reply.code(500).send(e.message);
