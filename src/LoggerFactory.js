@@ -1,7 +1,7 @@
 const pino = require('pino')
 const devMode = process.env.MODE == 'dev'
 
-if (devMode)
+//if (devMode)
     require('pino-pretty')
 
 function create(source) {
