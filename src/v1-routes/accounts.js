@@ -61,6 +61,7 @@ async function registrationHandler(request, reply) {
         if (await dynamoDbLib.exists(smsHash)) {
             record = await dynamoDbLib.getBySmsHash(smsHash);
             if (record.accountCreatedAt > 0) {
+                request.info.log(`Already got Telos account, record is ${JSON.stringify(record, null, 4)}`)
                 return reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
             }
         }
@@ -198,7 +199,7 @@ async function createHandler(request, reply) {
         const smsHash = await cryptoLib.hash(smsNumber);
 
         const accountRecord = await dynamoDbLib.getBySmsHash(smsHash);
-        console.log("ACCOUNT RECORD: ", JSON.stringify(accountRecord));
+        request.log.info("ACCOUNT RECORD: ", JSON.stringify(accountRecord));
         if (accountRecord.accountCreatedAt > 0) {
             return reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
         }
@@ -248,7 +249,7 @@ async function createHandler(request, reply) {
 
         accountRecord.accountCreatedAt = Date.now();
         accountRecord.result = JSON.stringify(result);
-        console.log("CREATE::MAIN:: Account record to save: ", JSON.stringify(accountRecord));
+        request.log.info("CREATE::MAIN:: Account record to save: ", JSON.stringify(accountRecord));
         await dynamoDbLib.save(accountRecord);
 
         response.message = message;
