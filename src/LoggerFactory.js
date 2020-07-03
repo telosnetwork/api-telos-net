@@ -12,7 +12,7 @@ function create(source) {
         name: source
     }
 
-    if (devMode)
+    //if (devMode)
         options.prettyPrint = { colorize: true }
 
     return pino(options)
