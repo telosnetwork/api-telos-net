@@ -30,7 +30,7 @@ const envProd = {
   testnetFaucetTableName: 'prod-testnet-faucet',
   accountCreatorAccount: 'accounts.tf',
   accountCreatorContract: 'accounts.tf',
-  accountCreatorKey: 'tf-account-creator-key',
+  accountCreatorKey: 'tf-account-creator-key-prod',
   allowDeleteNumber: 'N',
   eosioApiEndPoint: 'https://telos.caleos.io',
   sentryDsn: 'https://4fb0b518dbf74512a27bf8bb24977136@sentry.io/1749694',
