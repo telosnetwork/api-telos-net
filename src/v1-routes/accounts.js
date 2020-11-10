@@ -7,6 +7,8 @@ const eosioLib = require("../libs/eosio-lib");
 
 const CURRENT_VERSION = "v0.1";
 
+const RECAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify";
+
 const registrationOpts = {
     schema: {
         tags: ['accounts'],
@@ -377,10 +379,109 @@ async function checkAccountHandler(request, reply) {
     }
 }
 
+const recaptchaCreateOpts = {
+    schema: {
+        tags: ['accounts'],
+        body: {
+            required: ['accountName','activeKey','ownerKey', 'recaptchaResponse'],
+            type: 'object',
+            properties: {
+                recaptchaResponse: {
+                    description: 'Response code from the recaptcha API',
+                    type: 'string',
+                    example: ''
+                },
+                accountName: {
+                    type: 'string',
+                    description: '12 character account name, only characters a-z and 1-5 can be used',
+                    example: 'myaccount123'
+                },
+                ownerKey: {
+                    type: 'string',
+                    description: 'Owner public key',
+                    example: 'EOS1234...'
+                },
+                activeKey: {
+                    type: 'string',
+                    description: 'Active public key',
+                    example: 'EOS4321...'
+                }
+            }
+        },
+        response: {
+            204: {
+                description: 'Registration successful',
+                type: 'null'
+            },
+            400: {
+                description: 'Registration error',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function recaptchaCreateHandler(request, reply) {
+    try {
+        request.log.info("JESSE");
+        let accountName = request.body.accountName;
+        let ownerKey = request.body.ownerKey;
+        let activeKey = request.body.activeKey;
+        let recaptchaResponse = request.body.recaptchaResponse;
+
+        let record = {};
+        reply.send({
+            ipAddress: request.ip,
+            accountName, ownerKey, activeKey, recaptchaResponse
+        })
+
+        /*
+        if (await dynamoDbLib.exists(smsHash)) {
+            record = await dynamoDbLib.getBySmsHash(smsHash);
+            if (record.accountCreatedAt > 0) {
+                request.log.info(`Already got Telos account, record is ${JSON.stringify(record, null, 4)}`)
+                return reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
+            }
+        }
+
+        if (request.body.telosAccount) {
+            if (!await eosioLib.validAccountFormat(request.body.telosAccount)) {
+                return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
+            }
+            if (await eosioLib.accountExists(request.body.telosAccount)) {
+                return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) already exists.`);
+            }
+            record.telosAccount = request.body.telosAccount;
+        }
+
+        if (request.body.activeKey) { record.activeKey = request.body.activeKey; }
+        if (request.body.ownerKey) { record.ownerKey = request.body.ownerKey; }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        const msg = await sendLib.sendSMS(smsNumber, otp);
+
+        record.smsHash = smsHash;
+        record.smsOtp = otp;
+        record.smsSid = msg.sid;
+        record.version = CURRENT_VERSION;
+
+        await dynamoDbLib.save(record);
+
+        reply.code(204);
+    */
+    } catch (e) {
+        request.log.error(e)
+        if (e instanceof VoipError || e.name === 'VoipError') {
+            reply.code(401).send(e.message);
+        }
+        reply.code(500).send(e.message);
+    }
+}
 
 module.exports = async (fastify, options) => {
     fastify.post('registrations', registrationOpts, registrationHandler)
     fastify.post('accounts', createOpts, createHandler)
+    fastify.post('recaptchaCreate', recaptchaCreateOpts, recaptchaCreateHandler)
 
     fastify.get('keys', keygenOpts, keygenHandler)
     fastify.get('accounts/:telosAccount', checkAccountOpts, checkAccountHandler)

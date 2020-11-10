@@ -6,6 +6,7 @@ const LoggerFactory = require('./LoggerFactory')
 const path = require('path')
 
 const logger = LoggerFactory.create('TelosAPI')
+const port = process.env.SERVER_PORT || 9999
 
 logger.info(`Starting API with mode ${process.env.MODE} and SERVER_ENDPOINT ${process.env.SERVER_ENDPOINT} and SERVER_PORT ${process.env.SERVER_PORT}`)
 
@@ -38,6 +39,6 @@ fastify.ready(err => {
     fastify.oas()
 })
 
-fastify.listen(process.env.SERVER_PORT, '0.0.0.0', err => {
+fastify.listen(port, '0.0.0.0', err => {
     if (err) throw err
 })
