@@ -423,15 +423,16 @@ const recaptchaCreateOpts = {
 
 async function recaptchaCreateHandler(request, reply) {
     try {
-        request.log.info("JESSE");
         let accountName = request.body.accountName;
         let ownerKey = request.body.ownerKey;
         let activeKey = request.body.activeKey;
         let recaptchaResponse = request.body.recaptchaResponse;
 
+
         let record = {};
         reply.send({
             ipAddress: request.ip,
+            ipAddresses: request.ips,
             accountName, ownerKey, activeKey, recaptchaResponse
         })
 

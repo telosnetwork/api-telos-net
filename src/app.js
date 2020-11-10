@@ -11,6 +11,7 @@ const port = process.env.SERVER_PORT || 9999
 logger.info(`Starting API with mode ${process.env.MODE} and SERVER_ENDPOINT ${process.env.SERVER_ENDPOINT} and SERVER_PORT ${process.env.SERVER_PORT}`)
 
 const fastify = require('fastify')({
+    trustProxy: true,
     logger
 })
 
