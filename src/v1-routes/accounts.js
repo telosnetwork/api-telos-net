@@ -4,6 +4,7 @@ const cryptoLib = require("../libs/crypto-lib");
 const Sentry = require('@sentry/node');
 const { VoipError } = require('../libs/voip-error');
 const eosioLib = require("../libs/eosio-lib");
+const axios = require("axios");
 
 const CURRENT_VERSION = "v0.1";
 
@@ -427,54 +428,37 @@ async function recaptchaCreateHandler(request, reply) {
         let ownerKey = request.body.ownerKey;
         let activeKey = request.body.activeKey;
         let recaptchaResponse = request.body.recaptchaResponse;
+        let ipAddress = request.ips.pop();
 
 
-        let record = {};
-        reply.send({
-            ipAddress: request.ip,
-            ipAddresses: request.ips,
-            accountName, ownerKey, activeKey, recaptchaResponse
-        })
+        let canCreate = await dynamoDbLib.ipCanCreate(ipAddress);
+        if (canCreate) {
+            let recaptchaResult = await axios.post(RECAPTCHA_URL, {
+                secret: process.env.recaptchaServerkey,
+                response: recaptchaResponse
+            });
 
-        /*
-        if (await dynamoDbLib.exists(smsHash)) {
-            record = await dynamoDbLib.getBySmsHash(smsHash);
-            if (record.accountCreatedAt > 0) {
-                request.log.info(`Already got Telos account, record is ${JSON.stringify(record, null, 4)}`)
-                return reply.code(403).send(`This SMS number ${smsNumber} has already received a free Telos account via this service. Use SQRL or another wallet to create another account.`);
+            if (!recaptchaResult.data.success) {
+                request.log.info(`Recaptcha failure: ${JSON.stringify(recaptchaResult.data, null, 4)}`);
+                return reply.code(403).send({
+                    success: false,
+                    message: `Recaptcha failure` 
+                })
             }
+
+            dynamoDbLib.ipCreated(ipAddress);
+            result = await eosioLib.create(accountName, ownerKey, activeKey);
+            return reply.send({
+                success: true,
+            })
+        } else {
+            return reply.code(429).send({
+                success: false,
+                message: `IP Address ${ipAddress} cannot create any more accounts at this time`,
+            })
         }
-
-        if (request.body.telosAccount) {
-            if (!await eosioLib.validAccountFormat(request.body.telosAccount)) {
-                return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
-            }
-            if (await eosioLib.accountExists(request.body.telosAccount)) {
-                return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) already exists.`);
-            }
-            record.telosAccount = request.body.telosAccount;
-        }
-
-        if (request.body.activeKey) { record.activeKey = request.body.activeKey; }
-        if (request.body.ownerKey) { record.ownerKey = request.body.ownerKey; }
-
-        const otp = Math.floor(100000 + Math.random() * 900000);
-        const msg = await sendLib.sendSMS(smsNumber, otp);
-
-        record.smsHash = smsHash;
-        record.smsOtp = otp;
-        record.smsSid = msg.sid;
-        record.version = CURRENT_VERSION;
-
-        await dynamoDbLib.save(record);
-
-        reply.code(204);
-    */
     } catch (e) {
         request.log.error(e)
-        if (e instanceof VoipError || e.name === 'VoipError') {
-            reply.code(401).send(e.message);
-        }
         reply.code(500).send(e.message);
     }
 }

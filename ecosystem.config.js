@@ -20,7 +20,10 @@ const envDev = {
   API_LOG_LEVEL: 'debug',
   MODE: 'dev',
   SERVER_ENDPOINT: 'api-dev.telos.net',
-  SERVER_PORT: 3000
+  SERVER_PORT: 3000,
+  recaptchaClientKey: '6LeGBeEZAAAAAHP1EkKhZ1ECxlLgXD8Dr8c9nkuz',
+  recaptchaServerkey: '6LeGBeEZAAAAAGngFPZNYXMBrMK0JUr3-qvgujcf',
+  recaptchaTableName: 'dev-recaptcha-accounts'
 }
 
 const envProd = {
@@ -45,7 +48,10 @@ const envProd = {
   API_LOG_LEVEL: 'debug',
   MODE: 'prod',
   SERVER_ENDPOINT: 'api.telos.net',
-  SERVER_PORT: 4000
+  SERVER_PORT: 4000,
+  recaptchaClientKey: '6LeGBeEZAAAAAHP1EkKhZ1ECxlLgXD8Dr8c9nkuz',
+  recaptchaServerkey: '6LeGBeEZAAAAAGngFPZNYXMBrMK0JUr3-qvgujcf',
+  recaptchaTableName: 'prod-recaptcha-accounts'
 }
 
 const dev = {

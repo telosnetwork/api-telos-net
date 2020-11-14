@@ -26,6 +26,59 @@ async function deleteAccount(smsHash) {
   await call("delete", delParams);
 }
 
+async function ipCanCreate(ipAddress) {
+  const readParams = {
+    TableName: process.env.recaptchaTableName,
+    Key: {
+      ipAddress
+    }
+  }
+
+  const result = await call("get", readParams);
+  if (!result.Item || result.Item.accountsCreated < result.Item.accountsAllowed) {
+    return true;
+  }
+
+  return false;
+}
+
+async function ipCreated(ipAddress) {
+  const readParams = {
+    TableName: process.env.recaptchaTableName,
+    Key: {
+      ipAddress
+    }
+  }
+
+  const lastCreate = Date.now();
+  const result = await call("get", readParams);
+
+  if (!result.Item) {
+    const accountsCreated = 1;
+    const accountsAllowed = 1;
+    const createResult = await call("put", {
+      TableName: process.env.recaptchaTableName,
+      Item: {
+        ipAddress, accountsCreated, accountsAllowed, lastCreate
+      },
+      ConditionExpression: 'attribute_not_exists(ipAddress)'
+    })
+  } else {
+    const updateResult = await call("update", {
+      TableName: process.env.recaptchaTableName,
+      Key: {
+        ipAddress
+      },
+      UpdateExpression: "set accountsCreated = accountsCreated + :num, lastCreate = :lastCreate",
+      ConditionExpression: "accountsCreated < accountsAllowed",
+      ExpressionAttributeValues: {
+        ":num": 1,
+        ":lastCreate": lastCreate
+      }
+    })
+  }
+}
+
 async function exists(smsHash) {
   const readParams = {
     TableName: process.env.tableName,
@@ -58,4 +111,4 @@ async function getBySmsHash(smsHash) {
   return result.Item;
 }
 
-module.exports = { call, save, deleteAccount, exists, getBySmsHash }
+module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCreated }
