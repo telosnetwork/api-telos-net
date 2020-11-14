@@ -8,8 +8,6 @@ const axios = require("axios");
 
 const CURRENT_VERSION = "v0.1";
 
-const RECAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify";
-
 const registrationOpts = {
     schema: {
         tags: ['accounts'],
@@ -433,10 +431,15 @@ async function recaptchaCreateHandler(request, reply) {
 
         let canCreate = await dynamoDbLib.ipCanCreate(ipAddress);
         if (canCreate) {
-            let recaptchaResult = await axios.post(RECAPTCHA_URL, {
-                secret: process.env.recaptchaServerkey,
-                response: recaptchaResponse
-            });
+            let recaptchaResult = await axios.post(
+                `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.recaptchaServerkey}&response=${recaptchaResponse}`,
+                {},
+                {
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
+                  },
+                },
+              );
 
             if (!recaptchaResult.data.success) {
                 request.log.info(`Recaptcha failure: ${JSON.stringify(recaptchaResult.data, null, 4)}`);
