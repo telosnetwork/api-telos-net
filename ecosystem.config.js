@@ -49,8 +49,8 @@ const envProd = {
   MODE: 'prod',
   SERVER_ENDPOINT: 'api.telos.net',
   SERVER_PORT: 4000,
-  recaptchaClientKey: '6LeGBeEZAAAAAHP1EkKhZ1ECxlLgXD8Dr8c9nkuz',
-  recaptchaServerkey: '6LeGBeEZAAAAAGngFPZNYXMBrMK0JUr3-qvgujcf',
+  recaptchaClientKey: '6Ld-_eIZAAAAAF6JsrFudo_uQjRL4eqPAZE40I3o',
+  recaptchaServerkey: '6Ld-_eIZAAAAAHNKjH47BPSMdVltMNpSosc0hr0a',
   recaptchaTableName: 'prod-recaptcha-accounts'
 }
 
