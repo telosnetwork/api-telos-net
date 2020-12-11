@@ -1,13 +1,14 @@
 const { getCurrencyStats, getCurrencyBalance, getRexStats } = require("../libs/eosio-lib");
 
-const cmcCirculationExclusions = ["exrsrv.tf", "tf", "eosio.saving", "free.tf", "eosio.names",
+const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "works.decide", "tf", "eosio.saving", "free.tf", "eosio.names",
     "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf"];
 
-const standardCirculationExclusions = ["exrsrv.tf"];
+const standardCirculationExclusions = ["exrsrv.tf", "tlosrecovery"];
 
 async function circulatingSupply(requestor) {
 
-    let exclusions = requestor === 'cmc' ? cmcCirculationExclusions : standardCirculationExclusions;
+    //let exclusions = requestor === 'cmc' ? cmcCirculationExclusions : standardCirculationExclusions;
+    let exclusions = cmcCirculationExclusions;
 
     const stats = await getCurrencyStats();
     var supply = parseFloat(stats.supply);
