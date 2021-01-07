@@ -4,6 +4,7 @@ const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 const { getSecret } = require("./auth-lib");
 const { generateKeyPair } = require("crypto");
+const axios = require("axios");
 
 async function create(accountName, ownerKey, activeKey) {
 
@@ -115,4 +116,17 @@ async function getRexStats() {
   return rexRows.rows[0];
 }
 
-module.exports = { create, genRandomKey, genRandomKeys, accountExists, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats }
+async function getActionStats(byHour, endMoment) {
+  let params = {
+    period: byHour ? '1h' : '24h'
+  }
+
+  if (endMoment)
+    params.end_date = endMoment.toISOString();
+
+  let actionsResult = await axios(`${process.env.hyperionEndpoint}/v2/stats/get_action_usage`, { params });
+  
+  return actionsResult.data;
+}
+
+module.exports = { create, genRandomKey, genRandomKeys, accountExists, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats }

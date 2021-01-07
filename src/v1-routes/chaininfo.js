@@ -1,4 +1,5 @@
-const { getCurrencyStats, getCurrencyBalance, getRexStats } = require("../libs/eosio-lib");
+const moment = require('moment');
+const { getCurrencyStats, getCurrencyBalance, getRexStats, getActionStats } = require("../libs/eosio-lib");
 
 const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "works.decide", "tf", "eosio.saving", "free.tf", "eosio.names",
     "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf"];
@@ -60,7 +61,38 @@ async function rexPrice() {
     return rexTelosPrice;
 }
 
+async function blocktivityHourly() {
+    let actionStats = await getActionStats(true, moment().startOf('hour'));
+    return {
+        last_1h_op: actionStats.action_count,
+        last_1h_tx: actionStats.tx_count
+    };
+}
+
 module.exports = async (fastify, options) => {
+    fastify.get('stats/blocktivity', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    type: 'object',
+                    properties: {
+                        last_1h_op: {
+                            type: 'number',
+                            example: 123456789
+                        },
+                        last_1h_tx: {
+                            type: 'number',
+                            example: 123456
+                        }
+                    }
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await blocktivityHourly()
+    })
+
     fastify.get('supply/staked', {
         schema: {
             tags: ['stats'],
