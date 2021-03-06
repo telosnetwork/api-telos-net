@@ -4,10 +4,11 @@ const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 const { getKeyBySecretName } = require("./auth-lib");
 const AWS = require("aws-sdk");
+const { evmFaucetTransfer } = require("./evm-lib")
 const { request } = require("https");
 AWS.config.update({ region: "us-east-1" });
 
-const tlosPerFaucet = '1000.0000 TLOS';
+const tlosPerFaucet = '100.0000 TLOS';
 const rotationTableKey = 'rotation';
 
 async function call(action, params) {
@@ -41,6 +42,26 @@ async function setLastVoted(rotationSchedule) {
             rotationSchedule: rotationSchedule
         }
     });
+}
+
+async function evmFaucet(evmAddress) {
+    const faucetAccount = process.env.testnetFaucetAccount;
+    const actions = [{
+        account: 'eosio.token',
+        name: 'transfer',
+        authorization: [{
+            actor: faucetAccount,
+            permission: 'active',
+        }],
+        data: {
+            from: faucetAccount,
+            to: 'eosio.evm',
+            quantity: tlosPerFaucet,
+            memo: 'Deposit'
+        }
+    }];
+    await faucetActions(actions);
+    await evmFaucetTransfer(evmAddress, tlosPerFaucet);
 }
 
 async function faucet(accountName) {
@@ -275,4 +296,4 @@ async function getProducers() {
     return producers;
 }
 
-module.exports = { getLastVoted, rotate, create, faucet };
+module.exports = { getLastVoted, rotate, create, faucet, evmFaucet };

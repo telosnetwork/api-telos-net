@@ -1,5 +1,5 @@
 const { getCurrencyStats, getCurrencyBalance } = require("../libs/eosio-lib");
-const { getLastVoted, rotate, create, faucet } = require("../libs/testnet-lib");
+const { getLastVoted, rotate, create, faucet, evmFaucet } = require("../libs/testnet-lib");
 
 const faucetOpts = {
     schema: {
@@ -29,12 +29,48 @@ const faucetOpts = {
 
 async function faucetHandler(request, reply) {
     try {
-        let result = await faucet(request.params.accountName);
+        let result = await evmFaucet(request.params.evmAddress);
         reply.code(204)
     } catch (e) {
         reply.code(400).send(`Error pouring the faucet: ${e.message}`);
     }
 }
+
+const evmFaucetOpts = {
+    schema: {
+        tags: ['testnet'],
+        params: {
+            type: 'object',
+            properties: {
+                'evmAddress': {
+                    description: 'TelosEVM address to send the EVM TLOS to',
+                    type: 'string'
+                }
+            },
+            required: ['evmAddress']
+        },
+        response: {
+            204: {
+                description: 'Faucet successful',
+                type: 'null'
+            },
+            400: {
+                description: 'Faucet error',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function evmFaucetHandler(request, reply) {
+    try {
+        let result = await evmFaucet(request.params.evmAddress);
+        reply.code(204)
+    } catch (e) {
+        reply.code(400).send(`Error pouring the faucet: ${e.message}`);
+    }
+}
+
 
 const accountOpts = {
     schema: {
@@ -170,6 +206,7 @@ module.exports = async (fastify, options) => {
     fastify.get('testnet/rotate', autorotateOpts, autorotateHandler)
     fastify.get('testnet/produce/:bpAccount', addToRotationOpts, addToRotationHandler)
     fastify.get('testnet/faucet/:accountName', faucetOpts, faucetHandler)
+    fastify.get('testnet/evmFaucet/:evmAddress', evmFaucetOpts, evmFaucetHandler)
 
     fastify.post('testnet/account', accountOpts, accountHandler)
 }
