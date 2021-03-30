@@ -31,7 +31,6 @@ async function evmFaucetTransfer(evmAddress, quantity) {
     to: evmAddress,
     quantity,
   });
-  console.log("DONE");
 }
 
 module.exports = { evmFaucetTransfer };
