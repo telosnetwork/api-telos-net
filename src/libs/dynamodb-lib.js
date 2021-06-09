@@ -35,7 +35,14 @@ async function ipCanCreate(ipAddress) {
   }
 
   const result = await call("get", readParams);
-  if (!result.Item || result.Item.accountsCreated < result.Item.accountsAllowed) {
+
+  difference = 0;
+  if(result.Item.firstCreate) {
+    min = 1000*60
+    difference = (result.Item.lastCreate - result.Item.firstCreate)/min
+  }
+
+  if (!result.Item || !result.Item.firstCreate || result.Item.accountsCreated < result.Item.accountsAllowed || difference > process.env.TIME_SPAN) {
     return true;
   }
 
@@ -52,16 +59,51 @@ async function ipCreated(ipAddress) {
 
   const lastCreate = Date.now();
   const result = await call("get", readParams);
+  difference = 0;
 
-  if (!result.Item) {
+  if(result.Item.firstCreate){
+    min = 1000*60
+    difference = (result.Item.lastCreate - result.Item.firstCreate)/min // Get time since first create in minutes
+  }
+  
+  if (!result.Item) { // If user has never created an account through this service
     const accountsCreated = 1;
-    const accountsAllowed = 1;
+    const accountsAllowed = 4;
+    const firstCreate = lastCreate;
     const createResult = await call("put", {
       TableName: process.env.recaptchaTableName,
       Item: {
-        ipAddress, accountsCreated, accountsAllowed, lastCreate
+        ipAddress, accountsCreated, accountsAllowed, lastCreate, firstCreate
       },
       ConditionExpression: 'attribute_not_exists(ipAddress)'
+    })
+    
+  } else if(!result.Item.firstCreate){ // If a user has not created an account since we added support for creating 4 accounts/week
+    const updateResult = await call("update", {
+      TableName: process.env.recaptchaTableName,
+      Key: {
+        ipAddress
+      },
+      UpdateExpression: "set accountsCreated = accountsCreated + :num, accountsAllowed = :accountsAllowed, lastCreate = :lastCreate, firstCreate = :firstCreate",
+      ExpressionAttributeValues: {
+        ":accountsAllowed": accountsAllowed,
+        ":num": 1,
+        ":lastCreate": lastCreate,
+        ":firstCreate": firstCreate
+      }
+    })
+  } else if(difference > process.env.TIME_SPAN) { // If it has been at least 7 days since their first account this set
+    const updateResult = await call("update", {
+      TableName: process.env.recaptchaTableName,
+      Key: {
+        ipAddress
+      },
+      UpdateExpression: "set accountsCreated = accountsCreated + :num, accountsAllowed = accountsAllowed + :accountsAllowed, lastCreate = :lastCreate, firstCreate = :lastCreate",
+      ExpressionAttributeValues: {
+        ":num": 1,
+        ":lastCreate": lastCreate,
+        ":accountsAllowed": accountsAllowed
+      }
     })
   } else {
     const updateResult = await call("update", {
@@ -76,6 +118,8 @@ async function ipCreated(ipAddress) {
         ":lastCreate": lastCreate
       }
     })
+
+
   }
 }
 

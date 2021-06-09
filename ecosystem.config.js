@@ -25,7 +25,8 @@ const envDev = {
   recaptchaClientKey: '6Ld-_eIZAAAAAF6JsrFudo_uQjRL4eqPAZE40I3o',
   recaptchaServerkey: '6Ld-_eIZAAAAAHNKjH47BPSMdVltMNpSosc0hr0a',
   recaptchaTableName: 'dev-recaptcha-accounts',
-  moonpaySecretKey: 'sk_live_Wd8ggfnxz4fWk0n9DSfkEKjr5T3k7Mes'
+  moonpaySecretKey: 'sk_live_Wd8ggfnxz4fWk0n9DSfkEKjr5T3k7Mes',
+  TIME_SPAN: 5
 }
 
 const envProd = {
@@ -55,7 +56,8 @@ const envProd = {
   recaptchaClientKey: '6Ld-_eIZAAAAAF6JsrFudo_uQjRL4eqPAZE40I3o',
   recaptchaServerkey: '6Ld-_eIZAAAAAHNKjH47BPSMdVltMNpSosc0hr0a',
   recaptchaTableName: 'prod-recaptcha-accounts',
-  moonpaySecretKey: 'sk_live_Wd8ggfnxz4fWk0n9DSfkEKjr5T3k7Mes'
+  moonpaySecretKey: 'sk_live_Wd8ggfnxz4fWk0n9DSfkEKjr5T3k7Mes',
+  TIME_SPAN: 10080
 }
 
 const dev = {
