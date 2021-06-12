@@ -428,7 +428,6 @@ async function recaptchaCreateHandler(request, reply) {
         let recaptchaResponse = request.body.recaptchaResponse;
         let ipAddress = request.ips.pop();
 
-
         let canCreate = await dynamoDbLib.ipCanCreate(ipAddress);
         if (canCreate) {
             let recaptchaResult = await axios.post(
@@ -453,6 +452,7 @@ async function recaptchaCreateHandler(request, reply) {
             result = await eosioLib.create(accountName, ownerKey, activeKey);
             return reply.send({
                 success: true,
+                result
             })
         } else {
             return reply.code(429).send({

@@ -26,16 +26,18 @@ async function create(accountName, ownerKey, activeKey) {
 
   const actions = [
     {
-      account: process.env.accountCreatorAccount,
-      name: "create",
+      account: process.env.accountCreatorContract,
+      name: "createconf",
       authorization: [
         {
-          actor: process.env.accountCreatorContract,
+          actor: process.env.accountCreatorAccount,
           permission: "active"
         }
       ],
       data: {
-        account_to_create: accountName,
+        account_creator: process.env.accountCreatorAccount,
+        account_name: accountName,
+        auth_creator: false,
         owner_key: ownerKey,
         active_key: activeKey
       }
