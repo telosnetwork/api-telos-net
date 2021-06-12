@@ -58,18 +58,19 @@ async function ipCreated(ipAddress) {
   }
 
   const lastCreate = Date.now();
-  const result = await call("get", readParams);
-  difference = 0;
+  const firstCreate = lastCreate;
+  const accountsCreated = 1;
+  const accountsAllowed = 4;
 
+  difference = 0;
   if(result.Item.firstCreate){
     min = 1000*60
     difference = (result.Item.lastCreate - result.Item.firstCreate)/min // Get time since first create in minutes
   }
-  
+
+  const result = await call("get", readParams);
+
   if (!result.Item) { // If user has never created an account through this service
-    const accountsCreated = 1;
-    const accountsAllowed = 4;
-    const firstCreate = lastCreate;
     const createResult = await call("put", {
       TableName: process.env.recaptchaTableName,
       Item: {
