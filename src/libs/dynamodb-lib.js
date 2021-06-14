@@ -36,10 +36,10 @@ async function ipCanCreate(ipAddress) {
 
   const result = await call("get", readParams);
 
-  difference = 0;
-  if(result.Item.firstCreate) {
+  if(result.Item) {
     min = 1000*60
-    difference = (result.Item.lastCreate - result.Item.firstCreate)/min
+    difference = ((Date.now() - result.Item.firstCreate)/min)
+    difference = difference ? difference : 0
   }
 
   if (!result.Item || !result.Item.firstCreate || result.Item.accountsCreated < result.Item.accountsAllowed || difference > process.env.TIME_SPAN) {
@@ -62,14 +62,15 @@ async function ipCreated(ipAddress) {
   const accountsCreated = 1;
   const accountsAllowed = 4;
 
-  difference = 0;
-  if(result.Item.firstCreate){
-    min = 1000*60
-    difference = (result.Item.lastCreate - result.Item.firstCreate)/min // Get time since first create in minutes
-  }
-
   const result = await call("get", readParams);
 
+  difference = 0;
+  if(result.Item){
+    min = 1000*60
+    difference = ((Date.now() - result.Item.firstCreate)/min)
+    difference = difference ? difference : 0 // Get time since first create in minutes
+  }
+  
   if (!result.Item) { // If user has never created an account through this service
     const createResult = await call("put", {
       TableName: process.env.recaptchaTableName,
@@ -85,7 +86,7 @@ async function ipCreated(ipAddress) {
       Key: {
         ipAddress
       },
-      UpdateExpression: "set accountsCreated = accountsCreated + :num, accountsAllowed = :accountsAllowed, lastCreate = :lastCreate, firstCreate = :firstCreate",
+      UpdateExpression: "set accountsCreated = :num, accountsAllowed = :accountsAllowed, lastCreate = :lastCreate, firstCreate = :firstCreate",
       ExpressionAttributeValues: {
         ":accountsAllowed": accountsAllowed,
         ":num": 1,
@@ -99,7 +100,7 @@ async function ipCreated(ipAddress) {
       Key: {
         ipAddress
       },
-      UpdateExpression: "set accountsCreated = accountsCreated + :num, accountsAllowed = accountsAllowed + :accountsAllowed, lastCreate = :lastCreate, firstCreate = :lastCreate",
+      UpdateExpression: "set accountsCreated = accountsCreated + :num, accountsAllowed = accountsCreated + :accountsAllowed, lastCreate = :lastCreate, firstCreate = :lastCreate",
       ExpressionAttributeValues: {
         ":num": 1,
         ":lastCreate": lastCreate,
