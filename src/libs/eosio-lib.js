@@ -95,13 +95,17 @@ async function getCurrencyBalance(accountName, code = "eosio.token", symbol = "1
   }
 }
 
-async function getCurrencyStats(code = "eosio.token", symbol = "1.0000 TLOS") {
+async function getTableRows(opts) {
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
-  let symbolName = symbol.split(" ")[1];
+  return await rpc.get_table_rows(opts);
+}
+
+async function getCurrencyStats(code = "eosio.token", symbol = "TLOS") {
+  const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   let statRow = await rpc.get_table_rows({
     json: true,
     code: code,
-    scope: symbolName,
+    scope: symbol,
     table: 'stat'
   });
   return statRow.rows[0];
@@ -131,4 +135,4 @@ async function getActionStats(byHour, endMoment) {
   return actionsResult.data;
 }
 
-module.exports = { create, genRandomKey, genRandomKeys, accountExists, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats }
+module.exports = { create, genRandomKey, genRandomKeys, accountExists, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats, getTableRows }
