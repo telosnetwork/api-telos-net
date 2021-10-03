@@ -9,13 +9,14 @@ const standardCirculationExclusions = ["exrsrv.tf", "tlosrecovery"];
 async function circulatingSupply(requestor) {
 
     //let exclusions = requestor === 'cmc' ? cmcCirculationExclusions : standardCirculationExclusions;
-    let exclusions = cmcCirculationExclusions;
+    let exclusions = standardCirculationExclusions;
 
     const stats = await getCurrencyStats();
     var supply = parseFloat(stats.supply);
     if (isNaN(supply))
         throw new Error("Failed to get supply instead got stats with value of " + stats);
 
+    console.log(`Supply is: ${supply.toFixed(4)}`)
     for (let i = 0; i < exclusions.length; i++) {
         let accountToCheck = exclusions[i];
         let balanceString = await getCurrencyBalance(accountToCheck);
@@ -23,6 +24,7 @@ async function circulatingSupply(requestor) {
         if (isNaN(bal))
             throw new Error("Failed to get balance for " + accountToCheck + " instead got " + bal);
 
+        console.log(`${accountToCheck} has: ${bal.toFixed(4)}`)
         supply -= bal;
     }
 
