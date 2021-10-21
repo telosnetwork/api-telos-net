@@ -12,7 +12,10 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/src/app.js"
+            "program": "${workspaceFolder}/src/app.js",
+            "env": {
+                "AWS_SDK_LOAD_CONFIG": "1"
+            }
         }
     ]
 }
