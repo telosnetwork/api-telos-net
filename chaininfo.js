@@ -1,5 +1,6 @@
 import { getCurrencyStats, getCurrencyBalance, getRexStats } from "./libs/eosio-lib";
 import { respond } from './libs/response-lib';
+import { exclude } from "./src/utils/exclude";
 
 const cmcCirculationExclusions = ["exrsrv.tf", "tf", "eosio.saving", "free.tf", "eosio.names",
     "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf"];
@@ -15,19 +16,7 @@ export async function circulatingSupply(event, context) {
     }
 
     const stats = await getCurrencyStats();
-    var supply = parseFloat(stats.supply);
-    if (isNaN(supply))
-        throw new Error("Failed to get supply instead got stats with value of " + stats);
-
-    for (let i = 0; i < exclusions.length; i++) {
-        let accountToCheck = exclusions[i];
-        let balanceString = await getCurrencyBalance(accountToCheck);
-        var bal = parseFloat(balanceString, 10);
-        if (isNaN(bal))
-            throw new Error("Failed to get balance for " + accountToCheck + " instead got " + bal);
-
-        supply -= bal;
-    }
+    const supply = await exclude(stats, exclusions)
 
     console.log('supply: ' + supply + ' was ' + stats.supply);
     return respond(200, supply);
