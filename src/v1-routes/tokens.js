@@ -1,4 +1,4 @@
-const { getCurrencyStats, getTableRows } = require("../libs/eosio-lib");
+const { getCurrencyStats, getCurrencyBalance, getTableRows } = require("../libs/eosio-lib");
 
 
 
