@@ -18,7 +18,8 @@ module.exports = async (fastify, options) => {
             querystring: {
                 exclude: { 
                     default: '',
-                    type: 'string' }
+                    type: 'string' 
+                }
             },
             params: {
                 type: 'object',
