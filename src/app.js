@@ -12,7 +12,12 @@ logger.info(`Starting API with mode ${process.env.MODE} and SERVER_ENDPOINT ${pr
 
 const fastify = require('fastify')({
     trustProxy: true,
-    logger
+    logger,
+    ajv: {
+        customOptions: {
+            coerceTypes: 'array'
+        }
+    }
 })
 
 fastify.register(fastifyGracefulShutdown)

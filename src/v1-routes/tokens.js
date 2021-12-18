@@ -5,6 +5,8 @@ const { getCurrencyStats, getTableRows } = require("../libs/eosio-lib");
 async function tokenSupplyHandler(request, reply) {
     const contract = request.params.contract;
     const symbol = request.params.symbol;
+    const exclusions = request.query.exclude.split(',')
+
     /*
     if (contract == 'apx' && symbol == 'APX') {
         let configRows = await getTableRows({
@@ -20,11 +22,22 @@ async function tokenSupplyHandler(request, reply) {
         return supply;
     }
     */
-
     const stats = await getCurrencyStats(contract, symbol);
     var supply = parseFloat(stats.supply);
+
     if (isNaN(supply))
         throw new Error("Failed to get supply instead got stats with value of " + stats);
+    console.log(`Supply is: ${supply.toFixed(4)}`)
+    for (let i = 0; i < exclusions.length; i++) {
+        let accountToCheck = exclusions[i];
+        let balanceString = await getCurrencyBalance(accountToCheck);
+        var bal = parseFloat(balanceString, 10);
+        if (isNaN(bal))
+            throw new Error("Failed to get balance for " + accountToCheck + " instead got " + bal);
+
+        console.log(`${accountToCheck} has: ${bal.toFixed(4)}`)
+        supply -= bal;
+    }
 
     return supply;
 }
@@ -32,6 +45,11 @@ async function tokenSupplyHandler(request, reply) {
 module.exports = async (fastify, options) => {
     fastify.get('token/supply/:contract/:symbol', {
         schema: {
+            querystring: {
+                exclude: { 
+                    default: '',
+                    type: 'string' }
+            },
             params: {
                 type: 'object',
                 properties: {
