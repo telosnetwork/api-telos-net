@@ -83,18 +83,21 @@ async function validAccountFormat(accountName) {
   return true;
 }
 
-async function getCurrencyBalance(accountName, code = '') {
+async function getCurrencyBalance(accountName, code = '', symbol = '') {
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   try {
-    if (code) {
+    if (code && symbol) {
       const queryParams = {  
         code,      
         scope: accountName,        
         table: 'accounts',        
-        limit: 1
+        limit: 100
       }
       const tokenBalanceResponse = await rpc.get_table_rows(queryParams);
-      return tokenBalanceResponse.rows[0].balance;
+      for (row of tokenBalanceResponse.rows){
+        if (row.balance.includes(symbol)) return row.balance;
+      }
+      return '0'
     }
     let balanceResponse = await rpc.get_account(accountName);
     return balanceResponse.hasOwnProperty('core_liquid_balance') ?
