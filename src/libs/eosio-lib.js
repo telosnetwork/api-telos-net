@@ -95,7 +95,8 @@ async function getCurrencyBalance(accountName, code = '', symbol = '') {
       }
       const tokenBalanceResponse = await rpc.get_table_rows(queryParams);
       for (row of tokenBalanceResponse.rows){
-        if (row.balance.includes(symbol)) return row.balance;
+        const ticker = row.balance.split(" ")[1];
+        if (ticker === symbol) return row.balance;
       }
       return '0'
     }
