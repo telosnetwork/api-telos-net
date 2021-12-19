@@ -3,13 +3,15 @@ const { exclude } = require("../utils/exclude");
 
 
 async function tokenSupplyHandler(request, reply) {
+    let supply;
     const contract = request.params.contract;
     const symbol = request.params.symbol;
-    const exclusions = request.query.exclude.split(',');
     const stats = await getCurrencyStats(contract, symbol);
-    const supply = await exclude(stats, exclusions)
-
-    return supply;
+    if (request.query.exclude){
+        const exclusions = request.query.exclude.split(',');
+        return await exclude(stats, exclusions, contract, symbol) 
+    } 
+    return stats.supply;
 }
 
 module.exports = async (fastify, options) => {
@@ -17,7 +19,6 @@ module.exports = async (fastify, options) => {
         schema: {
             querystring: {
                 exclude: { 
-                    default: '',
                     type: 'string' 
                 }
             },
