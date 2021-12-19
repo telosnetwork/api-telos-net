@@ -3,13 +3,11 @@ const { exclude } = require("../utils/exclude");
 
 
 async function tokenSupplyHandler(request, reply) {
-    let supply;
     const contract = request.params.contract;
-    const symbol = request.params.symbol;
     const stats = await getCurrencyStats(contract, symbol);
     if (request.query.exclude){
         const exclusions = request.query.exclude.split(',');
-        return await exclude(stats, exclusions, contract, symbol) 
+        return await exclude(stats, exclusions, contract) 
     } 
     return stats.supply;
 }

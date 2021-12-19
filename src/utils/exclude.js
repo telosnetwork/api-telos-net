@@ -1,7 +1,7 @@
 const {  getCurrencyBalance } = require("../libs/eosio-lib");
 
 async function exclude(stats, exclusions, contract = ''){
-    var supply = parseFloat(stats.supply);
+    let supply = parseFloat(stats.supply);
     if (isNaN(supply)){
         throw new Error("Failed to get supply instead got stats with value of " + stats);
     }
@@ -9,7 +9,7 @@ async function exclude(stats, exclusions, contract = ''){
     for (let i = 0; i < exclusions.length; i++) {
         let accountToCheck = exclusions[i];
         let balanceString = await getCurrencyBalance(accountToCheck, contract);
-        var bal = parseFloat(balanceString, 10);
+        let bal = parseFloat(balanceString, 10);
         if (isNaN(bal)){
             throw new Error("Failed to get balance for " + accountToCheck + " instead got " + bal);
         }
