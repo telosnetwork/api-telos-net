@@ -1,37 +1,26 @@
-const { getCurrencyStats, getTableRows } = require("../libs/eosio-lib");
-
+const { getCurrencyStats } = require("../libs/eosio-lib");
+const { exclude } = require("../utils/exclude");
 
 
 async function tokenSupplyHandler(request, reply) {
     const contract = request.params.contract;
     const symbol = request.params.symbol;
-    /*
-    if (contract == 'apx' && symbol == 'APX') {
-        let configRows = await getTableRows({
-            code: contract,
-            scope: contract,
-            table: 'config'
-        })
-        let config = configRows.rows[0];
-        var supply = parseFloat(config.total_supply.split(' ')[0]);
-        if (isNaN(supply))
-            throw new Error("Failed to get supply instead got config.total_supply with value of " + config.total_supply);
-    
-        return supply;
-    }
-    */
-
     const stats = await getCurrencyStats(contract, symbol);
-    var supply = parseFloat(stats.supply);
-    if (isNaN(supply))
-        throw new Error("Failed to get supply instead got stats with value of " + stats);
-
-    return supply;
+    if (request.query.exclude){
+        const exclusions = request.query.exclude.split(',');
+        return await exclude(stats, exclusions, contract, symbol) 
+    } 
+    return stats.supply;
 }
 
 module.exports = async (fastify, options) => {
     fastify.get('token/supply/:contract/:symbol', {
         schema: {
+            querystring: {
+                exclude: { 
+                    type: 'string' 
+                }
+            },
             params: {
                 type: 'object',
                 properties: {

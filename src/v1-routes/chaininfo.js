@@ -1,5 +1,6 @@
 const moment = require('moment');
 const { getCurrencyStats, getCurrencyBalance, getRexStats, getActionStats } = require("../libs/eosio-lib");
+const { exclude } = require('../utils/exclude');
 
 const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "works.decide", "tf", "eosio.saving", "free.tf", "eosio.names",
     "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf"];
@@ -12,21 +13,7 @@ async function circulatingSupply(requestor) {
     let exclusions = standardCirculationExclusions;
 
     const stats = await getCurrencyStats();
-    var supply = parseFloat(stats.supply);
-    if (isNaN(supply))
-        throw new Error("Failed to get supply instead got stats with value of " + stats);
-
-    console.log(`Supply is: ${supply.toFixed(4)}`)
-    for (let i = 0; i < exclusions.length; i++) {
-        let accountToCheck = exclusions[i];
-        let balanceString = await getCurrencyBalance(accountToCheck);
-        var bal = parseFloat(balanceString, 10);
-        if (isNaN(bal))
-            throw new Error("Failed to get balance for " + accountToCheck + " instead got " + bal);
-
-        console.log(`${accountToCheck} has: ${bal.toFixed(4)}`)
-        supply -= bal;
-    }
+    const supply = await exclude(stats, exclusions);
 
     console.log('supply: ' + supply + ' was ' + stats.supply);
     return supply;

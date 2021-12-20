@@ -1,4 +1,3 @@
-const { getCurrencyStats, getCurrencyBalance } = require("../libs/eosio-lib");
 const { getLastVoted, rotate, create, faucet, evmFaucet } = require("../libs/testnet-lib");
 
 const faucetOpts = {

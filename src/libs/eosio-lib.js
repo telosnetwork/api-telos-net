@@ -83,9 +83,23 @@ async function validAccountFormat(accountName) {
   return true;
 }
 
-async function getCurrencyBalance(accountName, code = "eosio.token", symbol = "1.0000 TLOS") {
+async function getCurrencyBalance(accountName, code = '', symbol = '') {
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   try {
+    if (code && symbol) {
+      const queryParams = {  
+        code,      
+        scope: accountName,        
+        table: 'accounts',        
+        limit: 100
+      }
+      const tokenBalanceResponse = await rpc.get_table_rows(queryParams);
+      for (row of tokenBalanceResponse.rows){
+        const ticker = row.balance.split(" ")[1];
+        if (ticker === symbol) return row.balance;
+      }
+      return '0'
+    }
     let balanceResponse = await rpc.get_account(accountName);
     return balanceResponse.hasOwnProperty('core_liquid_balance') ?
       balanceResponse.core_liquid_balance.split(' ')[0] :
