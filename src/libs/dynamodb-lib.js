@@ -30,7 +30,6 @@ async function deleteAccount(smsHash) {
   await call("delete", delParams);
 }
 
-
 async function ipCanCreate(ipAddress) {
   const readParams = {
     TableName: process.env.recaptchaTableName,
@@ -91,7 +90,6 @@ async function ipCanTransact(ipAddress, accountName = NO_ACCOUNT) {
   }
   await addFaucetItem(ipAddress, accountName)
   return true;
-
 }
 
 async function updateAttemptCount(ipAddress, currentCount){
@@ -190,8 +188,6 @@ async function ipCreated(ipAddress) {
         ":lastCreate": lastCreate
       }
     })
-
-
   }
 }
 
