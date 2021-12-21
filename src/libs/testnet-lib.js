@@ -68,7 +68,7 @@ async function evmFaucet(evmAddress) {
 
 async function faucet(ipAddress, accountName) {
     console.log(`Faucet being called for ${accountName}`);
-    const actionAllowed = dynamoDbLib.ipCanTransact(ipAddress, accountName);
+    const actionAllowed = await dynamoDbLib.ipCanTransact(ipAddress, accountName);
     if (!actionAllowed){
         return false;
     }

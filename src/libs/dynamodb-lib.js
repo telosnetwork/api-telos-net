@@ -58,7 +58,7 @@ async function ipCanTransact(ipAddress, accountName) {
   const ipParams = {
     TableName: faucetTable,
     Key: {
-      ipAddress
+      IpAddress: ipAddress
     }
   }
 
@@ -72,8 +72,8 @@ async function ipCanTransact(ipAddress, accountName) {
   const result = await call("get", ipParams);
 
   if(result.Item) {
-    if (!dayElapsed(result.lastActionTime)){
-      await updateAttemptCount(ipAddress, result.attemptCount);
+    if (!dayElapsed(result.Item.LastActionTime)){
+      await updateAttemptCount(ipAddress, result.Item.AttemptCount);
       return false;
     }
   }else{
@@ -81,8 +81,8 @@ async function ipCanTransact(ipAddress, accountName) {
     const result = await call("get", accountParams);
 
     if(result.Item) {
-      if (!dayElapsed(result.lastActionTime)){
-        await updateAttemptCount(result.IpAddress, result.attemptCount)
+      if (!dayElapsed(result.Item.LastActionTime)){
+        await updateAttemptCount(result.Item.IpAddress, result.Item.attemptCount)
         return false;
       }
     }
@@ -98,12 +98,9 @@ async function updateAttemptCount(ipAddress, currentCount){
     Key: {
       IpAddress: ipAddress
     },
-    UpdateExpression: "set attemptCount = :num",
+    UpdateExpression: "set AttemptCount = :num",
     ExpressionAttributeValues: {
-      ":accountsAllowed": accountsAllowed,
       ":num": currentCount++,
-      ":lastCreate": lastCreate,
-      ":firstCreate": firstCreate
     }
   })
 }
