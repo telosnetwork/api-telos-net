@@ -46,7 +46,11 @@ async function setLastVoted(rotationSchedule) {
     });
 }
 
-async function evmFaucet(evmAddress) {
+async function evmFaucet(ipAddress, evmAddress) {
+    const actionAllowed = await dynamoDbLib.ipCanTransact(ipAddress, evmAddress);
+    if (!actionAllowed){
+        return false;
+    }
     const faucetAccount = process.env.testnetFaucetAccount;
     const actions = [{
         account: 'eosio.token',
