@@ -62,8 +62,6 @@ async function ipCanTransact(ipAddress, accountName) {
     }
   }
 
-
-
   const result = await call("get", ipParams);
 
   if(result.Item) {
@@ -90,7 +88,7 @@ async function ipCanTransact(ipAddress, accountName) {
       }
     }
   }
-  addFaucetItem(ipAddress, accountName)
+  await addFaucetItem(ipAddress, accountName)
   return true;
 
 }
