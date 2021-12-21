@@ -1,15 +1,17 @@
 const { Api, JsonRpc, RpcError } = require("eosjs");
 const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
-const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 const { getKeyBySecretName } = require("./auth-lib");
-const AWS = require("aws-sdk");
 const { evmFaucetTransfer } = require("./evm-lib")
 const { request } = require("https");
+const fetch = require("node-fetch"); // node only; not needed in browsers
+const AWS = require("aws-sdk");
+const dynamoDbLib = require("./dynamodb-lib");
+
 AWS.config.update({ region: "us-east-1" });
 
-const tlosPerFaucet = '100.0000 TLOS';
-const rotationTableKey = 'rotation';
+const TLOS_PER_FAUCET = '100.0000 TLOS';
+const ROTATION_TABLE_KEY = 'rotation';
 
 async function call(action, params) {
     const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -20,7 +22,24 @@ async function getLastVoted() {
     const readParams = {
         TableName: process.env.testnetRotationTableName,
         Key: {
-            tableKey: rotationTableKey
+            tableKey: ROTATION_TABLE_KEY
+        }
+    };
+
+    const result = await call("get", readParams);
+    if (!result.Item) {
+        console.error("Failed to get rotation");
+        return "[]";
+    }
+
+    return JSON.parse(result.Item.rotationSchedule);
+}
+
+async function getLastTransaction() {
+    const readParams = {
+        TableName: process.env.testnetFaucetTableName,
+        Key: {
+            tableKey: ROTATION_TABLE_KEY
         }
     };
 
@@ -38,7 +57,7 @@ async function setLastVoted(rotationSchedule) {
         TableName: process.env.testnetRotationTableName,
         Item: {
             updatedAt: Date.now(),
-            tableKey: rotationTableKey,
+            tableKey: ROTATION_TABLE_KEY,
             rotationSchedule: rotationSchedule
         }
     });
@@ -56,16 +75,20 @@ async function evmFaucet(evmAddress) {
         data: {
             from: faucetAccount,
             to: 'eosio.evm',
-            quantity: tlosPerFaucet,
+            quantity: TLOS_PER_FAUCET,
             memo: 'Deposit'
         }
     }];
     await faucetActions(actions);
-    await evmFaucetTransfer(evmAddress, tlosPerFaucet);
+    await evmFaucetTransfer(evmAddress, TLOS_PER_FAUCET);
 }
 
-async function faucet(accountName) {
+async function faucet(ipAddress, accountName) {
     console.log(`Faucet being called for ${accountName}`);
+    const actionAllowed = dynamoDbLib.ipCanTransact(ipAddress, accountName);
+    if (!actionAllowed){
+        return false;
+    }
     const faucetAccount = process.env.testnetFaucetAccount;
     const actions = [{
         account: 'eosio.token',
@@ -77,7 +100,7 @@ async function faucet(accountName) {
         data: {
             from: faucetAccount,
             to: accountName,
-            quantity: tlosPerFaucet,
+            quantity: TLOS_PER_FAUCET,
             memo: 'Testnet faucet'
         }
     }];
@@ -159,7 +182,7 @@ async function create(accountName, ownerKey, activeKey) {
         data: {
             from: faucetAccount,
             to: accountName,
-            quantity: tlosPerFaucet,
+            quantity: TLOS_PER_FAUCET,
             memo: 'Testnet account creation'
         }
     }];

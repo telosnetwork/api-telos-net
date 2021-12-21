@@ -28,7 +28,8 @@ const faucetOpts = {
 
 async function faucetHandler(request, reply) {
     try {
-        let result = await faucet(request.params.accountName);
+        let result = await faucet(request.ips.pop(), request.params.accountName);
+        if (!result) reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         reply.code(204)
     } catch (e) {
         reply.code(400).send(`Error pouring the faucet: ${e.message}`);

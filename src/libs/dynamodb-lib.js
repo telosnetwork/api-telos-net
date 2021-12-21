@@ -1,5 +1,8 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-1" });
+import { dayElapsed } from "../utils/dayElapsed";
+
+const faucetTable = process.env.testnetFaucetTableName
 
 function call(action, params) {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -26,6 +29,7 @@ async function deleteAccount(smsHash) {
   await call("delete", delParams);
 }
 
+
 async function ipCanCreate(ipAddress) {
   const readParams = {
     TableName: process.env.recaptchaTableName,
@@ -47,6 +51,73 @@ async function ipCanCreate(ipAddress) {
   }
 
   return false;
+}
+
+async function ipCanTransact(ipAddress, accountName) {
+
+  const ipParams = {
+    TableName: faucetTable,
+    Key: {
+      ipAddress
+    }
+  }
+
+  const accountParams = {
+    TableName: faucetTable,
+    IndexName: process.env.testnetFaucetSecondaryIndex,
+    KeyConditionExpression: `${process.env.testnetFaucetSecondaryIndex} = :account_name`,
+    ExpressionAttributeValues:  { ':account_name' : { S: accountName } }
+  }
+
+  const result = await call("get", ipParams);
+
+  if(result.Item) {
+    if (!dayElapsed(result.lastActionTime)){
+      await updateAttemptCount(ipAddress, result.attemptCount);
+      return false;
+    }
+  }else{
+
+    const result = await call("get", accountParams);
+
+    if(result.Item) {
+      if (!dayElapsed(result.lastActionTime)){
+        await updateAttemptCount(result.IpAddress, result.attemptCount)
+        return false;
+      }
+    }
+  }
+  addFaucetItem(ipAddress, accountName)
+  return true;
+
+}
+
+async function updateAttemptCount(ipAddress, currentCount){
+  await call("update", {
+    TableName: faucetTable,
+    Key: {
+      IpAddress: ipAddress
+    },
+    UpdateExpression: "set attemptCount = :num",
+    ExpressionAttributeValues: {
+      ":accountsAllowed": accountsAllowed,
+      ":num": currentCount++,
+      ":lastCreate": lastCreate,
+      ":firstCreate": firstCreate
+    }
+  })
+}
+
+async function addFaucetItem(ipAddress, accountName){
+  await call("put", {
+    TableName: faucetTable,
+    Item: {
+      IpAddress: ipAddress, 
+      AttemptCount: 1, 
+      AccountName: accountName, 
+      LastActionTime: Date.now()
+    }
+  })
 }
 
 async function ipCreated(ipAddress) {
@@ -157,4 +228,4 @@ async function getBySmsHash(smsHash) {
   return result.Item;
 }
 
-module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCreated }
+module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCanTransact, ipCreated }
