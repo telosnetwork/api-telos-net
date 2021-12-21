@@ -80,7 +80,7 @@ async function ipCanTransact(ipAddress, accountName) {
 
     const result = await call("query", accountParams);
 
-    if(result.Items) {
+    if(result.Items.length) {
       const item = result.Items[0];
       if (!dayElapsed(item.LastActionTime)){
         await updateAttemptCount(item.IpAddress, item.AttemptCount)
