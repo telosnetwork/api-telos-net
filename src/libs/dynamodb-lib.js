@@ -64,9 +64,9 @@ async function ipCanTransact(ipAddress, accountName) {
 
   const accountParams = {
     TableName: faucetTable,
-    IndexName: process.env.testnetFaucetSecondaryIndex,
+    IndexName: `${process.env.testnetFaucetSecondaryIndex}-index`,
     KeyConditionExpression: `${process.env.testnetFaucetSecondaryIndex} = :account_name`,
-    ExpressionAttributeValues:  { ':account_name' : { S: accountName } }
+    ExpressionAttributeValues:  { ':account_name' : accountName }
   }
 
   const result = await call("get", ipParams);
@@ -78,11 +78,12 @@ async function ipCanTransact(ipAddress, accountName) {
     }
   }else{
 
-    const result = await call("get", accountParams);
+    const result = await call("query", accountParams);
 
-    if(result.Item) {
-      if (!dayElapsed(result.Item.LastActionTime)){
-        await updateAttemptCount(result.Item.IpAddress, result.Item.attemptCount)
+    if(result.Items) {
+      const item = result.Items[0];
+      if (!dayElapsed(item.LastActionTime)){
+        await updateAttemptCount(item.IpAddress, item.AttemptCount)
         return false;
       }
     }
@@ -100,9 +101,9 @@ async function updateAttemptCount(ipAddress, currentCount){
     },
     UpdateExpression: "set AttemptCount = :num",
     ExpressionAttributeValues: {
-      ":num": currentCount++,
+      ":num": ++currentCount,
     }
-  })
+  });
 }
 
 async function addFaucetItem(ipAddress, accountName){
