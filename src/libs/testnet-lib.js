@@ -46,11 +46,7 @@ async function setLastVoted(rotationSchedule) {
     });
 }
 
-async function evmFaucet(ipAddress, evmAddress) {
-    const actionAllowed = await dynamoDbLib.ipCanTransact(ipAddress, evmAddress);
-    if (!actionAllowed){
-        return false;
-    }
+async function evmFaucet(evmAddress) {
     const faucetAccount = process.env.testnetFaucetAccount;
     const actions = [{
         account: 'eosio.token',
@@ -70,12 +66,12 @@ async function evmFaucet(ipAddress, evmAddress) {
     await evmFaucetTransfer(evmAddress, TLOS_PER_FAUCET);
 }
 
-async function faucet(ipAddress, accountName) {
+async function validateUserAccount(ipAddress, accountName = ''){
+    return await dynamoDbLib.ipCanTransact(ipAddress, accountName);
+}
+
+async function faucet(accountName) {
     console.log(`Faucet being called for ${accountName}`);
-    const actionAllowed = await dynamoDbLib.ipCanTransact(ipAddress, accountName);
-    if (!actionAllowed){
-        return false;
-    }
     const faucetAccount = process.env.testnetFaucetAccount;
     const actions = [{
         account: 'eosio.token',
@@ -98,6 +94,7 @@ async function faucet(ipAddress, accountName) {
 }
 
 async function create(accountName, ownerKey, activeKey) {
+    
     console.log(`Creating testnet account with name ${accountName} and keys ${ownerKey} ${activeKey}`);
     const faucetAccount = process.env.testnetFaucetAccount;
     accountName = accountName.trim();
@@ -306,4 +303,4 @@ async function getProducers() {
     return producers;
 }
 
-module.exports = { getLastVoted, rotate, create, faucet, evmFaucet };
+module.exports = { getLastVoted, rotate, create, faucet, evmFaucet, validateUserAccount };

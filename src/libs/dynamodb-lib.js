@@ -62,12 +62,7 @@ async function ipCanTransact(ipAddress, accountName) {
     }
   }
 
-  const accountParams = {
-    TableName: faucetTable,
-    IndexName: `${process.env.testnetFaucetSecondaryIndex}-index`,
-    KeyConditionExpression: `${process.env.testnetFaucetSecondaryIndex} = :account_name`,
-    ExpressionAttributeValues:  { ':account_name' : accountName }
-  }
+
 
   const result = await call("get", ipParams);
 
@@ -76,7 +71,14 @@ async function ipCanTransact(ipAddress, accountName) {
       await updateAttemptCount(ipAddress, result.Item.AttemptCount);
       return false;
     }
-  }else{
+  }else if(accountName.length){
+
+    const accountParams = {
+      TableName: faucetTable,
+      IndexName: `${process.env.testnetFaucetSecondaryIndex}-index`,
+      KeyConditionExpression: `${process.env.testnetFaucetSecondaryIndex} = :account_name`,
+      ExpressionAttributeValues:  { ':account_name' : accountName }
+    }
 
     const result = await call("query", accountParams);
 
