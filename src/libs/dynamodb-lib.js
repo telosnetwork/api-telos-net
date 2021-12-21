@@ -1,6 +1,6 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-1" });
-import { dayElapsed } from "../utils/dayElapsed";
+const { dayElapsed } = require("../utils/dayElapsed");
 
 const faucetTable = process.env.testnetFaucetTableName
 

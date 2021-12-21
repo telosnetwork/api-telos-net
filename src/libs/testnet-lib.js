@@ -35,23 +35,6 @@ async function getLastVoted() {
     return JSON.parse(result.Item.rotationSchedule);
 }
 
-async function getLastTransaction() {
-    const readParams = {
-        TableName: process.env.testnetFaucetTableName,
-        Key: {
-            tableKey: ROTATION_TABLE_KEY
-        }
-    };
-
-    const result = await call("get", readParams);
-    if (!result.Item) {
-        console.error("Failed to get rotation");
-        return "[]";
-    }
-
-    return JSON.parse(result.Item.rotationSchedule);
-}
-
 async function setLastVoted(rotationSchedule) {
     await call("put", {
         TableName: process.env.testnetRotationTableName,
