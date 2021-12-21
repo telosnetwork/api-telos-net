@@ -2,7 +2,8 @@ const AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-1" });
 const { dayElapsed } = require("../utils/dayElapsed");
 
-const faucetTable = process.env.testnetFaucetTableName
+const FAUCET_TABLE = process.env.testnetFaucetTableName;
+const NO_ACCOUNT = 'create account'
 
 function call(action, params) {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -53,10 +54,10 @@ async function ipCanCreate(ipAddress) {
   return false;
 }
 
-async function ipCanTransact(ipAddress, accountName) {
+async function ipCanTransact(ipAddress, accountName = NO_ACCOUNT) {
 
   const ipParams = {
-    TableName: faucetTable,
+    TableName: FAUCET_TABLE,
     Key: {
       IpAddress: ipAddress
     }
@@ -69,10 +70,10 @@ async function ipCanTransact(ipAddress, accountName) {
       await updateAttemptCount(ipAddress, result.Item.AttemptCount);
       return false;
     }
-  }else if(accountName.length){
+  }else if(accountName !== NO_ACCOUNT){
 
     const accountParams = {
-      TableName: faucetTable,
+      TableName: FAUCET_TABLE,
       IndexName: `${process.env.testnetFaucetSecondaryIndex}-index`,
       KeyConditionExpression: `${process.env.testnetFaucetSecondaryIndex} = :account_name`,
       ExpressionAttributeValues:  { ':account_name' : accountName }
@@ -95,7 +96,7 @@ async function ipCanTransact(ipAddress, accountName) {
 
 async function updateAttemptCount(ipAddress, currentCount){
   await call("update", {
-    TableName: faucetTable,
+    TableName: FAUCET_TABLE,
     Key: {
       IpAddress: ipAddress
     },
@@ -108,7 +109,7 @@ async function updateAttemptCount(ipAddress, currentCount){
 
 async function addFaucetItem(ipAddress, accountName){
   await call("put", {
-    TableName: faucetTable,
+    TableName: FAUCET_TABLE,
     Item: {
       IpAddress: ipAddress, 
       AttemptCount: 1, 

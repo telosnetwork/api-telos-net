@@ -66,7 +66,7 @@ async function evmFaucet(evmAddress) {
     await evmFaucetTransfer(evmAddress, TLOS_PER_FAUCET);
 }
 
-async function validateUserAccount(ipAddress, accountName = ''){
+async function validateUserAccount(ipAddress, accountName){
     return await dynamoDbLib.ipCanTransact(ipAddress, accountName);
 }
 
