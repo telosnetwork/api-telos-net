@@ -10,7 +10,7 @@ const dynamoDbLib = require("./dynamodb-lib");
 
 AWS.config.update({ region: "us-east-1" });
 
-const TLOS_PER_FAUCET = '100.0000 TLOS';
+const TLOS_PER_FAUCET = '50.0000 TLOS';
 const ROTATION_TABLE_KEY = 'rotation';
 
 async function call(action, params) {
