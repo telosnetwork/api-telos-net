@@ -30,10 +30,10 @@ async function faucetHandler(request, reply) {
     try {
         const ipAddress = request.ips.pop();
         let result = await faucet(ipAddress, request.params.accountName);
-        if (!result){
-            reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
-        }else{
+        if (result){
             reply.code(204);
+        }else{
+            reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         } 
     } catch (e) {
         reply.code(400).send(`Error pouring the faucet: ${e.message}`);
@@ -68,8 +68,13 @@ const evmFaucetOpts = {
 
 async function evmFaucetHandler(request, reply) {
     try {
-        let result = await evmFaucet(request.params.evmAddress);
-        reply.code(204)
+        const ipAddress = request.ips.pop();
+        let result = await evmFaucet(ipAddress, request.params.evmAddress);
+        if (result){
+            reply.code(204);
+        }else{
+            reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+        } 
     } catch (e) {
         reply.code(400).send(`Error pouring the faucet: ${e.message}`);
     }
