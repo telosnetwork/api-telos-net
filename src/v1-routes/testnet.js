@@ -1,4 +1,4 @@
-const { getLastVoted, rotate, create, faucet, evmFaucet } = require("../libs/testnet-lib");
+const { getLastVoted, rotate, validateUserAccount, create, faucet, evmFaucet } = require("../libs/testnet-lib");
 
 const faucetOpts = {
     schema: {
@@ -29,7 +29,7 @@ const faucetOpts = {
 async function faucetHandler(request, reply) {
     try {
         const ipAddress = request.ips.pop();
-        const actionAllowed = validateUserAccount(ipAddress, request.params.accountName)
+        const actionAllowed = await validateUserAccount(ipAddress, request.params.accountName)
         if (!actionAllowed){
             reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         }
@@ -69,7 +69,7 @@ const evmFaucetOpts = {
 async function evmFaucetHandler(request, reply) {
     try {
         const ipAddress = request.ips.pop();
-        const actionAllowed = validateUserAccount(ipAddress, request.params.accountName)
+        const actionAllowed = await validateUserAccount(ipAddress, request.params.accountName)
         if (!actionAllowed){
             reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         }
@@ -121,7 +121,7 @@ const accountOpts = {
 async function accountHandler(request, reply) {
     try {
         const ipAddress = request.ips.pop();
-        const actionAllowed = validateUserAccount(ipAddress)
+        const actionAllowed = await validateUserAccount(ipAddress)
         if (!actionAllowed){
             reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         }
