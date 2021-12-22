@@ -1,15 +1,17 @@
 const { Api, JsonRpc, RpcError } = require("eosjs");
 const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
-const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 const { getKeyBySecretName } = require("./auth-lib");
-const AWS = require("aws-sdk");
 const { evmFaucetTransfer } = require("./evm-lib")
 const { request } = require("https");
+const fetch = require("node-fetch"); // node only; not needed in browsers
+const AWS = require("aws-sdk");
+const dynamoDbLib = require("./dynamodb-lib");
+
 AWS.config.update({ region: "us-east-1" });
 
-const tlosPerFaucet = '100.0000 TLOS';
-const rotationTableKey = 'rotation';
+const TLOS_PER_FAUCET = '50.0000 TLOS';
+const ROTATION_TABLE_KEY = 'rotation';
 
 async function call(action, params) {
     const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -20,7 +22,7 @@ async function getLastVoted() {
     const readParams = {
         TableName: process.env.testnetRotationTableName,
         Key: {
-            tableKey: rotationTableKey
+            tableKey: ROTATION_TABLE_KEY
         }
     };
 
@@ -38,7 +40,7 @@ async function setLastVoted(rotationSchedule) {
         TableName: process.env.testnetRotationTableName,
         Item: {
             updatedAt: Date.now(),
-            tableKey: rotationTableKey,
+            tableKey: ROTATION_TABLE_KEY,
             rotationSchedule: rotationSchedule
         }
     });
@@ -56,12 +58,16 @@ async function evmFaucet(evmAddress) {
         data: {
             from: faucetAccount,
             to: 'eosio.evm',
-            quantity: tlosPerFaucet,
+            quantity: TLOS_PER_FAUCET,
             memo: 'Deposit'
         }
     }];
     await faucetActions(actions);
-    await evmFaucetTransfer(evmAddress, tlosPerFaucet);
+    await evmFaucetTransfer(evmAddress, TLOS_PER_FAUCET);
+}
+
+async function validateUserAccount(ipAddress, accountName){
+    return await dynamoDbLib.ipCanTransact(ipAddress, accountName);
 }
 
 async function faucet(accountName) {
@@ -77,7 +83,7 @@ async function faucet(accountName) {
         data: {
             from: faucetAccount,
             to: accountName,
-            quantity: tlosPerFaucet,
+            quantity: TLOS_PER_FAUCET,
             memo: 'Testnet faucet'
         }
     }];
@@ -88,6 +94,7 @@ async function faucet(accountName) {
 }
 
 async function create(accountName, ownerKey, activeKey) {
+    
     console.log(`Creating testnet account with name ${accountName} and keys ${ownerKey} ${activeKey}`);
     const faucetAccount = process.env.testnetFaucetAccount;
     accountName = accountName.trim();
@@ -159,7 +166,7 @@ async function create(accountName, ownerKey, activeKey) {
         data: {
             from: faucetAccount,
             to: accountName,
-            quantity: tlosPerFaucet,
+            quantity: TLOS_PER_FAUCET,
             memo: 'Testnet account creation'
         }
     }];
@@ -296,4 +303,4 @@ async function getProducers() {
     return producers;
 }
 
-module.exports = { getLastVoted, rotate, create, faucet, evmFaucet };
+module.exports = { getLastVoted, rotate, create, faucet, evmFaucet, validateUserAccount };

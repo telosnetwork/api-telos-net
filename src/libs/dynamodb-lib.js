@@ -1,5 +1,9 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: "us-east-1" });
+const { dayElapsed } = require("../utils/dayElapsed");
+
+const FAUCET_TABLE = process.env.testnetFaucetTableName;
+const NO_ACCOUNT = 'create account'
 
 function call(action, params) {
   const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -47,6 +51,70 @@ async function ipCanCreate(ipAddress) {
   }
 
   return false;
+}
+
+async function ipCanTransact(ipAddress, accountName = NO_ACCOUNT) {
+
+  const ipParams = {
+    TableName: FAUCET_TABLE,
+    Key: {
+      IpAddress: ipAddress
+    }
+  }
+
+  const result = await call("get", ipParams);
+
+  if(result.Item) {
+    if (!dayElapsed(result.Item.LastActionTime)){
+      await updateAttemptCount(ipAddress, result.Item.AttemptCount);
+      return false;
+    }
+  }else if(accountName !== NO_ACCOUNT){
+
+    const accountParams = {
+      TableName: FAUCET_TABLE,
+      IndexName: `${process.env.testnetFaucetSecondaryIndex}-index`,
+      KeyConditionExpression: `${process.env.testnetFaucetSecondaryIndex} = :account_name`,
+      ExpressionAttributeValues:  { ':account_name' : accountName }
+    }
+
+    const result = await call("query", accountParams);
+
+    if(result.Items.length) {
+      const item = result.Items[0];
+      if (!dayElapsed(item.LastActionTime)){
+        await updateAttemptCount(item.IpAddress, item.AttemptCount)
+        return false;
+      }
+    }
+  }
+  await addFaucetItem(ipAddress, accountName)
+  return true;
+}
+
+async function updateAttemptCount(ipAddress, currentCount){
+  await call("update", {
+    TableName: FAUCET_TABLE,
+    Key: {
+      IpAddress: ipAddress
+    },
+    UpdateExpression: "set AttemptCount = AttemptCount + :num",
+    ExpressionAttributeValues: {
+      ":num": 1,
+    }
+  });
+}
+
+async function addFaucetItem(ipAddress, accountName){
+  await call("put", {
+    TableName: FAUCET_TABLE,
+    Item: {
+      IpAddress: ipAddress, 
+      AttemptCount: 1, 
+      AccountName: accountName, 
+      LastActionTime: Date.now()
+    }
+  })
 }
 
 async function ipCreated(ipAddress) {
@@ -120,8 +188,6 @@ async function ipCreated(ipAddress) {
         ":lastCreate": lastCreate
       }
     })
-
-
   }
 }
 
@@ -157,4 +223,4 @@ async function getBySmsHash(smsHash) {
   return result.Item;
 }
 
-module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCreated }
+module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCanTransact, ipCreated }
