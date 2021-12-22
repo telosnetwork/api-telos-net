@@ -1,4 +1,4 @@
-const { getLastVoted, rotate, create, faucet, evmFaucet } = require("../libs/testnet-lib");
+const { getLastVoted, rotate, validateUserAccount, create, faucet, evmFaucet } = require("../libs/testnet-lib");
 
 const faucetOpts = {
     schema: {
@@ -28,8 +28,13 @@ const faucetOpts = {
 
 async function faucetHandler(request, reply) {
     try {
-        let result = await faucet(request.params.accountName);
-        reply.code(204)
+        const ipAddress = request.ips.pop();
+        const actionAllowed = await validateUserAccount(ipAddress, request.params.accountName)
+        if (!actionAllowed){
+            return reply.code(429).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+        }
+        await faucet(request.params.accountName);
+        reply.code(204);
     } catch (e) {
         reply.code(400).send(`Error pouring the faucet: ${e.message}`);
     }
@@ -63,8 +68,13 @@ const evmFaucetOpts = {
 
 async function evmFaucetHandler(request, reply) {
     try {
-        let result = await evmFaucet(request.params.evmAddress);
-        reply.code(204)
+        const ipAddress = request.ips.pop();
+        const actionAllowed = await validateUserAccount(ipAddress, request.params.evmAddress)
+        if (!actionAllowed){
+            return reply.code(429).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+        }
+        await evmFaucet(request.params.evmAddress);
+        reply.code(204);
     } catch (e) {
         reply.code(400).send(`Error pouring the faucet: ${e.message}`);
     }
@@ -110,7 +120,12 @@ const accountOpts = {
 
 async function accountHandler(request, reply) {
     try {
-        let result = await create(request.body.accountName, request.body.ownerKey, request.body.activeKey);
+        const ipAddress = request.ips.pop();
+        const actionAllowed = await validateUserAccount(ipAddress)
+        if (!actionAllowed){
+            return reply.code(429).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+        }
+        const result = await create(request.body.accountName, request.body.ownerKey, request.body.activeKey);
         reply.send(result.transaction_id)
     } catch (e) {
         reply.code(400).send(`Error creating account: ${e.message}`);
@@ -205,6 +220,5 @@ module.exports = async (fastify, options) => {
     fastify.get('testnet/produce/:bpAccount', addToRotationOpts, addToRotationHandler)
     fastify.get('testnet/faucet/:accountName', faucetOpts, faucetHandler)
     fastify.get('testnet/evmFaucet/:evmAddress', evmFaucetOpts, evmFaucetHandler)
-
     fastify.post('testnet/account', accountOpts, accountHandler)
 }
