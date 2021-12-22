@@ -31,7 +31,7 @@ async function faucetHandler(request, reply) {
         const ipAddress = request.ips.pop();
         const actionAllowed = await validateUserAccount(ipAddress, request.params.accountName)
         if (!actionAllowed){
-            return reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+            return reply.code(429).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         }
         await faucet(request.params.accountName);
         reply.code(204);
@@ -71,7 +71,7 @@ async function evmFaucetHandler(request, reply) {
         const ipAddress = request.ips.pop();
         const actionAllowed = await validateUserAccount(ipAddress, request.params.evmAddress)
         if (!actionAllowed){
-            return reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+            return reply.code(429).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         }
         await evmFaucet(request.params.evmAddress);
         reply.code(204);
@@ -123,7 +123,7 @@ async function accountHandler(request, reply) {
         const ipAddress = request.ips.pop();
         const actionAllowed = await validateUserAccount(ipAddress)
         if (!actionAllowed){
-            return reply.code(403).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+            return reply.code(429).send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
         }
         const result = await create(request.body.accountName, request.body.ownerKey, request.body.activeKey);
         reply.send(result.transaction_id)

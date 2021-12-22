@@ -98,9 +98,9 @@ async function updateAttemptCount(ipAddress, currentCount){
     Key: {
       IpAddress: ipAddress
     },
-    UpdateExpression: "set AttemptCount = :num",
+    UpdateExpression: "set AttemptCount = AttemptCount + :num",
     ExpressionAttributeValues: {
-      ":num": ++currentCount,
+      ":num": 1,
     }
   });
 }
