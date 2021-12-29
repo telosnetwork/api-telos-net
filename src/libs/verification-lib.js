@@ -1,40 +1,17 @@
 /**
- * Contract Validator for Telos EVM
+ * Contract Verification for Telos EVM
  * compiles and compares bytecode with uploaded contracts to verify source authenticity. 
  * see teloscan repo 'ContractVerification.vue' for implementation
  */
 
 const solc = require('solc');
-const util = require('util');
 const Web3EthAbi = require('web3-eth-abi');
-
 const NONE = 'n/a';
-const versionString = "v0.7.1+commit.f4a555be";
-const fileName = 'test.sol';
-const fileContent = 
-`pragma solidity ^0.7.1;
-contract A { 
-    uint value;
-    function get() public view returns (uint) { return value; }
-    function set(uint _value) public { value = _value; }
-}
-contract B { 
-    uint value;
-    uint myValue;
-    address initAddress;
-    constructor(uint _constructorArg, address _address) {
-        value = _constructorArg;
-        initAddress = _address;
-    }
-    function set(uint _value) public { myValue= _value; }
-    function get() public view returns (uint) { return value + myValue; }
-}`;
 const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
 
 const processFile = async (requestBody) => {
-    
-    const fileName = requestBody.contractName;
-    const contractContent = requestBody.contractCode;
+
+    const fileName = requestBody.fileName;
 
     const input = {
         language: 'Solidity',
@@ -47,18 +24,17 @@ const processFile = async (requestBody) => {
           }
         }
       };
-    input.sources[contractName] = { content: contractContent };
+    input.sources[fileName] = { content: requestBody.contractCode };
 
-    const output = await compileFile(input);
+    const output = await compileFile(requestBody.compilerVersion, input);
 
     for (let contractName in output.contracts[fileName]) {
         let encodedConstructorArgs = NONE; 
         let decodedConstructorArgs = NONE;
 
         const bytecode = output.contracts[fileName][contractName].evm.bytecode.object;
-        const rawAbi = output.contracts[fileName][contractName].abi;
-        const argTypes = getArgTypes(rawAbi);
-        const abi = util.inspect(rawAbi, false, null, true);
+        const abi = output.contracts[fileName][contractName].abi;
+        const argTypes = getArgTypes(abi);
 
         if (argTypes.length) {
             try{
@@ -76,9 +52,9 @@ const processFile = async (requestBody) => {
     }
 }
 
-compileFile = async (input) => {
+compileFile = async (compilerVersion, input) => {
     return await new Promise((resolve,reject) => {
-        solc.loadRemoteVersion(versionString, (e, solcVersion) => {
+        solc.loadRemoteVersion(compilerVersion, (e, solcVersion) => {
             e ? reject(e) : resolve(JSON.parse(solcVersion.compile(JSON.stringify(input))));
         });
     })
@@ -98,4 +74,26 @@ getArgTypes = (abi) => {
 
 module.exports = { processFile };
 
-( async () => { await processFile(fileName, fileContent) })();
+const mockRequestBody = {
+    fileName: 'test.sol',
+    contractCode: 
+    `pragma solidity ^0.7.1;
+    contract B { 
+        uint value;
+        uint myValue;
+        address initAddress;
+        constructor(uint _constructorArg, address _address) {
+            value = _constructorArg;
+            initAddress = _address;
+        }
+        function set(uint _value) public { myValue= _value; }
+        function get() public view returns (uint) { return value + myValue; }
+    }`,
+    compilerVersion: "v0.7.1+commit.f4a555be"
+};
+
+
+(async () => { 
+    const test = await processFile(mockRequestBody);
+    console.dir(test, {depth: null});
+})();
