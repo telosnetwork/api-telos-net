@@ -31,7 +31,11 @@ contract B {
 }`;
 const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
 
-const processFile = async (fileName, fileContent) => {
+const processFile = async (requestBody) => {
+    
+    const fileName = requestBody.contractName;
+    const contractContent = requestBody.contractCode;
+
     const input = {
         language: 'Solidity',
         sources: {},
@@ -43,7 +47,7 @@ const processFile = async (fileName, fileContent) => {
           }
         }
       };
-    input.sources[fileName] = { content: fileContent };
+    input.sources[contractName] = { content: contractContent };
 
     const output = await compileFile(input);
 
@@ -92,6 +96,6 @@ getArgTypes = (abi) => {
     return typesArr;
 }
 
-exports.processFile = processFile;
+module.exports = { processFile };
 
 ( async () => { await processFile(fileName, fileContent) })();
