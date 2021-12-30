@@ -74,26 +74,28 @@ getArgTypes = (abi) => {
 
 module.exports = { processFile };
 
-const mockRequestBody = {
-    fileName: 'test.sol',
-    contractCode: 
-    `pragma solidity ^0.7.1;
-    contract B { 
-        uint value;
-        uint myValue;
-        address initAddress;
-        constructor(uint _constructorArg, address _address) {
-            value = _constructorArg;
-            initAddress = _address;
-        }
-        function set(uint _value) public { myValue= _value; }
-        function get() public view returns (uint) { return value + myValue; }
-    }`,
-    compilerVersion: "v0.7.1+commit.f4a555be"
-};
+
+//  // below used for testing
+// const mockRequestBody = {
+//     fileName: 'test.sol',
+//     contractCode: 
+//     `pragma solidity ^0.7.1;
+//     contract B { 
+//         uint value;
+//         uint myValue;
+//         address initAddress;
+//         constructor(uint _constructorArg, address _address) {
+//             value = _constructorArg;
+//             initAddress = _address;
+//         }
+//         function set(uint _value) public { myValue= _value; }
+//         function get() public view returns (uint) { return value + myValue; }
+//     }`,
+//     compilerVersion: "v0.7.1+commit.f4a555be"
+// };
 
 
-(async () => { 
-    const test = await processFile(mockRequestBody);
-    console.dir(test, {depth: null});
-})();
+// (async () => { 
+//     const test = await processFile(mockRequestBody);
+//     console.dir(test, {depth: null});
+// })();
