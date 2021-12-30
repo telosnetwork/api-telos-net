@@ -20,21 +20,22 @@ const verificationOpts = {
                 compilerVersion: {
                     description: "compiler version. see https://github.com/ethereum/solc-bin/blob/gh-pages/bin/list.json",
                     type: 'string',
-                    example: 'v0.7.1+commit.f4a555be'
+                    example: 'v0.4.23+commit.124ca40d'
                 },
                 contractCode: {
                     description: "Raw string containing contract code",
                     type: 'string',
-                    example: 'pragma solidity ^0.4.0; contract HelloWorld { ...'
+                    example: `/** *Submitted for verification at Etherscan.io on 2018-04-21*/ pragma solidity ^0.4.0; contract HelloWorld {address public owner;modifier onlyOwner() { require(msg.sender == owner); _; }constructor() public {owner = msg.sender;}function salutaAndonio() public pure returns(bytes32 hw){hw = "HelloWorld";}function killMe() public onlyOwner {selfdestruct(owner);}}`
                 },
                 optimized: {
                     description: 'flag for optimization when compiling',
-                    type: 'boolean'
+                    type: 'boolean',
+                    example: false
                 },
                 runs: {
                     description: 'Optimization value for frequency',
                     type: 'number',
-                    example: '200'
+                    example: 200
                 }
             }
         },
@@ -52,6 +53,7 @@ const verificationOpts = {
 }
 
 async function verificationHandler(request, reply) {
+    console.log("YAY WE MADE IT");
 
     const contractAddress = request.body.contractAddress;
     const fileName = request.body.fileName;
@@ -76,12 +78,11 @@ async function verificationHandler(request, reply) {
 
     const isContract = await verificationLib.isContract(contractAddress);
 
-
     if (!isContract) {
         return reply.code(400).send(`${contractAddress} is not a valid contract address`);
     }
 
-    const verificationStatus = await verifyContract(request.body);
+    const verificationStatus = await verificationLib.verifyContract(request.body);
     
     reply.send(verificationStatus);
 }

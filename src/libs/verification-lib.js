@@ -5,11 +5,18 @@
  */
 
 const solc = require('solc');
-const Web3EthAbi = require('web3-eth-abi');
+const Web3Eth = require('web3-eth');
+const eth = new Web3Eth('https://cloudflare-eth.com/');
+
 const NONE = 'n/a';
 const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
 
-const processFile = async (requestBody) => {
+const isContract = async () => {
+    const byteCode = await eth.getCode("0xc4c89dD46524c6f704e92a9Cd012a3EbaDAdFF36");
+    return byteCode != "0x";
+}
+
+const verifyContract = async (requestBody) => {
 
     const fileName = requestBody.fileName;
 
@@ -38,8 +45,8 @@ const processFile = async (requestBody) => {
 
         if (argTypes.length) {
             try{
-                encodedConstructorArgs = Web3EthAbi.encodeParameters(argTypes, constructorArgs)
-                decodedConstructorArgs = Web3EthAbi.decodeParameters(argTypes, encodedConstructorArgs) 
+                encodedConstructorArgs = eth.abi.encodeParameters(argTypes, constructorArgs)
+                decodedConstructorArgs = eth.abi.decodeParameters(argTypes, encodedConstructorArgs) 
             }catch(e){
                 console.error(e);
             }
@@ -72,7 +79,7 @@ getArgTypes = (abi) => {
     return typesArr;
 }
 
-module.exports = { processFile };
+module.exports = { verifyContract, isContract };
 
 
 //  // below used for testing
@@ -98,4 +105,5 @@ module.exports = { processFile };
 // (async () => { 
 //     const test = await processFile(mockRequestBody);
 //     console.dir(test, {depth: null});
+//     await isContract();
 // })();
