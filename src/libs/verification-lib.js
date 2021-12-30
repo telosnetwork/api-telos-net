@@ -11,8 +11,9 @@ const eth = new Web3Eth('https://cloudflare-eth.com/');
 const NONE = 'n/a';
 const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
 
-const isContract = async () => {
-    const byteCode = await eth.getCode("0xc4c89dD46524c6f704e92a9Cd012a3EbaDAdFF36");
+const isContract = async (address) => {
+    const byteCode = await eth.getCode(address);
+    console.log(byteCode);
     return byteCode != "0x";
 }
 
@@ -55,7 +56,10 @@ const verifyContract = async (requestBody) => {
         if (encodedConstructorArgs !== NONE){
             console.log("bytecode w/constructor args: ", bytecode + encodedConstructorArgs.substring(2))
         }
-        return { contract: contractName, bytecode, abi, constructorArgs: encodedConstructorArgs }
+
+        const deployedByteCode = await eth.getCode(requestBody.contractAddress);
+        return bytecode === deployedByteCode;
+        // return { contract: contractName, bytecode, abi, constructorArgs: encodedConstructorArgs }
     }
 }
 

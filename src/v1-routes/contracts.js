@@ -76,15 +76,15 @@ async function verificationHandler(request, reply) {
         return reply.code(400).send("No contract code submitted");
     }
 
-    const isContract = await verificationLib.isContract(contractAddress);
+    const isContractAddress = await verificationLib.isContract(contractAddress);
 
-    if (!isContract) {
+    if (!isContractAddress) {
         return reply.code(400).send(`${contractAddress} is not a valid contract address`);
     }
 
     const verificationStatus = await verificationLib.verifyContract(request.body);
-    
-    reply.send(verificationStatus);
+    const message = verificationStatus ? 'Contract verified' : 'Verification failed';
+    reply.send(message);
 }
 
 module.exports = async (fastify, options) => {
