@@ -1,9 +1,8 @@
 const verificationLib = require("../libs/verification-lib");
-const axios = require("axios");
 
 const verificationOpts = {
     schema: {
-        tags: ['contract', 'verification', 'validation', 'source'],
+        tags: ['contracts'],
         body: {
             required: ['contractAddress','fileName','compilerVersion', 'contractCode'],
             type: 'object',
@@ -88,5 +87,5 @@ async function verificationHandler(request, reply) {
 }
 
 module.exports = async (fastify, options) => {
-    fastify.post('contract/verify', verificationOpts, verificationHandler)
+    fastify.post('contracts/verify', verificationOpts, verificationHandler)
 }
