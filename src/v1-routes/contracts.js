@@ -1,5 +1,6 @@
 const verificationLib = require("../libs/verification-lib");
 
+
 const verificationOpts = {
     schema: {
         summary: 'verifies source code for solidity contract',
@@ -90,15 +91,37 @@ const verificationHandler = async(request, reply) => {
 const fileUploadOpts = {
     schema: {
         tags: ['contracts'],
-        summary: 'upload solidity contract file',
+        summary: 'upload solidity contract file(s)',
+        consumes: ['multipart/form-data'],
         body: {
             type: 'object',
             properties: {
-                file: { type: 'object' }
+                file: { 
+                    type: 'string',
+                    format: 'binary'
+                }
             },
         required: ['file']
       }
-    }
+    },
+    response: {
+        200: {
+          description: 'Succesful upload',
+          type: 'object',
+          properties: {
+            path: {type: 'string'}
+          }
+        },
+        500: {
+          description: 'Error response',
+          type: 'object',
+          properties: {
+            error: {type: 'string'},
+            message: {type: 'string'},
+            statusCode: {type: 'number'}
+          }
+        }
+      }
 };
 
 const fileUploadHandler = async (request, reply) => {
