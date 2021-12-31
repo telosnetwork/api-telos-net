@@ -2,7 +2,8 @@ const verificationLib = require("../libs/verification-lib");
 
 const verificationOpts = {
     schema: {
-        tags: ['contracts'],
+        summary: 'verifies source code for solidity contract',
+        tags: 'contracts',
         body: {
             required: ['contractAddress','fileName','compilerVersion', 'contractCode'],
             type: 'object',
@@ -52,7 +53,7 @@ const verificationOpts = {
     }
 }
 
-async function verificationHandler(request, reply) {
+const verificationHandler = async(request, reply) => {
     console.log("YAY WE MADE IT");
 
     const contractAddress = request.body.contractAddress;
@@ -87,6 +88,27 @@ async function verificationHandler(request, reply) {
     reply.send(message);
 }
 
+const fileUploadOpts = {
+    schema: {
+        tags: 'contracts',
+        summary: 'upload solidity contract file',
+        body: {
+            type: 'object',
+            properties: {
+                file: { type: 'object' }
+            },
+        required: ['file']
+      }
+    }
+};
+
+const fileUploadHandler = async (request, reply) => {
+    const file = request.body.file;
+    console.log(file);
+    reply.send(200);
+  }
+
 module.exports = async (fastify, options) => {
     fastify.post('contracts/verify', verificationOpts, verificationHandler)
+    fastify.post('contracts/upload', fileUploadOpts, fileUploadHandler)
 }
