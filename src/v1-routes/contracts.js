@@ -1,5 +1,13 @@
 const verificationLib = require("../libs/verification-lib");
 
+const parseMultiForm = (request, done) => {
+    const fileList = Object.keys(request.files);
+    const fileName = fileList[0];
+    const testFileData = request.files[fileName].data;
+    console.log(testFileData.toString('utf8'));
+
+    done();  
+};
 
 const verificationOpts = {
     schema: {
@@ -92,16 +100,13 @@ const fileUploadOpts = {
     schema: {
         tags: ['contracts'],
         summary: 'upload solidity contract file(s)',
-        consumes: ['multipart/form-data'],
         body: {
             type: 'object',
             properties: {
-                file: { 
+                compilerVersion: { 
                     type: 'string',
-                    format: 'binary'
                 }
             },
-        required: ['file']
       }
     },
     response: {
@@ -125,12 +130,12 @@ const fileUploadOpts = {
 };
 
 const fileUploadHandler = async (request, reply) => {
-    const file = request.body.file;
-    console.log(file);
+    console.dir(request.body);
     reply.send(200);
   }
 
 module.exports = async (fastify, options) => {
     fastify.post('contracts/verify', verificationOpts, verificationHandler)
     fastify.post('contracts/upload', fileUploadOpts, fileUploadHandler)
+    fastify.addContentTypeParser('multipart/form-data', parseMultiForm);
 }

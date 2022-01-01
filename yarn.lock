@@ -2851,6 +2851,13 @@ builtin-status-codes@^3.0.0:
   resolved "https://registry.yarnpkg.com/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
 
+busboy@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/busboy/-/busboy-0.3.1.tgz#170899274c5bf38aae27d5c62b71268cd585fd1b"
+  integrity sha512-y7tTxhGKXcyBxRKAni+awqx8uqaJKrSFSNFSeRG5CsWNdmy2BIK+6VGWEW7TZnIO/533mtMEA4rOevQV815YJw==
+  dependencies:
+    dicer "0.3.0"
+
 bytebuffer@5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/bytebuffer/-/bytebuffer-5.0.1.tgz#582eea4b1a873b6d020a48d58df85f0bba6cfddd"
@@ -3689,6 +3696,13 @@ detect-newline@^2.1.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-2.1.0.tgz#f41f1c10be4b00e87b5f13da680759f2c5bfd3e2"
   integrity sha1-9B8cEL5LAOh7XxPaaAdZ8sW/0+I=
 
+dicer@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/dicer/-/dicer-0.3.0.tgz#eacd98b3bfbf92e8ab5c2fdb71aaac44bb06b872"
+  integrity sha512-MdceRRWqltEG2dZqO769g27N/3PXfcKl04VhYnBlo2YhH7zPi88VebsjTKclaOyiuMaGU72hTfw3VkUitGcVCA==
+  dependencies:
+    streamsearch "0.1.2"
+
 diff-sequences@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/diff-sequences/-/diff-sequences-24.9.0.tgz#5715d6244e2aa65f48bba0bc972db0b0b11e95b5"
@@ -4325,6 +4339,13 @@ expect@^24.9.0:
     jest-message-util "^24.9.0"
     jest-regex-util "^24.9.0"
 
+express-fileupload@^1.1.6:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.2.1.tgz#73ac798bd14247d510adb1e439af2420c8367ded"
+  integrity sha512-fWPNAkBj+Azt9Itmcz/Reqdg3LeBfaXptDEev2JM8bCC0yDptglCnlizhf0YZauyU5X/g6v7v4Xxqhg8tmEfEA==
+  dependencies:
+    busboy "^0.3.1"
+
 ext@^1.1.2:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/ext/-/ext-1.6.0.tgz#3871d50641e874cc172e2b53f919842d19db4c52"
@@ -4450,6 +4471,14 @@ fastify-cors@^3.0.3:
   dependencies:
     fastify-plugin "^1.6.0"
     vary "^1.1.2"
+
+fastify-file-upload@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/fastify-file-upload/-/fastify-file-upload-2.1.0.tgz#447ffdd76e003fbb5feeaa8395914666ef65ba79"
+  integrity sha512-xuoST5zq5wUY3afVowkP5MXKKz5ej324KdD4/Rj9g6eeJqe+Bv3sxaHwYA/9JEeIl6csEOhD9uOarzgTvZ4Ofw==
+  dependencies:
+    express-fileupload "^1.1.6"
+    fastify-plugin "^1.6.1"
 
 fastify-graceful-shutdown@^2.0.1:
   version "2.0.1"
@@ -9057,6 +9086,11 @@ stream@^0.0.2:
   integrity sha1-f1Nj8Ff2WSxVlfALyAon9c7B8O8=
   dependencies:
     emitter-component "^1.1.1"
+
+streamsearch@0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-0.1.2.tgz#808b9d0e56fc273d809ba57338e929919a1a9f1a"
+  integrity sha1-gIudDlb8Jz2Am6VzOOkpkZoanxo=
 
 strict-uri-encode@^1.0.0:
   version "1.1.0"
