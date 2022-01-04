@@ -2,10 +2,15 @@ const verificationLib = require("../libs/verification-lib");
 
 const parseMultiForm = (request, done) => {
     const fileList = Object.keys(request.files);
-    const fileName = fileList[0];
-    const testFileData = request.files[fileName].data;
-    console.log(testFileData.toString('utf8'));
-
+    request.body.files = [];
+    for (let file of fileList){
+        const testFileData = request.files[file].data;
+        const contractString = testFileData.toString('utf8');
+        console.log(contractString);
+        request.files[file]['string'] = contractString;
+        request.body.files.push(request.files[file])
+    }
+    delete request.files; 
     done();  
 };
 
@@ -105,8 +110,12 @@ const fileUploadOpts = {
             properties: {
                 compilerVersion: { 
                     type: 'string',
+                },
+                files: {
+                    type: 'array'
                 }
-            },
+
+            }
       }
     },
     response: {
@@ -130,7 +139,6 @@ const fileUploadOpts = {
 };
 
 const fileUploadHandler = async (request, reply) => {
-    console.dir(request.body);
     reply.send(200);
   }
 
