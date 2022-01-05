@@ -1,10 +1,16 @@
 const verificationLib = require("../libs/verification-lib");
 
 const parseMultiForm = (request, done) => {
-    const files = request.files;
-    for (let i in files){
-        files[i]['code'] = files[i].data.toString('utf8');
+    const files = request.files.files;
+
+    if (Array.isArray(files)){
+        for (let i in files){
+            files[i]['code'] = files[i].data.toString('utf8');
+        }
+    }else {
+      files['code'] = files.data.toString('utf8');
     }
+
     done();  
 };
 
@@ -13,7 +19,7 @@ const verificationOpts = {
         summary: 'verifies source code for solidity contract',
         tags: ['evm'],
         body: {
-            required: ['compilerVersion'],
+            required: ['compilerVersion', 'contractAddress'],
             type: 'object',
             properties: {
                 contractAddress: {
@@ -26,11 +32,11 @@ const verificationOpts = {
                     type: 'string',
                     example: 'v0.4.23+commit.124ca40d'
                 },
-                // files: {
-                //     description: "array of file objects containing code as string",
-                //     type: 'array',
-                //     example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
-                // },
+                files: {
+                    description: "array of file objects containing code as string",
+                    type: 'array',
+                    example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
+                },
                 // optimized: {
                 //     description: 'flag for optimization when compiling',
                 //     type: 'boolean',
@@ -57,10 +63,9 @@ const verificationOpts = {
 }
 
 const verificationHandler = async(request, reply) => {
-
-    // const contractAddress = request.body.contractAddress;
+    const contractAddress = request.body.contractAddress;
     const compilerVersion = request.body.compilerVersion;
-    const contractCode = request.body.files[0].code;
+    const contractCode = request.body.files[0].code; 
 
     // if (!contractAddress ) {
     //     return reply.code(400).send("Must specify deployed contract address");
@@ -85,49 +90,7 @@ const verificationHandler = async(request, reply) => {
     reply.send(message);
 }
 
-// const fileUploadOpts = {
-//     schema: {
-//         tags: ['evm'],
-//         summary: 'upload solidity contract file(s)',
-//         body: {
-//             type: 'object',
-//             properties: {
-//                 compilerVersion: { 
-//                     type: 'string',
-//                 },
-//                 files: {
-//                     type: 'array'
-//                 }
-
-//             }
-//       }
-//     },
-//     response: {
-//         200: {
-//           description: 'Succesful upload',
-//           type: 'object',
-//           properties: {
-//             path: {type: 'string'}
-//           }
-//         },
-//         500: {
-//           description: 'Error response',
-//           type: 'object',
-//           properties: {
-//             error: {type: 'string'},
-//             message: {type: 'string'},
-//             statusCode: {type: 'number'}
-//           }
-//         }
-//       }
-// };
-
-// const fileUploadHandler = async (request, reply) => {
-//     reply.send(200);
-//   }
-
 module.exports = async (fastify, options) => {
     fastify.post('contracts/verify', verificationOpts, verificationHandler)
-    // fastify.post('contracts/upload', fileUploadOpts, fileUploadHandler)
     fastify.addContentTypeParser('multipart/form-data', parseMultiForm);
 }
