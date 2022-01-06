@@ -33,8 +33,8 @@ const verificationOpts = {
                     example: 'v0.4.23+commit.124ca40d'
                 },
                 files: {
-                    description: "array of file objects containing code as string",
-                    type: 'array',
+                    description: "a single file object or an array of file objects containing code as string",
+                    type: ['array', 'object'],
                     example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
                 },
                 // optimized: {
@@ -65,11 +65,11 @@ const verificationOpts = {
 const verificationHandler = async(request, reply) => {
     const contractAddress = request.body.contractAddress;
     const compilerVersion = request.body.compilerVersion;
-    const contractCode = request.body.files[0].code; 
+    const contractCode = request.body.files.length ? request.body.files[0].code : request.body.files.code 
 
-    // if (!contractAddress ) {
-    //     return reply.code(400).send("Must specify deployed contract address");
-    // }
+    if (!contractAddress ) {
+        return reply.code(400).send("Must specify deployed contract address");
+    }
 
     // const isContractAddress = await verificationLib.isContract(contractAddress);
 

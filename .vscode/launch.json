@@ -7,15 +7,9 @@
         {
             "type": "node",
             "outputCapture": "std",
-            "request": "launch",
-            "name": "Launch API",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/src/app.js",
-            "env": {
-                "AWS_SDK_LOAD_CONFIG": "1"
-            }
+            "request": "attach",
+            "name": "attach to process",
+            "processId": "${command:PickProcess}"
         }
     ]
 }

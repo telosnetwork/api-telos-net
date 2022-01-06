@@ -3,10 +3,11 @@
  * compiles and compares bytecode with uploaded contracts to verify source authenticity. 
  * see teloscan repo 'ContractVerification.vue' for implementation
  */
-
+// require('dotenv').config();
 const solc = require('solc');
 const Web3Eth = require('web3-eth');
-const eth = new Web3Eth('https://cloudflare-eth.com/');
+console.log(process.env.evmProvider)
+// const eth = new Web3Eth(proccess.env.evmprovider);
 
 const NONE = 'n/a';
 const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
@@ -17,9 +18,9 @@ const isContract = async (address) => {
     return byteCode != "0x";
 }
 
-const verifyContract = async (requestBody) => {
+const verifyContract = async (data) => {
 
-    const fileName = requestBody.fileName;
+    const fileName = data.fileName;
 
     const input = {
         language: 'Solidity',
@@ -32,9 +33,9 @@ const verifyContract = async (requestBody) => {
           }
         }
       };
-    input.sources[fileName] = { content: requestBody.contractCode };
+    input.sources[fileName] = { content: data.contractCode };
 
-    const output = await compileFile(requestBody.compilerVersion, input);
+    const output = await compileFile(data.compilerVersion, input);
 
     for (let contractName in output.contracts[fileName]) {
         let encodedConstructorArgs = NONE; 
@@ -57,7 +58,7 @@ const verifyContract = async (requestBody) => {
             console.log("bytecode w/constructor args: ", bytecode + encodedConstructorArgs.substring(2))
         }
 
-        const deployedByteCode = await eth.getCode(requestBody.contractAddress);
+        const deployedByteCode = await eth.getCode(data.contractAddress);
         return bytecode === deployedByteCode;
         // return { contract: contractName, bytecode, abi, constructorArgs: encodedConstructorArgs }
     }

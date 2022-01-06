@@ -1,4 +1,4 @@
-require('dotenv').config()
+// require('dotenv').config()
 const AutoLoad = require('fastify-autoload')
 const fastifyCors = require('fastify-cors')
 const fastifyGracefulShutdown = require('fastify-graceful-shutdown')
