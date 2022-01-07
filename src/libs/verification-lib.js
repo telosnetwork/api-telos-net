@@ -3,7 +3,6 @@
  * compiles and compares bytecode with uploaded contracts to verify source authenticity. 
  * see teloscan repo 'ContractVerification.vue' for implementation
  */
-// require('dotenv').config();
 const solc = require('solc');
 const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
