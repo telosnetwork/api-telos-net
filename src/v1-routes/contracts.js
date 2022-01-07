@@ -71,11 +71,11 @@ const verificationHandler = async(request, reply) => {
         return reply.code(400).send("Must specify deployed contract address");
     }
 
-    // const isContractAddress = await verificationLib.isContract(contractAddress);
+    const isContractAddress = await verificationLib.isContract(contractAddress);
 
-    // if (!isContractAddress) {
-    //     return reply.code(400).send(`${contractAddress} is not a valid contract address`);
-    // }
+    if (!isContractAddress) {
+        return reply.code(400).send(`${contractAddress} is not a valid contract address`);
+    }
 
     if (!compilerVersion ) {
         return reply.code(400).send("Must specify compiler version");

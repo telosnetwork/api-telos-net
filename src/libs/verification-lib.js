@@ -6,8 +6,7 @@
 // require('dotenv').config();
 const solc = require('solc');
 const Web3Eth = require('web3-eth');
-console.log(process.env.evmProvider)
-// const eth = new Web3Eth(proccess.env.evmprovider);
+const eth = new Web3Eth(process.env.evmProvider);
 
 const NONE = 'n/a';
 const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
@@ -18,9 +17,9 @@ const isContract = async (address) => {
     return byteCode != "0x";
 }
 
-const verifyContract = async (data) => {
+const verifyContract = async (payload) => {
 
-    const fileName = data.fileName;
+    const fileName = payload.files.name;
 
     const input = {
         language: 'Solidity',
@@ -33,9 +32,9 @@ const verifyContract = async (data) => {
           }
         }
       };
-    input.sources[fileName] = { content: data.contractCode };
+    input.sources[fileName] = { content: payload.code };
 
-    const output = await compileFile(data.compilerVersion, input);
+    const output = await compileFile(payload.compilerVersion, input);
 
     for (let contractName in output.contracts[fileName]) {
         let encodedConstructorArgs = NONE; 
@@ -58,7 +57,7 @@ const verifyContract = async (data) => {
             console.log("bytecode w/constructor args: ", bytecode + encodedConstructorArgs.substring(2))
         }
 
-        const deployedByteCode = await eth.getCode(data.contractAddress);
+        const deployedByteCode = await eth.getCode(payload.contractAddress);
         return bytecode === deployedByteCode;
         // return { contract: contractName, bytecode, abi, constructorArgs: encodedConstructorArgs }
     }

@@ -65,6 +65,7 @@ const sharedConfig = {
 const localConfig = {
   name: 'api-local',
   watch: true,
+  autorestart: false,
   env: { ...envShared,...envDev, ...envLocal}
 };
 

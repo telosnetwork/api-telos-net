@@ -2,14 +2,15 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    //launch proccess with inspector flag
+    // pm2 start ecosystem.config.js --only api-local  --node-args="--inspect-brk"
     "version": "0.2.0",
     "configurations": [
         {
             "type": "node",
-            "outputCapture": "std",
             "request": "attach",
-            "name": "attach to process",
-            "processId": "${command:PickProcess}"
-        }
+            "name": "Attach to Process",
+            "processId": "${command:PickProcess}" 
+       }       
     ]
 }
