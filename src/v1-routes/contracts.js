@@ -37,16 +37,16 @@ const verificationOpts = {
                     type: ['array', 'object'],
                     example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
                 },
-                // optimized: {
-                //     description: 'flag for optimization when compiling',
-                //     type: 'boolean',
-                //     example: false
-                // },
-                // runs: {
-                //     description: 'Optimization value for frequency',
-                //     type: 'number',
-                //     example: 200
-                // }
+                optimized: {
+                    description: 'flag for optimization when compiling',
+                    type: 'boolean',
+                    example: false
+                },
+                runs: {
+                    description: 'Optimization value for frequency',
+                    type: 'number',
+                    example: 200
+                }
             }
         },
         response: {
