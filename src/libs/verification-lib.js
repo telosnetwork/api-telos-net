@@ -8,7 +8,7 @@ const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
 
 const NONE = 'n/a';
-const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
+// const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
@@ -16,9 +16,10 @@ const isContract = async (address) => {
     return byteCode != "0x";
 }
 
-const verifyContract = async (payload) => {
-
-    const fileName = payload.files.name;
+const verifyContract = async (formData) => {
+    const file = formData.files;
+    const fileName = file.name;
+    const code = parseCode(file.data);
 
     const input = {
         language: 'Solidity',
@@ -31,9 +32,10 @@ const verifyContract = async (payload) => {
           }
         }
       };
-    input.sources[fileName] = { content: payload.code };
 
-    const output = await compileFile(payload.compilerVersion, input);
+    input.sources[fileName] = { content: code };
+
+    const output = await compileFile(formData.compilerVersion, input);
 
     for (let contractName in output.contracts[fileName]) {
         let encodedConstructorArgs = NONE; 
@@ -56,16 +58,21 @@ const verifyContract = async (payload) => {
             console.log("bytecode w/constructor args: ", bytecode + encodedConstructorArgs.substring(2))
         }
 
-        const deployedByteCode = await eth.getCode(payload.contractAddress);
+        const deployedByteCode = await eth.getCode(formData.contractAddress);
         return bytecode === deployedByteCode;
         // return { contract: contractName, bytecode, abi, constructorArgs: encodedConstructorArgs }
     }
 }
 
+parseCode = (dataStream) => {
+    return dataStream.toString('utf8');
+}
+
 compileFile = async (compilerVersion, input) => {
     return await new Promise((resolve,reject) => {
         solc.loadRemoteVersion(compilerVersion, (e, solcVersion) => {
-            e ? reject(e) : resolve(JSON.parse(solcVersion.compile(JSON.stringify(input))));
+            e ? reject(e) 
+            : resolve(JSON.parse(solcVersion.compile(JSON.stringify(input))));
         });
     })
 }

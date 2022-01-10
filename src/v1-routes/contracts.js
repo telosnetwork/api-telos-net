@@ -1,16 +1,7 @@
 const verificationLib = require("../libs/verification-lib");
 
 const parseMultiForm = (request, done) => {
-    const files = request.files.files;
-
-    if (Array.isArray(files)){
-        for (let i in files){
-            files[i]['code'] = files[i].data.toString('utf8');
-        }
-    }else {
-      files['code'] = files.data.toString('utf8');
-    }
-
+    /* interceptor for multi-form (files) */
     done();  
 };
 
