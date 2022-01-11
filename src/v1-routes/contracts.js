@@ -56,7 +56,7 @@ const verificationOpts = {
 const verificationHandler = async(request, reply) => {
     const contractAddress = request.body.contractAddress;
     const compilerVersion = request.body.compilerVersion;
-    const contractCode = request.body.files.length ? request.body.files[0].code : request.body.files.code 
+    const contractCode = request.body.files && request.body.files.size > 0;
 
     if (!contractAddress ) {
         return reply.code(400).send("Must specify deployed contract address");

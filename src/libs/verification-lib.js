@@ -8,18 +8,18 @@ const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
 
 const NONE = 'n/a';
-// const constructorArgs = [42,"0x46ef48e06ff160f311d17151e118c504d015ec6e"];
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
-    console.log(byteCode);
     return byteCode != "0x";
 }
 
 const verifyContract = async (formData) => {
-    const file = formData.files;
+    const file = formData.files; //@TODO will need to refactor when multiple supported
     const fileName = file.name;
     const code = parseCode(file.data);
+    const constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
+    //@TODO option get the types from input to cross check w/deployed
 
     const input = {
         language: 'Solidity',
@@ -38,29 +38,19 @@ const verifyContract = async (formData) => {
     const output = await compileFile(formData.compilerVersion, input);
 
     for (let contractName in output.contracts[fileName]) {
-        let encodedConstructorArgs = NONE; 
-        let decodedConstructorArgs = NONE;
-
         const bytecode = output.contracts[fileName][contractName].evm.bytecode.object;
-        const abi = output.contracts[fileName][contractName].abi;
-        const argTypes = getArgTypes(abi);
-
-        if (argTypes.length) {
-            try{
-                encodedConstructorArgs = eth.abi.encodeParameters(argTypes, constructorArgs)
-                decodedConstructorArgs = eth.abi.decodeParameters(argTypes, encodedConstructorArgs) 
-            }catch(e){
-                console.error(e);
-            }
-        }
-
-        if (encodedConstructorArgs !== NONE){
-            console.log("bytecode w/constructor args: ", bytecode + encodedConstructorArgs.substring(2))
-        }
-
         const deployedByteCode = await eth.getCode(formData.contractAddress);
-        return bytecode === deployedByteCode;
-        // return { contract: contractName, bytecode, abi, constructorArgs: encodedConstructorArgs }
+        const abi = output.contracts[fileName][contractName].abi;
+
+        //@TODO option inform user of partial match if compiled code matches but missing args
+        if (constructorArgs.length > 0) {
+            bytecode += getEncodedConstructorArgs(abi, constructorArgs);
+        }
+
+        //TODO optional get constructor args from deployed and decode to check match with user input
+        // decodedConstructorArgs = eth.abi.decodeParameters(argTypes, encodedConstructorArgs) 
+
+        return `0x${bytecode}` === deployedByteCode;
     }
 }
 
@@ -75,6 +65,18 @@ compileFile = async (compilerVersion, input) => {
             : resolve(JSON.parse(solcVersion.compile(JSON.stringify(input))));
         });
     })
+}
+
+getEncodedConstructorArgs = (abi, constructorArgs) => {
+    const argTypes = getArgTypes(abi);
+    encodedConstructorArgs = eth.abi.encodeParameters(argTypes, constructorArgs)
+    const encodedRaw = removeHexPrefix(encodedConstructorArgs);
+    
+    return encodedRaw;
+}
+
+removeHexPrefix = (encodedString) => {
+    return encodedString.substring(3);
 }
 
 getArgTypes = (abi) => {
