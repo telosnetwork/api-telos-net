@@ -10,7 +10,7 @@ const verificationOpts = {
         summary: 'verifies source code for solidity contract',
         tags: ['evm'],
         body: {
-            required: ['compilerVersion', 'contractAddress'],
+            required: ['compilerVersion', 'contractAddress', 'files', 'optimizer', 'runs'],
             type: 'object',
             properties: {
                 contractAddress: {
@@ -28,7 +28,7 @@ const verificationOpts = {
                     type: ['array', 'object'],
                     example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
                 },
-                optimized: {
+                optimizer: {
                     description: 'flag for optimization when compiling',
                     type: 'boolean',
                     example: false
