@@ -82,8 +82,8 @@ const verificationHandler = async(request, reply) => {
     }
 
     const verificationStatus = await verificationLib.verifyContract(request.body);
-    const message = verificationStatus ? 'Contract verified' : 'Verification failed';
-    reply.send(message);
+    const message = verificationStatus ? { message: 'Success! Contract verified!', type: 'positive' } : { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
+    reply.send(JSON.stringify(message));
 }
 
 module.exports = async (fastify, options) => {

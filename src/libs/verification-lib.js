@@ -32,7 +32,6 @@ const verifyContract = async (formData) => {
               enabled: formData.optimizer,
               runs: formData.runs
           },
-          evmVersion: formData.targetEvm,
           outputSelection: {
             '*': {
               '*': ['*']
@@ -40,12 +39,12 @@ const verifyContract = async (formData) => {
           }
         }
       };
-    // if (formData.evmVersion){ input.settings['evmVersion'] = formData.targetEvm; }
+    if (formData.targetEvm){ input.settings['evmVersion'] = formData.targetEvm; }
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
     const functionHashes = contract.evm.methodIdentifiers;
-    const bytecode = contract.evm.bytecode.object;
+    const bytecode = contract.evm.deployedBytecode.object;
     const argTypes = getArgTypes(abi);
 
     if (argTypes.length > 0) {
