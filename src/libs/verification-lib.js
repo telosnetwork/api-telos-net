@@ -32,6 +32,7 @@ const verifyContract = async (formData) => {
               enabled: formData.optimizer,
               runs: formData.runs
           },
+          evmVersion: formData.targetEvm,
           outputSelection: {
             '*': {
               '*': ['*']
@@ -39,7 +40,7 @@ const verifyContract = async (formData) => {
           }
         }
       };
-
+    // if (formData.evmVersion){ input.settings['evmVersion'] = formData.targetEvm; }
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;

@@ -10,7 +10,7 @@ const verificationOpts = {
         summary: 'verifies source code for solidity contract',
         tags: ['evm'],
         body: {
-            required: ['compilerVersion', 'contractAddress', 'files', 'optimizer', 'runs'],
+            required: ['compilerVersion', 'contractAddress', 'files', 'optimizer', 'runs', 'targetEvm'],
             type: 'object',
             properties: {
                 contractAddress: {
@@ -37,6 +37,11 @@ const verificationOpts = {
                     description: 'Optimization value for frequency',
                     type: 'number',
                     example: 200
+                },
+                targetEvm: {
+                    description: 'Target EVM',
+                    type: 'string',
+                    example: 'byzantium'
                 }
             }
         },
