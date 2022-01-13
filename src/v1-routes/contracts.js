@@ -25,7 +25,7 @@ const verificationOpts = {
                 },
                 files: {
                     description: "a single file object or an array of file objects containing code as string",
-                    type: ['array', 'object'],
+                    type: ['array', 'object', 'string'],
                     example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
                 },
                 optimizer: {
