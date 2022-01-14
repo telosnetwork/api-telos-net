@@ -14,9 +14,15 @@ const isContract = async (address) => {
 }
 
 const verifyContract = async (formData) => {
+    let fileName, code;
     const file = formData.files;
-    const fileName = file.name;
-    const code = parseCode(file.data);
+    if (typeof file === 'string'){
+        fileName = formData.sourceName
+        code = file;
+    }else{
+        fileName = file.name;
+        code = parseCode(file.data);
+    }
     const constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
     const deployedByteCode = await eth.getCode(formData.contractAddress);
 
