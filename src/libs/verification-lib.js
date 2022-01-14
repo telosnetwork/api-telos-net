@@ -15,14 +15,15 @@ const isContract = async (address) => {
 
 const verifyContract = async (formData) => {
     let fileName, code;
-    const file = formData.files;
-    if (typeof file === 'string'){
+    const fileData = formData.files;
+    if (typeof fileData === 'string'){
         fileName = formData.sourceName
-        code = file;
+        code = fileData.replace(/\r\n/g, '\n');
     }else{
-        fileName = file.name;
-        code = parseCode(file.data);
+        fileName = fileData.name;
+        code = parseCode(fileData.data);
     }
+
     const constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
     const deployedByteCode = await eth.getCode(formData.contractAddress);
 

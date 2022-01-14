@@ -1,6 +1,7 @@
 const verificationLib = require("../libs/verification-lib");
 
 const parseMultiForm = (request, done) => {
+    // console.log(request.files.length);
     /* interceptor for multi-form (files) */
     done();  
 };
@@ -85,8 +86,8 @@ const verificationHandler = async(request, reply) => {
     }
 
     const verificationStatus = await verificationLib.verifyContract(request.body);
-    const message = verificationStatus ? { message: 'Success! Contract verified!', type: 'positive' } : { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
-    reply.send(JSON.stringify(message));
+    const result = verificationStatus ? { message: 'Success! Contract verified!', type: 'positive' } : { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
+    reply.send(JSON.stringify(result));
 }
 
 module.exports = async (fastify, options) => {
