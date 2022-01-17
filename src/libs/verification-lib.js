@@ -44,7 +44,6 @@ const verifyContract = async (formData) => {
     if (argTypes.length > 0) {
         bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
     }
-    console.log(byte)
 
     return bytecode === deployedByteCode;
 }
