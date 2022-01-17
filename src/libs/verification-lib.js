@@ -68,7 +68,6 @@ getInputObject = (formData, code) => {
           }
         }
       };
-    if (formData.targetEvm){ input.settings['evmVersion'] = formData.targetEvm; };
     return input;
 }
 
