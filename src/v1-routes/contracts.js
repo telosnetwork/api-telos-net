@@ -1,7 +1,6 @@
 const verificationLib = require("../libs/verification-lib");
 
 const parseMultiForm = (request, done) => {
-    // console.log(request.files.length);
     /* interceptor for multi-form (files) */
     done();  
 };
