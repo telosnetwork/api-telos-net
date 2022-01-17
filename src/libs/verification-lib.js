@@ -7,7 +7,6 @@
 const solc = require('solc');
 const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
-const fs = require('fs');
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
@@ -15,46 +14,27 @@ const isContract = async (address) => {
 }
 
 const verifyContract = async (formData) => {
-    let fileName, code, compilerVersion, constructorArgs, input;
+    let fileName, decodedData, constructorArgs, input;
     const fileData = formData.files;
+    constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
     fileName = formData.sourceName;
-    if (typeof fileData === 'string'){
-        code = removeBrowserFormatting(fileData);
-    }else{
-        const extension = getFileExtension(fileName);
-        code = parseCode(fileData.data);
 
+    if (typeof fileData === 'string'){
+        decodedData = removeBrowserFormatting(fileData);
+        input = getInputObject(formData, decodedData);
+    }else{
+        decodedData = decodeStream(fileData.data);
+        const extension = getFileExtension(fileData.name);
         if (extension === 'sol'){
-            constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
-            input = {
-                language: 'Solidity',
-                sources: {
-                    [fileName]: {
-                        content: code
-                    },
-                },
-                settings: {
-                  optimizer: {
-                      enabled: formData.optimizer,
-                      runs: formData.runs
-                  },
-                  outputSelection: {
-                    '*': {
-                      '*': ['*']
-                    }
-                  }
-                }
-              };
-            if (formData.targetEvm){ input.settings['evmVersion'] = formData.targetEvm; };
+            input = getInputObject(formData, decodedData);
         }else{
-            input = JSON.parse(code);
+            input = JSON.parse(decodedData);
             fileName = Object.keys(input.sources)[0];
         }
-        compilerVersion = formData.compilerVersion;
     }
 
     const deployedByteCode = await eth.getCode(formData.contractAddress);
-    const output = await compileFile(compilerVersion,input);
+    const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
     const functionHashes = contract.evm.methodIdentifiers;
@@ -64,8 +44,33 @@ const verifyContract = async (formData) => {
     if (argTypes.length > 0) {
         bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
     }
+    console.log(byte)
 
     return bytecode === deployedByteCode;
+}
+
+getInputObject = (formData, code) => {
+    input = {
+        language: 'Solidity',
+        sources: {
+            [formData.sourceName]: {
+                content: code
+            },
+        },
+        settings: {
+          optimizer: {
+              enabled: formData.optimizer,
+              runs: formData.runs
+          },
+          outputSelection: {
+            '*': {
+              '*': ['*']
+            }
+          }
+        }
+      };
+    if (formData.targetEvm){ input.settings['evmVersion'] = formData.targetEvm; };
+    return input;
 }
 
 removeBrowserFormatting = (fileData) => {
@@ -76,7 +81,7 @@ getFileExtension = (fileName) => {
     return fileName.split('.').pop();
 }
 
-parseCode = (dataStream) => {
+decodeStream = (dataStream) => {
     return dataStream.toString('utf8');
 }
 
