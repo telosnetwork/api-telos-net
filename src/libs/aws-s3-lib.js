@@ -10,21 +10,24 @@ const configOptionsAws =
 });
 AWS.config.update(configOptionsAws);
 const clientS3 = new AWS.S3();
-// const { reject } = require("core-js/fn/promise");
-// const { resolve } = require("path");
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
-const params = { Bucket , Key: fileName, Body: outputObj};
 
-async function getObject(contractNAme){
-    await clientS3.getObject(params, function (err, data) {
-        return err ? reject(err) : resolve(data); 
-  });
+async function getObject(fileName){
+    const params = { Bucket , Key: fileName };
+    try{
+        return await clientS3.getObject(params);
+    }catch(e){
+        return e;
+    }
 }
 
-async function uploadObject(outputObj){
-    await clientS3.putObject(params, function (err, data) {
-         return err ? reject(err) : resolve(data); 
-   });
+async function uploadObject(fileName, outputObj){
+    const params = { Bucket , Key: fileName, Body: outputObj};
+    try{
+        return await clientS3.putObject(params);
+    }catch(e){
+        return e;
+    }
 }
 
 module.exports = { getObject, uploadObject }
