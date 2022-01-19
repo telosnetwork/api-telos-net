@@ -9,7 +9,6 @@ const envShared = {
   testnetFaucetSecondaryIndex: 'AccountName',
   testnetFaucetAccount: 'faucet.tf',
   testnetFaucetKey: 'testnet-faucet-key',
-
   twilioAccountSid: 'tf-twilio-sid',
   twilioAuthToken: 'tf-twilio-auth',
   twilioSmsNumber: '+18178356742',
@@ -18,7 +17,8 @@ const envShared = {
   recaptchaServerkey: '6Ld-_eIZAAAAAHNKjH47BPSMdVltMNpSosc0hr0a',
   recaptchaTableName: 'prod-recaptcha-accounts',
   API_LOG_LEVEL: 'debug',
-  SERVER_HOSTNAME: 'api-2051445629.us-east-1.elb.amazonaws.com'
+  SERVER_HOSTNAME: 'api-2051445629.us-east-1.elb.amazonaws.com',
+  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts'
 };
 
 const envLocal = {
