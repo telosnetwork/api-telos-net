@@ -1,25 +1,16 @@
 const AWS = require("aws-sdk");
-// const configOptionsAws =
-//   new AWS.Config({
-//     accessKeyId: config.s3AccessKeyId,
-//     secretAccessKey: config.s3SecretAccessKey,
-//     region: config.s3Region,
-//     endpoint: config.s3Endpoint,
-//     sslEnabled: true,
-//     s3ForcePathStyle: true
-// });
-// AWS.config.update(configOptionsAws);
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
 
-async function getObject(fileName){
+async function isVerified(fileName){
     const params = { Bucket , Key: fileName };
-    try{
-        let test = await clientS3.getObject(params);
-        return test;
-    }catch(e){
-        return e;
-    }
+        try{
+            await clientS3.headObject(params, (err, data) => {
+                return err ? false : !data.deleteMarker && data.ContentLength 
+            });
+        }catch(e){
+            return false
+        }
 }
 
 async function uploadObject(fileName, outputObj){
@@ -31,4 +22,4 @@ async function uploadObject(fileName, outputObj){
     }
 }
 
-module.exports = { getObject, uploadObject }
+module.exports = { isVerified, uploadObject }

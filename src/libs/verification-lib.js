@@ -7,7 +7,7 @@
 const solc = require('solc');
 const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
-const { getObject, uploadObject } = require('./aws-s3-lib');
+const { uploadObject } = require('./aws-s3-lib');
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
@@ -47,7 +47,7 @@ const verifyContract = async (formData) => {
     }
 
     if (bytecode === deployedByteCode){
-        await uploadObject(fileName, JSON.stringify(output))
+        await uploadObject(fileName, JSON.stringify(output));
     }
 
     return bytecode === deployedByteCode;
