@@ -46,6 +46,10 @@ const verifyContract = async (formData) => {
         bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
     }
 
+    if (bytecode === deployedByteCode){
+        await uploadObject(fileName, JSON.stringify(output))
+    }
+
     return bytecode === deployedByteCode;
 }
 
