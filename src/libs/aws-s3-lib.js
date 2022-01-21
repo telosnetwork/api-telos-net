@@ -2,21 +2,22 @@ const AWS = require("aws-sdk");
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
 
-async function isVerified(fileName){
-    const params = { Bucket , Key: fileName };
-        try{
-            await clientS3.headObject(params, (err, data) => {
-                return err ? false : !data.deleteMarker && data.ContentLength 
-            });
-        }catch(e){
-            return false
-        }
+async function isVerified(contractAddress){
+    let headInfo;
+    const params = { Bucket , Key: contractAddress };
+    try{
+        headInfo = await clientS3.headObject(params).promise();  
+    }catch(e){
+        //aws returns 404 if key isn't found
+        return { status: false, message: 'contract has not been verified' };
+    }
+    return { status: true, message: headInfo.LastModified};    
 }
 
-async function uploadObject(fileName, outputObj){
-    const params = { Bucket , Key: fileName, Body: outputObj, ACL: 'public-read'};
+async function uploadObject(contractAddress, outputObj){
+    const params = { Bucket , Key: contractAddress, Body: outputObj, ACL: 'public-read'};
     try{
-        return await clientS3.putObject(params);
+        return await clientS3.putObject(params).promise();
     }catch(e){
         return e;
     }

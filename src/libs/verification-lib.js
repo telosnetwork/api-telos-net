@@ -47,7 +47,7 @@ const verifyContract = async (formData) => {
     }
 
     if (bytecode === deployedByteCode){
-        await uploadObject(fileName, JSON.stringify(output));
+        await uploadObject(formData.contractAddress, JSON.stringify(output));
     }
 
     return bytecode === deployedByteCode;

@@ -1,8 +1,43 @@
 const verificationLib = require("../libs/verification-lib");
+const { isVerified } = require("../libs/aws-s3-lib");
 
 const parseMultiForm = (request, done) => {
     /* interceptor for multi-form (files) */
     done();  
+};
+
+const statusOpts = {
+    schema: {
+        summary: 'returns current verifcation status of contract',
+        tags: ['evm'],
+        querystring: {
+            contractAddress: {
+                type: 'string'
+            }
+        }
+    },
+    response: {
+        200: {
+            description: 'returns true if contract has been verified',
+            type: 'boolean'
+        },
+        400: {
+            description: 'request failed',
+            type: 'string'
+        }
+    }
+};
+
+const statusHandler = async(request, reply) => {
+    const contractAddress = request.query.contractAddress;
+    const isContract = await verificationLib.isContract(contractAddress);
+    
+    if (!isContract){
+        return reply.code(400).send(`${contractAddress} is not a valid contract address`);
+    }
+
+    const status = await isVerified(contractAddress);
+    reply.code(200).send(status);
 };
 
 const verificationOpts = {
@@ -90,6 +125,7 @@ const verificationHandler = async(request, reply) => {
 }
 
 module.exports = async (fastify, options) => {
+    fastify.get('contracts/status/:contractAddress', statusOpts, statusHandler);
     fastify.post('contracts/verify', verificationOpts, verificationHandler)
     fastify.addContentTypeParser('multipart/form-data', parseMultiForm);
 }
