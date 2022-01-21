@@ -37,8 +37,8 @@ const verifyContract = async (formData) => {
     const deployedByteCode = await eth.getCode(formData.contractAddress);
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
+    const sourceCode = Object.values(input.sources[fileName])[0];
     const abi = contract.abi;
-    const functionHashes = contract.evm.methodIdentifiers;
     const bytecode = `0x${contract.evm.deployedBytecode.object}`;
     const argTypes = getArgTypes(abi);
 
@@ -47,7 +47,14 @@ const verifyContract = async (formData) => {
     }
 
     if (bytecode === deployedByteCode){
-        await uploadObject(formData.contractAddress, JSON.stringify(output));
+        let contentType = 'application/json';
+        let buffer = new Buffer.from(JSON.stringify(output));
+        await uploadObject(`${formData.contractAddress}/output.json`, buffer, contentType);
+        buffer = new Buffer.from(JSON.stringify(abi));
+        await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
+        contentType = 'application/octet-stream';
+        buffer = new Buffer.from(sourceCode);
+        await uploadObject(`${formData.contractAddress}/${fileName}`, buffer, contentType);
     }
 
     return bytecode === deployedByteCode;

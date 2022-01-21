@@ -14,8 +14,14 @@ async function isVerified(contractAddress){
     return { status: true, message: headInfo.LastModified};    
 }
 
-async function uploadObject(contractAddress, outputObj){
-    const params = { Bucket , Key: contractAddress, Body: outputObj, ACL: 'public-read'};
+async function uploadObject(contractAddress, buffer, contentType){
+    const params = { 
+        Bucket , 
+        Key: contractAddress, 
+        Body: buffer, 
+        ACL: 'public-read', 
+        ContentType: contentType
+    };
     try{
         return await clientS3.putObject(params).promise();
     }catch(e){
