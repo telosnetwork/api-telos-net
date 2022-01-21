@@ -18,8 +18,8 @@ const statusOpts = {
     },
     response: {
         200: {
-            description: 'returns true if contract has been verified',
-            type: 'boolean'
+            description: 'returns object with boolean "status" along with message string. If verified, message is verification timestamp.',
+            type: 'object'
         },
         400: {
             description: 'request failed',
@@ -31,7 +31,7 @@ const statusOpts = {
 const statusHandler = async(request, reply) => {
     const contractAddress = request.query.contractAddress;
     const isContract = await verificationLib.isContract(contractAddress);
-    
+
     if (!isContract){
         return reply.code(400).send(`${contractAddress} is not a valid contract address`);
     }
@@ -85,7 +85,7 @@ const verificationOpts = {
         },
         response: {
             200: {
-                description: '',
+                description: 'request succeeded',
                 type: 'null'
             },
             400: {
@@ -125,7 +125,7 @@ const verificationHandler = async(request, reply) => {
 }
 
 module.exports = async (fastify, options) => {
-    fastify.get('contracts/status/:contractAddress', statusOpts, statusHandler);
+    fastify.get('contracts/status:contractAddress', statusOpts, statusHandler);
     fastify.post('contracts/verify', verificationOpts, verificationHandler)
     fastify.addContentTypeParser('multipart/form-data', parseMultiForm);
 }
