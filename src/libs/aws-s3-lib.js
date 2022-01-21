@@ -2,6 +2,7 @@ const AWS = require("aws-sdk");
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
 const OUTPUT_FILENAME = 'output.json';
+const ABI_FILENAME = 'abi.json';
 
 async function isVerified(contractAddress){
     let headInfo;
@@ -10,9 +11,36 @@ async function isVerified(contractAddress){
         headInfo = await clientS3.headObject(params).promise();  
     }catch(e){
         //aws returns 404 if key isn't found
-        return { status: false, message: 'contract has not been verified' };
+        return { status: 404, message: 'contract has not been verified' };
     }
     return { status: true, message: headInfo.LastModified};    
+}
+
+async function getOutput(contractAddress){
+    const params = { Bucket , Key: `${contractAddress}/${OUTPUT_FILENAME}` };
+    try{
+        return await clientS3.getObject(params).promise();
+    }catch(e){
+        return { status: 404, message: 'file not found'}
+    }
+}
+
+async function getAbi(contractAddress){
+    const params = { Bucket , Key: `${contractAddress}/${ABI_FILENAME}` };
+    try{
+        return await clientS3.getObject(params).promise();
+    }catch(e){
+        return { status: 404, message: 'file not found'}
+    }
+}
+
+async function getContract(contractAddress, contractPath){
+    const params = { Bucket , Key: `${contractAddress}/${contractPath}` };
+    try{
+        return await clientS3.getObject(params).promise();
+    }catch(e){
+        return { status: 404, message: 'file not found'}
+    }
 }
 
 async function uploadObject(contractAddress, buffer, contentType){
@@ -30,4 +58,4 @@ async function uploadObject(contractAddress, buffer, contentType){
     }
 }
 
-module.exports = { isVerified, uploadObject }
+module.exports = { isVerified, uploadObject, getOutput, getAbi, getContract  }

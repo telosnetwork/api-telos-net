@@ -1,5 +1,5 @@
 const verificationLib = require("../libs/verification-lib");
-const { isVerified } = require("../libs/aws-s3-lib");
+const { isVerified, getOutput, getAbi, getContract } = require("../libs/aws-s3-lib");
 
 const parseMultiForm = (request, done) => {
     /* interceptor for multi-form (files) */
@@ -38,6 +38,46 @@ const statusHandler = async(request, reply) => {
 
     const status = await isVerified(contractAddress);
     reply.code(200).send(status);
+};
+
+const sourceOpts = {
+    schema: {
+        summary: 'returns source files',
+        tags: ['evm'],
+        querystring: {
+            contractAddress: {
+                type: 'string'
+            }
+        }
+    },
+    response: {
+        200: {
+            description: 'returns source code, metadata output, and abi',
+            type: 'object'
+        },
+        400: {
+            description: 'request failed',
+            type: 'string'
+        }
+    }
+};
+
+const sourceHandler = async(request, reply) => {
+    const contractAddress = request.query.contractAddress;
+
+    const outputBuffer = await getOutput(contractAddress);
+    const output = JSON.parse(outputBuffer.Body.toString('utf8'));
+
+    const sourcePath = Object.keys(output.contracts)[0];
+    const contractBuffer = await getContract(contractAddress, sourcePath);
+    const contract = contractBuffer.Body.toString('utf8');
+
+    const abiBuffer = await getAbi(contractAddress);
+    const abi = JSON.parse(abiBuffer.Body.toString('utf8'));
+
+    const metadata = (Object.values(output.contracts[sourcePath])[0]).metadata;
+    const source = { contract, abi, metadata }
+    reply.code(200).send(source);
 };
 
 const verificationOpts = {
@@ -126,6 +166,7 @@ const verificationHandler = async(request, reply) => {
 
 module.exports = async (fastify, options) => {
     fastify.get('contracts/status:contractAddress', statusOpts, statusHandler);
-    fastify.post('contracts/verify', verificationOpts, verificationHandler)
+    fastify.get('contracts/source:contractAddress', sourceOpts, sourceHandler);
+    fastify.post('contracts/verify', verificationOpts, verificationHandler);
     fastify.addContentTypeParser('multipart/form-data', parseMultiForm);
 }
