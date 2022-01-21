@@ -30,7 +30,7 @@ const statusOpts = {
 
 const statusHandler = async(request, reply) => {
     const contractAddress = request.query.contractAddress;
-    const isContract = await verificationLib.isContract(contractAddress);
+    const isContract = await verificationLib.isContract(contractAddress.substring(0,42));
 
     if (!isContract){
         return reply.code(400).send(`${contractAddress} is not a valid contract address`);

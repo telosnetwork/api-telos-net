@@ -1,10 +1,11 @@
 const AWS = require("aws-sdk");
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
+const OUTPUT_FILENAME = 'output.json';
 
 async function isVerified(contractAddress){
     let headInfo;
-    const params = { Bucket , Key: contractAddress };
+    const params = { Bucket , Key: `${contractAddress}/${OUTPUT_FILENAME}` };
     try{
         headInfo = await clientS3.headObject(params).promise();  
     }catch(e){
