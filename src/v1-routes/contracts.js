@@ -53,7 +53,7 @@ const sourceOpts = {
     response: {
         200: {
             description: 'returns source code, metadata output, and abi',
-            type: 'object'
+            type: 'array'
         },
         400: {
             description: 'request failed',
@@ -76,7 +76,7 @@ const sourceHandler = async(request, reply) => {
     const abi = JSON.parse(abiBuffer.Body.toString('utf8'));
 
     const metadata = (Object.values(output.contracts[sourcePath])[0]).metadata;
-    const source = { contract, abi, metadata }
+    const source = [ contract, abi, metadata ]
     reply.code(200).send(source);
 };
 
