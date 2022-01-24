@@ -76,7 +76,7 @@ const sourceHandler = async(request, reply) => {
     const abi = JSON.parse(abiBuffer.Body.toString('utf8'));
 
     const metadata = (Object.values(output.contracts[sourcePath])[0]).metadata;
-    const source = [ contract, abi, metadata ]
+    const source = { contract, abi, metadata }
     reply.code(200).send(source);
 };
 

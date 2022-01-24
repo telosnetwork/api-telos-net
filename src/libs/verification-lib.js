@@ -48,7 +48,9 @@ const verifyContract = async (formData) => {
 
     if (bytecode === deployedByteCode){
         let contentType = 'application/json';
-        let buffer = new Buffer.from(JSON.stringify(output));
+        let buffer = new Buffer.from(JSON.stringify(input));
+        await uploadObject(`${formData.contractAddress}/input.json`, buffer, contentType);
+        buffer = new Buffer.from(JSON.stringify(output));
         await uploadObject(`${formData.contractAddress}/output.json`, buffer, contentType);
         buffer = new Buffer.from(JSON.stringify(abi));
         await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
