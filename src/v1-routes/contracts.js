@@ -1,5 +1,5 @@
 const verificationLib = require("../libs/verification-lib");
-const { isVerified, getOutput, getAbi, getContract } = require("../libs/aws-s3-lib");
+const { isVerified, getInput, getOutput, getAbi } = require("../libs/aws-s3-lib");
 
 const parseMultiForm = (request, done) => {
     /* interceptor for multi-form (files) */
@@ -65,18 +65,21 @@ const sourceOpts = {
 const sourceHandler = async(request, reply) => {
     const contractAddress = request.query.contractAddress;
 
+    const inputBuffer = await getInput(contractAddress);
+    const input = JSON.parse(inputBuffer.Body.toString('utf8'));
+
+    const sources = input.sources;
+
     const outputBuffer = await getOutput(contractAddress);
     const output = JSON.parse(outputBuffer.Body.toString('utf8'));
-
     const sourcePath = Object.keys(output.contracts)[0];
-    const contractBuffer = await getContract(contractAddress, sourcePath);
-    const contract = contractBuffer.Body.toString('utf8');
+    
+    const metadata = JSON.parse((Object.values(output.contracts[sourcePath])[0]).metadata);
 
     const abiBuffer = await getAbi(contractAddress);
     const abi = JSON.parse(abiBuffer.Body.toString('utf8'));
 
-    const metadata = (Object.values(output.contracts[sourcePath])[0]).metadata;
-    const source = { contract, abi, metadata }
+    const source = { sources, abi, metadata }
     reply.code(200).send(source);
 };
 

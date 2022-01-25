@@ -44,15 +44,6 @@ async function getAbi(contractAddress){
     }
 }
 
-async function getContract(contractAddress, contractPath){
-    const params = { Bucket , Key: `${contractAddress}/${contractPath}` };
-    try{
-        return await clientS3.getObject(params).promise();
-    }catch(e){
-        return { status: 404, message: 'file not found'}
-    }
-}
-
 async function uploadObject(contractAddress, buffer, contentType){
     const params = { 
         Bucket , 
@@ -68,4 +59,4 @@ async function uploadObject(contractAddress, buffer, contentType){
     }
 }
 
-module.exports = { isVerified, uploadObject, getOutput, getInput, getAbi, getContract  }
+module.exports = { isVerified, uploadObject, getOutput, getInput, getAbi }
