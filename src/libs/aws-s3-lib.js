@@ -2,6 +2,7 @@ const AWS = require("aws-sdk");
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
 const OUTPUT_FILENAME = 'output.json';
+const INPUT_FILENAME = 'input.json';
 const ABI_FILENAME = 'abi.json';
 
 async function isVerified(contractAddress){
@@ -18,6 +19,15 @@ async function isVerified(contractAddress){
 
 async function getOutput(contractAddress){
     const params = { Bucket , Key: `${contractAddress}/${OUTPUT_FILENAME}` };
+    try{
+        return await clientS3.getObject(params).promise();
+    }catch(e){
+        return { status: 404, message: 'file not found'}
+    }
+}
+
+async function getInput(contractAddress){
+    const params = { Bucket , Key: `${contractAddress}/${INPUT_FILENAME}` };
     try{
         return await clientS3.getObject(params).promise();
     }catch(e){
@@ -58,4 +68,4 @@ async function uploadObject(contractAddress, buffer, contentType){
     }
 }
 
-module.exports = { isVerified, uploadObject, getOutput, getAbi, getContract  }
+module.exports = { isVerified, uploadObject, getOutput, getInput, getAbi, getContract  }
