@@ -55,8 +55,6 @@ const verifyContract = async (formData) => {
         buffer = new Buffer.from(JSON.stringify(abi));
         await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
         contentType = 'application/octet-stream';
-        // buffer = new Buffer.from(sourceCode);
-        // await uploadObject(`${formData.contractAddress}/${fileName}`, buffer, contentType);
     }
 
     return bytecode === deployedByteCode;
