@@ -88,7 +88,7 @@ const verificationOpts = {
         summary: 'verifies source code for solidity contract',
         tags: ['evm'],
         body: {
-            required: ['compilerVersion', 'contractAddress', 'files', 'optimizer', 'runs', 'targetEvm'],
+            required: ['compilerVersion','files', 'contractAddress', 'optimizer', 'runs', 'targetEvm'],
             type: 'object',
             properties: {
                 contractAddress: {
