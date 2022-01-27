@@ -30,9 +30,11 @@ const verifyContract = async (formData) => {
             const arrayArg = Array.isArray(fileData) ? fileData : [fileData];
             input.sources = getSourcesObj(formData.sourcePath, arrayArg)
         }else{
+            decodedData = decodeStream(fileData);
             input = JSON.parse(decodedData);
-            fileName = Object.keys(input.sources)[0];
         }
+        fileName = Object.keys(input.sources)[0];
+
     }
 
     const deployedByteCode = await eth.getCode(formData.contractAddress);
