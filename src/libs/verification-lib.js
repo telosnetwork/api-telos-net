@@ -16,18 +16,19 @@ const isContract = async (address) => {
 
 const verifyContract = async (formData) => {
     let fileName, decodedData, constructorArgs, input;
-    const fileData = formData.files;
+    const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
-    fileName = formData.sourceName;
 
     if (typeof fileData === 'string'){
         decodedData = removeBrowserFormatting(fileData);
-        input = getInputObject(formData, decodedData);
-    }else{
-        decodedData = decodeStream(fileData.data);
-        const extension = getFileExtension(fileData.name);
-        if (extension === 'sol'){
-            input = getInputObject(formData, decodedData);
+        fileName = constructFileName(formData.sourcePath, decodedData);
+        input = getInputObject(formData);
+        input.sources = { [fileName] : decodedData };
+    }else{ 
+        if (formData.fileType){ 
+            input = getInputObject(formData);
+            const arrayArg = Array.isArray(fileData) ? fileData : [fileData];
+            input.sources = getSourcesObj(formData.sourcePath, arrayArg)
         }else{
             input = JSON.parse(decodedData);
             fileName = Object.keys(input.sources)[0];
@@ -37,7 +38,6 @@ const verifyContract = async (formData) => {
     const deployedByteCode = await eth.getCode(formData.contractAddress);
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
-    const sourceCode = Object.values(input.sources[fileName])[0];
     const abi = contract.abi;
     const bytecode = `0x${contract.evm.deployedBytecode.object}`;
     const argTypes = getArgTypes(abi);
@@ -60,14 +60,17 @@ const verifyContract = async (formData) => {
     return bytecode === deployedByteCode;
 }
 
-getInputObject = (formData, code) => {
+constructFilename = (sourcePath, decodedData) => {
+    const regexResults = decodedData.match(new RegExp('Contract' + "(.*)" + '\{'));
+    const contractFileName = `${sourcePath}${regexResults[1].replace(/\s+/g, '')}.sol`;
+    return contractFileName;
+}
+
+getInputObject = (formData) => {
+
     input = {
         language: 'Solidity',
-        sources: {
-            [formData.sourceName]: {
-                content: code
-            },
-        },
+        sources: {},
         settings: {
           optimizer: {
               enabled: formData.optimizer,
@@ -80,19 +83,29 @@ getInputObject = (formData, code) => {
           }
         }
       };
+
     return input;
-}
+};
 
-removeBrowserFormatting = (fileData) => {
-    return fileData.replace(/\r\n/g, '\n');
-}
+getSourcesObj = (sourcePath, fileArray ) =>{
+    let sources = {};
+    for (let i in fileArray ) {
+        const code  = decodeStream(fileArray[i].data);
 
-getFileExtension = (fileName) => {
-    return fileName.split('.').pop();
+        sources[`${sourcePath}${fileArray[i].name}`] = {
+            content: code
+        }  
+    }
+
+    return sources;
 }
 
 decodeStream = (dataStream) => {
     return dataStream.toString('utf8');
+}
+
+removeBrowserFormatting = (fileData) => {
+    return fileData.replace(/\r\n/g, '\n');
 }
 
 compileFile = async (compilerVersion, input) => {
