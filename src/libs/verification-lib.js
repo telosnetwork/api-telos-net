@@ -49,14 +49,13 @@ const verifyContract = async (formData) => {
     }
 
     if (bytecode === deployedByteCode){
-        let contentType = 'application/json';
+        const contentType = 'application/json';
         let buffer = new Buffer.from(JSON.stringify(input));
         await uploadObject(`${formData.contractAddress}/input.json`, buffer, contentType);
         buffer = new Buffer.from(JSON.stringify(output));
         await uploadObject(`${formData.contractAddress}/output.json`, buffer, contentType);
         buffer = new Buffer.from(JSON.stringify(abi));
         await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
-        contentType = 'application/octet-stream';
     }
 
     return bytecode === deployedByteCode;
@@ -93,12 +92,10 @@ getSourcesObj = (sourcePath, fileArray ) =>{
     let sources = {};
     for (let i in fileArray ) {
         const code  = decodeStream(fileArray[i].data);
-
         sources[`${sourcePath}${fileArray[i].name}`] = {
             content: code
         }  
     }
-
     return sources;
 }
 
@@ -134,7 +131,6 @@ getArgTypes = (abi) => {
             typesArr.push(constructorObj.inputs[i].type);
         }
     }
-
     return typesArr;
 }
 
