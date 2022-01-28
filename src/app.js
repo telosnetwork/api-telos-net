@@ -1,4 +1,3 @@
-require('dotenv').config()
 const AutoLoad = require('fastify-autoload')
 const fastifyCors = require('fastify-cors')
 const fastifyGracefulShutdown = require('fastify-graceful-shutdown')
@@ -10,9 +9,15 @@ const port = process.env.SERVER_PORT || 9999
 
 logger.info(`Starting API with mode ${process.env.MODE} and SERVER_ENDPOINT ${process.env.SERVER_ENDPOINT} and SERVER_PORT ${process.env.SERVER_PORT}`)
 
+
 const fastify = require('fastify')({
     trustProxy: true,
-    logger
+    logger,
+    ajv: {
+        customOptions: {
+            unknownFormats: ['binary']
+        }
+    }
 })
 
 fastify.register(fastifyGracefulShutdown)
@@ -22,6 +27,8 @@ fastify.register(require('fastify-oas'), require('../swaggerOpts.js'))
 fastify.register(fastifyCors, { origin: true })
 
 fastify.register(AutoLoad, { dir: path.join(__dirname, 'v1-routes'), options: { prefix: '/v1/' } });
+
+fastify.register(require('fastify-file-upload'))
 
 fastify.get('/', { schema: { hide: true } }, (request, reply) => {
     reply.code(307).redirect('/v1/docs')
