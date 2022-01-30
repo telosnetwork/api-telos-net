@@ -41,8 +41,8 @@ const verifyContract = async (formData) => {
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
-    const bytecode = `0x${contract.evm.deployedBytecode.object}`;
     const argTypes = getArgTypes(abi);
+    let bytecode = `0x${contract.evm.deployedBytecode.object}`;
 
     if (argTypes.length > 0) {
         bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
@@ -57,7 +57,6 @@ const verifyContract = async (formData) => {
         buffer = new Buffer.from(JSON.stringify(abi));
         await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
     }
-
     return bytecode === deployedByteCode;
 }
 
