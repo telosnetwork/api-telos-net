@@ -15,15 +15,20 @@ const isContract = async (address) => {
 }
 
 const verifyContract = async (formData) => {
-    let fileName, decodedData, constructorArgs, input;
+    let fileName, decodedData, constructorArgs, input, deployedByteCode;
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
     if (typeof fileData === 'string'){
         decodedData = removeBrowserFormatting(fileData);
-        fileName = constructFileName(formData.sourcePath, decodedData);
+        fileName = constructFilename(formData.sourcePath, decodedData);
         input = getInputObject(formData);
-        input.sources = { [fileName] : decodedData };
+
+        input.sources = { 
+            [fileName] : {
+                content: decodedData
+            }
+        }
     }else{ 
         if (formData.fileType){ 
             input = getInputObject(formData);
@@ -36,15 +41,21 @@ const verifyContract = async (formData) => {
         fileName = Object.keys(input.sources)[0];
 
     }
+    
+    
+    try{ 
+        deployedByteCode = await eth.getCode(formData.contractAddress);
+    }catch(e){
+        return e
+    }
 
-    const deployedByteCode = await eth.getCode(formData.contractAddress);
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
     const argTypes = getArgTypes(abi);
     let bytecode = `0x${contract.evm.deployedBytecode.object}`;
 
-    if (argTypes.length > 0) {
+    if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
         bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
     }
 
@@ -61,8 +72,9 @@ const verifyContract = async (formData) => {
 }
 
 constructFilename = (sourcePath, decodedData) => {
-    const regexResults = decodedData.match(new RegExp('Contract' + "(.*)" + '\{'));
-    const contractFileName = `${sourcePath}${regexResults[1].replace(/\s+/g, '')}.sol`;
+    let regexResults = decodedData.match(new RegExp('[C|c]ontract ' + "(.*)" + '\{'));
+    regexResults = regexResults[1].toLowerCase().split(' ');
+    const contractFileName = `${sourcePath}${regexResults[0].replace(/\s+/g, '')}.sol`;
     return contractFileName;
 }
 
