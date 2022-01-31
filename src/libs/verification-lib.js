@@ -4,7 +4,8 @@
  * If a match and not present in current db, it is stored for future reference. 
  * see teloscan repo 'ContractVerification.vue' for client implementation.
  */
-const solc = require('solc');
+ const axios = require("axios");
+ const solc = require('solc');
 const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
 const { uploadObject } = require('./aws-s3-lib');
@@ -13,11 +14,14 @@ const META_DATA_FLAG = 'a2646970667358221220';
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
-    return byteCode != "0x";
+    // return byteCode != "0x";
+    return true;
 }
 
+
+
 const verifyContract = async (formData) => {
-    let fileName, decodedData, constructorArgs, input, deployedByteCode;
+    let fileName, decodedData, constructorArgs, input, deployedByteCode, constructorArgsVerified;
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
@@ -43,7 +47,7 @@ const verifyContract = async (formData) => {
         fileName = Object.keys(input.sources)[0];
     }
     
-    if (formData.targetEvm) {
+    if (formData.targetEvm !== 'default') {
         input.settings['evmVersion'] = formData.targetEvm;
     }
     
@@ -54,10 +58,20 @@ const verifyContract = async (formData) => {
     let bytecode = `0x${contract.evm.deployedBytecode.object}`;
 
     //@TODO implkement once we have the create transaction input to compare with
-    // const argTypes = getArgTypes(abi);
-    // if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
-    //     bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
-    // }
+    const argTypes = getArgTypes(abi);
+    if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
+
+        const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${formData.contractAddress}`);
+        const creationTransaction = contractResult.data.creation_trx;
+        const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
+        const creationInput = transactionResult.data.transactions[0].input_data;
+        const encodedConstructorArgs =  getEncodedConstructorArgs(argTypes, constructorArgs);
+        const deployedConstructorArgs = creationInput.slice(-encodedConstructorArgs.length);
+
+        if (encodedConstructorArgs === deployedConstructorArgs){
+            constructorArgsVerified = true;
+        }
+    }
 
     if (bytecode === deployedByteCode){
         const contentType = 'application/json';
