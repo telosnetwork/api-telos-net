@@ -9,6 +9,8 @@ const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
 const { uploadObject } = require('./aws-s3-lib');
 
+const META_DATA_FLAG = 'a2646970667358221220';
+
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
     return byteCode != "0x";
@@ -39,25 +41,23 @@ const verifyContract = async (formData) => {
             input = JSON.parse(decodedData);
         }
         fileName = Object.keys(input.sources)[0];
-
     }
     
-    
-    try{ 
-        deployedByteCode = await eth.getCode(formData.contractAddress);
-    }catch(e){
-        return e
+    if (formData.targetEvm) {
+        input.settings['evmVersion'] = formData.targetEvm;
     }
-
+    
+    deployedByteCode = await eth.getCode(formData.contractAddress);
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
-    const argTypes = getArgTypes(abi);
     let bytecode = `0x${contract.evm.deployedBytecode.object}`;
 
-    if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
-        bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
-    }
+    //@TODO implkement once we have the create transaction input to compare with
+    // const argTypes = getArgTypes(abi);
+    // if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
+    //     bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
+    // }
 
     if (bytecode === deployedByteCode){
         const contentType = 'application/json';
