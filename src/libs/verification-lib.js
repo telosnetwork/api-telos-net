@@ -14,14 +14,11 @@ const META_DATA_FLAG = 'a2646970667358221220';
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
-    // return byteCode != "0x";
-    return true;
+    return byteCode != "0x";
 }
 
-
-
 const verifyContract = async (formData) => {
-    let fileName, decodedData, constructorArgs, input, deployedByteCode, constructorArgsVerified;
+    let fileName, decodedData, constructorArgs, input, constructorArgsVerified;
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
@@ -51,13 +48,12 @@ const verifyContract = async (formData) => {
         input.settings['evmVersion'] = formData.targetEvm;
     }
     
-    deployedByteCode = await eth.getCode(formData.contractAddress);
+    const deployedByteCode = await eth.getCode(formData.contractAddress);
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
-    let bytecode = `0x${contract.evm.deployedBytecode.object}`;
+    const bytecode = `0x${contract.evm.deployedBytecode.object}`;
 
-    //@TODO implkement once we have the create transaction input to compare with
     const argTypes = getArgTypes(abi);
     if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
 
