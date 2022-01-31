@@ -4,10 +4,13 @@
  * If a match and not present in current db, it is stored for future reference. 
  * see teloscan repo 'ContractVerification.vue' for client implementation.
  */
-const solc = require('solc');
+ const axios = require("axios");
+ const solc = require('solc');
 const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
 const { uploadObject } = require('./aws-s3-lib');
+
+const META_DATA_FLAG = 'a2646970667358221220';
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
@@ -15,15 +18,20 @@ const isContract = async (address) => {
 }
 
 const verifyContract = async (formData) => {
-    let fileName, decodedData, constructorArgs, input;
+    let fileName, decodedData, constructorArgs, input, constructorArgsVerified;
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
     if (typeof fileData === 'string'){
         decodedData = removeBrowserFormatting(fileData);
-        fileName = constructFileName(formData.sourcePath, decodedData);
+        fileName = constructFilename(formData.sourcePath, decodedData);
         input = getInputObject(formData);
-        input.sources = { [fileName] : decodedData };
+
+        input.sources = { 
+            [fileName] : {
+                content: decodedData
+            }
+        }
     }else{ 
         if (formData.fileType){ 
             input = getInputObject(formData);
@@ -34,18 +42,31 @@ const verifyContract = async (formData) => {
             input = JSON.parse(decodedData);
         }
         fileName = Object.keys(input.sources)[0];
-
     }
-
+    
+    if (formData.targetEvm !== 'default') {
+        input.settings['evmVersion'] = formData.targetEvm;
+    }
+    
     const deployedByteCode = await eth.getCode(formData.contractAddress);
     const output = await compileFile(formData.compilerVersion,input);
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
     const bytecode = `0x${contract.evm.deployedBytecode.object}`;
-    const argTypes = getArgTypes(abi);
 
-    if (argTypes.length > 0) {
-        bytecode += getEncodedConstructorArgs(argTypes, constructorArgs);
+    const argTypes = getArgTypes(abi);
+    if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
+
+        const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${formData.contractAddress}`);
+        const creationTransaction = contractResult.data.creation_trx;
+        const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
+        const creationInput = transactionResult.data.transactions[0].input_data;
+        const encodedConstructorArgs =  getEncodedConstructorArgs(argTypes, constructorArgs);
+        const deployedConstructorArgs = creationInput.slice(-encodedConstructorArgs.length);
+
+        if (encodedConstructorArgs === deployedConstructorArgs){
+            constructorArgsVerified = true;
+        }
     }
 
     if (bytecode === deployedByteCode){
@@ -57,13 +78,13 @@ const verifyContract = async (formData) => {
         buffer = new Buffer.from(JSON.stringify(abi));
         await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
     }
-
     return bytecode === deployedByteCode;
 }
 
 constructFilename = (sourcePath, decodedData) => {
-    const regexResults = decodedData.match(new RegExp('Contract' + "(.*)" + '\{'));
-    const contractFileName = `${sourcePath}${regexResults[1].replace(/\s+/g, '')}.sol`;
+    let regexResults = decodedData.match(new RegExp('[C|c]ontract ' + "(.*)" + '\{'));
+    regexResults = regexResults[1].toLowerCase().split(' ');
+    const contractFileName = `${sourcePath}${regexResults[0].replace(/\s+/g, '')}.sol`;
     return contractFileName;
 }
 
