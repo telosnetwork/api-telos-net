@@ -17,8 +17,7 @@ const envShared = {
   recaptchaServerkey: '6Ld-_eIZAAAAAHNKjH47BPSMdVltMNpSosc0hr0a',
   recaptchaTableName: 'prod-recaptcha-accounts',
   API_LOG_LEVEL: 'debug',
-  SERVER_HOSTNAME: 'api-2051445629.us-east-1.elb.amazonaws.com',
-  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts'
+  SERVER_HOSTNAME: 'api-2051445629.us-east-1.elb.amazonaws.com'
 };
 
 const envLocal = {
@@ -40,6 +39,7 @@ const envDev = {
   SERVER_ENDPOINT: 'api-dev.telos.net',
   SERVER_PORT: 3000,
   TIME_SPAN: 5,
+  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts-testnet'
 };
 
 const envProd = {
@@ -55,7 +55,8 @@ const envProd = {
   MODE: 'prod',
   SERVER_ENDPOINT: 'api.telos.net',
   SERVER_PORT: 4000,
-  TIME_SPAN: 10080
+  TIME_SPAN: 10080,
+  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts'
 };
 
 const sharedConfig = {
