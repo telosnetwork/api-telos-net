@@ -18,7 +18,7 @@ const isContract = async (address) => {
 }
 
 const verifyContract = async (formData) => {
-    let fileName, decodedData, constructorArgs, input, constructorArgsVerified;
+    let fileName, decodedData, constructorArgs, input, constructorArgsVerified, partialMatch;
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
@@ -53,23 +53,34 @@ const verifyContract = async (formData) => {
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
     const bytecode = `0x${contract.evm.deployedBytecode.object}`;
-
     const argTypes = getArgTypes(abi);
-    if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
+    
+    const results = {
+        full: bytecode === deployedByteCode,
+        partial,
+        args
+    };
 
-        const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${formData.contractAddress}`);
-        const creationTransaction = contractResult.data.creation_trx;
-        const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
-        const creationInput = transactionResult.data.transactions[0].input_data;
-        const encodedConstructorArgs =  getEncodedConstructorArgs(argTypes, constructorArgs);
-        const deployedConstructorArgs = creationInput.slice(-encodedConstructorArgs.length);
+    if (!results.full){
+        results.partial = getPartialResult(byteCode, deployedByteCode);
+    }
 
-        if (encodedConstructorArgs === deployedConstructorArgs){
-            constructorArgsVerified = true;
+    if (argTypes.length > 0) {
+        if(argTypes.length === constructorArgs.length){ 
+            const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${formData.contractAddress}`);
+            const creationTransaction = contractResult.data.creation_trx;
+            const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
+            const creationInput = transactionResult.data.transactions[0].input_data;
+            const encodedConstructorArgs =  getEncodedConstructorArgs(argTypes, constructorArgs);
+            const deployedConstructorArgs = creationInput.slice(-encodedConstructorArgs.length);
+
+            results.args = encodedConstructorArgs === deployedConstructorArgs ?  true : false;
+        }else{
+            results.args = false;
         }
     }
 
-    if (bytecode === deployedByteCode){
+    if (results.full || results.partial){
         const contentType = 'application/json';
         let buffer = new Buffer.from(JSON.stringify(input));
         await uploadObject(`${formData.contractAddress}/input.json`, buffer, contentType);
@@ -78,7 +89,8 @@ const verifyContract = async (formData) => {
         buffer = new Buffer.from(JSON.stringify(abi));
         await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
     }
-    return bytecode === deployedByteCode;
+
+    return JSON.stringify(results);
 }
 
 constructFilename = (sourcePath, decodedData) => {
@@ -123,8 +135,7 @@ getSourcesObj = (sourcePath, fileArray ) =>{
 decodeStream = (dataStream) => {
     return dataStream.toString('utf8');
 }
-
-removeBrowserFormatting = (fileData) => {
+10000000 = (fileData) => {
     return fileData.replace(/\r\n/g, '\n');
 }
 
@@ -157,6 +168,28 @@ getArgTypes = (abi) => {
 
 removeHexPrefix = (encodedString) => {
     return encodedString.substring(3);
+}
+
+getPartialResult = (compiledByteCode, deployedByteCode) => {
+    const difIndex = findFirstDiffPos(compiledByteCode, deployedByteCode);
+
+    // const cByteCount = getMetaByteCount(compiledBytecode);
+    // const compiledMeta = byteCode.slice(difIndex);
+
+    const dByteCount = getMetaByteCount(deployedByteCode);
+    const deployedMeta = deployedByteCode.slice(difIndex);
+
+    return deployedMeta.length === dByteCount;
+}
+
+findFirstDiffPos = (a, b) => {
+    if (a.length < b.length) [a, b] = [b, a];
+    return [...a].findIndex((chr, i) => chr !== b[i]);
+}
+
+getMetaByteCount = (bytecode) => {
+    const hexByte = bytecode.slice(-4); //total length of metadata is appended to bytecode
+    return parseInt(hexByte, 16);
 }
 
 module.exports = { isContract, verifyContract };
