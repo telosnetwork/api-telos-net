@@ -58,8 +58,8 @@ const verifyContract = async (formData) => {
     
     const results = {
         full: bytecode === deployedByteCode,
-        partial,
-        args
+        partial: false,
+        args: false
     };
 
     if (!results.full){
@@ -194,10 +194,11 @@ getMetaByteCount = (bytecode) => {
     return parseInt(hexByte, 16);
 }
 
-upload = (object) => {
+upload = async (object) => {
     const contentType = 'application/json';
+    const objectName = Object.keys({object})[0]
     const buffer = new Buffer.from(JSON.stringify(object));
-    await uploadObject(`${formData.contractAddress}/input.json`, buffer, contentType);
+    await uploadObject(`${formData.contractAddress}/${objectName}.json`, buffer, contentType);
 }
 
 module.exports = { isContract, verifyContract };
