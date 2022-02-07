@@ -106,7 +106,7 @@ const verifyContract = async (formData) => {
     if (argTypes.length > 0) {
         let result = false;
         if( argTypes.length === constructorArgs.length ){ 
-            result = await verifyConstructorArgs(formData.contractAddress, constructorArgs);
+            result = await verifyConstructorArgs(formData.contractAddress, argTypes, constructorArgs);
         }
         results.args = result;
     }
@@ -188,7 +188,7 @@ getArgTypes = (abi) => {
     return typesArr;
 }
 
-verifyConstructorArgs = async (contractAddress, constructorArgs) => {
+verifyConstructorArgs = async (contractAddress, argTypes, constructorArgs) => {
     const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${contractAddress}`);
     const creationTransaction = contractResult.data.creation_trx;
     const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
