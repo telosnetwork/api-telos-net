@@ -164,11 +164,11 @@ const verificationHandler = async(request, reply) => {
 
     const verificationStatus = await verificationLib.verifyContract(request.body);
     
-    const result = getResponseObj(verificationStatus);
+    const result = getResponseObj(JSON.parse(verificationStatus));
     reply.send(JSON.stringify(result));
 }
 
-const getResponseObj = () => {
+const getResponseObj = (results) => {
     let responseObj = { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
     const partial = 'Verification incomplete! Please resubmit with correct information to complete verification. Reason: ';
     const constructor = 'Constructor args missing or do not match those provided during deployment. ';
