@@ -1,16 +1,17 @@
 /**
  * Contract Verification for Telos EVM
- * compiles and compares bytecode with uploaded contracts to verify source authenticity. 
- * If a match and not present in current db, it is stored for future reference. 
- * see teloscan repo 'ContractVerification.vue' for client implementation.
+ * compiles contract source file(s) provided by the user and 
+ * compares the resulting bytecode with creation transaction input and 
+ * deployed bytecode to determine source authenticity. In the case of a match,
+ * the generated (or provided) input object, and output objects are stored future 
+ * reference and for render or download in applications.
+ * See teloscan repo 'ContractVerification.vue' for client implementation.
  */
- const axios = require("axios");
- const solc = require('solc');
+const axios = require("axios");
+const solc = require('solc');
 const Web3Eth = require('web3-eth');
 const eth = new Web3Eth(process.env.evmProvider);
 const { uploadObject } = require('./aws-s3-lib');
-
-const META_DATA_FLAG = 'a2646970667358221220';
 
 const isContract = async (address) => {
     const byteCode = await eth.getCode(address);
@@ -18,11 +19,11 @@ const isContract = async (address) => {
 }
 
 const verifyContract = async (formData) => {
-    let fileName, decodedData, constructorArgs, input, constructorArgsVerified;
+    let fileName, decodedData, constructorArgs, input
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
-    if (typeof fileData === 'string'){
+    if (typeof fileData === 'string'){ // raw contract copy paste in textarea input
         decodedData = removeBrowserFormatting(fileData);
         fileName = constructFilename(formData.sourcePath, decodedData);
         input = getInputObject(formData);
@@ -33,11 +34,11 @@ const verifyContract = async (formData) => {
             }
         }
     }else{ 
-        if (formData.fileType){ 
+        if (formData.fileType){ // file option `.sol` 
             input = getInputObject(formData);
             const arrayArg = Array.isArray(fileData) ? fileData : [fileData];
             input.sources = getSourcesObj(formData.sourcePath, arrayArg)
-        }else{
+        }else{ // file option `.json` 
             decodedData = decodeStream(fileData);
             input = JSON.parse(decodedData);
         }
@@ -53,32 +54,71 @@ const verifyContract = async (formData) => {
     const contract = Object.values(output.contracts[fileName])[0];
     const abi = contract.abi;
     const bytecode = `0x${contract.evm.deployedBytecode.object}`;
-
     const argTypes = getArgTypes(abi);
-    if (argTypes.length > 0 && argTypes.length === constructorArgs.length) {
+    
+    /**
+     * results object returned to client
+     * 
+     * - full match - verified -
+     * 
+     * case: verified (no constructor)
+     * full: true
+     * partial: null
+     * args: null
+     * 
+     * case: verified (w/constructor)
+     * full: true
+     * partial: null
+     * args: true
+     * 
+     * - partial match - conditionally verified -
+     * 
+     * case: constructor args don't match
+     * full: true
+     * partial: null
+     * args: false
+     * 
+     * case: metadata doesn't match (no constructor)
+     * full: false
+     * partial: true
+     * args: null
+     * 
+     * case: metadata doesn't match, constructor args match
+     * full: false
+     * partial: true
+     * args: true
+     * 
+     * case: metadata doesn't match, constructor args do not match
+     * full: false
+     * partial: true
+     * args: false
+     */
+    const results = {
+        full: bytecode === deployedByteCode, 
+        partial: null, 
+        args: null 
+    };
 
-        const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${formData.contractAddress}`);
-        const creationTransaction = contractResult.data.creation_trx;
-        const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
-        const creationInput = transactionResult.data.transactions[0].input_data;
-        const encodedConstructorArgs =  getEncodedConstructorArgs(argTypes, constructorArgs);
-        const deployedConstructorArgs = creationInput.slice(-encodedConstructorArgs.length);
+    if (!results.full){
+        results.partial = getPartialResult(byteCode, deployedByteCode);
+    }
 
-        if (encodedConstructorArgs === deployedConstructorArgs){
-            constructorArgsVerified = true;
+    if (argTypes.length > 0) {
+        let result = false;
+        if( argTypes.length === constructorArgs.length ){ 
+            result = await verifyConstructorArgs(formData.contractAddress, argTypes, constructorArgs);
         }
+        results.args = result;
     }
 
-    if (bytecode === deployedByteCode){
-        const contentType = 'application/json';
-        let buffer = new Buffer.from(JSON.stringify(input));
-        await uploadObject(`${formData.contractAddress}/input.json`, buffer, contentType);
-        buffer = new Buffer.from(JSON.stringify(output));
-        await uploadObject(`${formData.contractAddress}/output.json`, buffer, contentType);
-        buffer = new Buffer.from(JSON.stringify(abi));
-        await uploadObject(`${formData.contractAddress}/abi.json`, buffer, contentType);
+    if (results.full || results.partial){
+        await upload(formData.contractAddress, input, 'input');
+        await upload(formData.contractAddress, output, 'output');
+        await upload(formData.contractAddress, abi, 'abi');
+        await upload(formData.contractAddress, results, 'results');
     }
-    return bytecode === deployedByteCode;
+
+    return JSON.stringify(results);
 }
 
 constructFilename = (sourcePath, decodedData) => {
@@ -137,13 +177,6 @@ compileFile = async (compilerVersion, input) => {
     })
 }
 
-getEncodedConstructorArgs = (argTypes, constructorArgs) => {
-    encodedConstructorArgs = eth.abi.encodeParameters(argTypes, constructorArgs)
-    const encodedRaw = removeHexPrefix(encodedConstructorArgs);
-    
-    return encodedRaw;
-}
-
 getArgTypes = (abi) => {
     const typesArr = [];
     const constructorObj = abi.find(obj => { return obj.type === 'constructor' });
@@ -155,8 +188,56 @@ getArgTypes = (abi) => {
     return typesArr;
 }
 
+verifyConstructorArgs = async (contractAddress, argTypes, constructorArgs) => {
+    const contractResult = await axios(`${process.env.evmHyperionProvider}/get_contract?contract=${contractAddress}`);
+    const creationTransaction = contractResult.data.creation_trx;
+    const transactionResult = await axios(`${process.env.evmHyperionProvider}/get_transactions?hash=${creationTransaction}`);
+    const creationInput = transactionResult.data.transactions[0].input_data;
+    const encodedConstructorArgs =  getEncodedConstructorArgs(argTypes, constructorArgs);
+    const deployedConstructorArgs = creationInput.slice(-encodedConstructorArgs.length);
+
+    return encodedConstructorArgs === deployedConstructorArgs;
+}
+
+getEncodedConstructorArgs = (argTypes, constructorArgs) => {
+    encodedConstructorArgs = eth.abi.encodeParameters(argTypes, constructorArgs)
+    const encodedRaw = removeHexPrefix(encodedConstructorArgs);
+    
+    return encodedRaw;
+}
+
 removeHexPrefix = (encodedString) => {
     return encodedString.substring(3);
+}
+
+getPartialResult = (compiledByteCode, deployedByteCode) => {
+    const difIndex = findFirstDiffPos(compiledByteCode, deployedByteCode);
+
+    const cByteCount = getMetaByteCount(compiledBytecode);
+    const compiledMeta = byteCode.slice(difIndex);
+
+    const dByteCount = getMetaByteCount(deployedByteCode);
+    const deployedMeta = deployedByteCode.slice(difIndex);
+
+    return  deployedMeta.length === dByteCount && compiledMeta.length === cByteCount;
+}
+
+findFirstDiffPos = (a, b) => {
+    if (a.length < b.length) [a, b] = [b, a];
+    return [...a].findIndex((chr, i) => chr !== b[i]);
+}
+
+getMetaByteCount = (bytecode) => {
+    const hexByte = bytecode.slice(-4); //total length of metadata is appended to bytecode
+    return parseInt(hexByte, 16);
+}
+
+upload = async (address, object, filename) => {
+    const name = obj => Object.keys(obj)[0];
+    const test = name({object});
+    const contentType = 'application/json';
+    const buffer = new Buffer.from(JSON.stringify(object));
+    await uploadObject(`${address}/${filename}.json`, buffer, contentType);
 }
 
 module.exports = { isContract, verifyContract };
