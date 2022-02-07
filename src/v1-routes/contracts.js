@@ -163,8 +163,35 @@ const verificationHandler = async(request, reply) => {
     }
 
     const verificationStatus = await verificationLib.verifyContract(request.body);
-    const result = verificationStatus ? { message: 'Success! Contract verified!', type: 'positive' } : { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
+    
+    const result = getResponseObj(verificationStatus);
     reply.send(JSON.stringify(result));
+}
+
+const getResponseObj = () => {
+    let responseObj = { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
+    const partial = 'Verification incomplete! Please resubmit with correct information to complete verification. Reason: ';
+    const constructor = 'Constructor args missing or do not match those provided during deployment. ';
+    const meta = 'Metadata does not match deployed';
+
+    if (results.full){
+        if (results.args || results.args == null){
+            responseObj.message = 'Success! Contract verified!'
+            responseObj.type ='positive'  ;
+        }else{
+            responseObj.message = `${partial}${constructor}`
+            responseObj.type ='warning'  ;
+        }
+    }else if(results.partial){
+        if (results.args || results.args == null){
+            responseObj.message = `${partial}${meta}`
+            responseObj.type ='warning'  ;
+        }else{
+            responseObj.message = `${partial}${meta}${constructor}`
+            responseObj.type ='warning'  ;
+        }
+    }
+    return responseObj;
 }
 
 module.exports = async (fastify, options) => {

@@ -23,7 +23,7 @@ const verifyContract = async (formData) => {
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
 
-    if (typeof fileData === 'string'){ // raw contract copy paste in textarea
+    if (typeof fileData === 'string'){ // raw contract copy paste in textarea input
         decodedData = removeBrowserFormatting(fileData);
         fileName = constructFilename(formData.sourcePath, decodedData);
         input = getInputObject(formData);
@@ -56,10 +56,47 @@ const verifyContract = async (formData) => {
     const bytecode = `0x${contract.evm.deployedBytecode.object}`;
     const argTypes = getArgTypes(abi);
     
+    /**
+     * results object returned to client
+     * 
+     * - full match - verified -
+     * 
+     * case: verified (no constructor)
+     * full: true
+     * partial: null
+     * args: null
+     * 
+     * case: verified (w/constructor)
+     * full: true
+     * partial: null
+     * args: true
+     * 
+     * - partial match - conditionally verified -
+     * 
+     * case: constructor args don't match
+     * full: true
+     * partial: null
+     * args: false
+     * 
+     * case: metadata doesn't match (no constructor)
+     * full: false
+     * partial: true
+     * args: null
+     * 
+     * case: metadata doesn't match, constructor args match
+     * full: false
+     * partial: true
+     * args: true
+     * 
+     * case: metadata doesn't match, constructor args do not match
+     * full: false
+     * partial: true
+     * args: false
+     */
     const results = {
-        full: bytecode === deployedByteCode,
-        partial: false,
-        args: false
+        full: bytecode === deployedByteCode, 
+        partial: null, 
+        args: null 
     };
 
     if (!results.full){
@@ -67,17 +104,17 @@ const verifyContract = async (formData) => {
     }
 
     if (argTypes.length > 0) {
-        if(argTypes.length === constructorArgs.length){ 
-            results.args = await verifyConstructorArgs(formData.address);
-        }else{
-            results.args = false;
+        let result = false;
+        if( argTypes.length === constructorArgs.length ){ 
+            result = await verifyConstructorArgs(formData.address);
         }
+        results.args = result;
     }
 
     if (results.full || results.partial){
-        await upload(input);
-        await upload(output);
-        await upload(abi);
+        await upload(input, 'input');
+        await upload(output, 'output');
+        await upload(abi, 'abi');
     }
 
     return JSON.stringify(results);
@@ -194,11 +231,12 @@ getMetaByteCount = (bytecode) => {
     return parseInt(hexByte, 16);
 }
 
-upload = async (object) => {
+upload = async (object, filename) => {
+    const name = obj => Object.keys(obj)[0];
+    const test = name({object});
     const contentType = 'application/json';
-    const objectName = Object.keys({object})[0]
     const buffer = new Buffer.from(JSON.stringify(object));
-    await uploadObject(`${formData.contractAddress}/${objectName}.json`, buffer, contentType);
+    await uploadObject(`${formData.contractAddress}/${filename}.json`, buffer, contentType);
 }
 
 module.exports = { isContract, verifyContract };
