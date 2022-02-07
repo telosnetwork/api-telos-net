@@ -70,7 +70,7 @@ const localConfig = {
   name: 'api-local',
   watch: true,
   autorestart: false,
-  env: { ...envShared,...envDev, ...envLocal}
+  env: { ...envShared,...envProd, ...envLocal}
 };
 
 const devConfig = {

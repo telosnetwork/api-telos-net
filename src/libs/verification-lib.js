@@ -22,6 +22,7 @@ const verifyContract = async (formData) => {
     let fileName, decodedData, constructorArgs, input
     const fileData = formData.files; //passed as single object or array 
     constructorArgs = formData.constructorArgs.length ? formData.constructorArgs.split(',') : [];
+    const contractImports ={}
 
     if (typeof fileData === 'string'){ // raw contract copy paste in textarea input
         decodedData = removeBrowserFormatting(fileData);
@@ -37,7 +38,7 @@ const verifyContract = async (formData) => {
         if (formData.fileType){ // file option `.sol` 
             input = getInputObject(formData);
             const arrayArg = Array.isArray(fileData) ? fileData : [fileData];
-            input.sources = getSourcesObj(formData.sourcePath, arrayArg)
+            input.sources = await getSourcesObj(formData.sourcePath, arrayArg)
         }else{ // file option `.json` 
             decodedData = decodeStream(fileData);
             input = JSON.parse(decodedData);
@@ -100,7 +101,7 @@ const verifyContract = async (formData) => {
     };
 
     if (!results.full){
-        results.partial = getPartialResult(byteCode, deployedByteCode);
+        results.partial = getPartialResult(bytecode, deployedByteCode);
     }
 
     if (argTypes.length > 0) {
@@ -112,10 +113,10 @@ const verifyContract = async (formData) => {
     }
 
     if (results.full || results.partial){
-        await upload(formData.contractAddress, input, 'input');
-        await upload(formData.contractAddress, output, 'output');
-        await upload(formData.contractAddress, abi, 'abi');
-        await upload(formData.contractAddress, results, 'results');
+        await upload(formData.contractAddress, input);
+        await upload(formData.contractAddress, output);
+        await upload(formData.contractAddress, abi);
+        await upload(formData.contractAddress, results);
     }
 
     return JSON.stringify(results);
@@ -149,10 +150,12 @@ getInputObject = (formData) => {
     return input;
 };
 
-getSourcesObj = (sourcePath, fileArray ) =>{
+getSourcesObj = async (sourcePath, fileArray ) =>{
     let sources = {};
+    let imports = {};
     for (let i in fileArray ) {
         const code  = decodeStream(fileArray[i].data);
+        imports = await getImports(code);
         sources[`${sourcePath}${fileArray[i].name}`] = {
             content: code
         }  
@@ -164,6 +167,10 @@ decodeStream = (dataStream) => {
     return dataStream.toString('utf8');
 }
 
+getImports = (code) => {
+    let test = code.match(new RegExp(/import[/\s]*(["'][/\w*@-]*["'])/));
+}
+
 removeBrowserFormatting = (fileData) => {
     return fileData.replace(/\r\n/g, '\n');
 }
@@ -172,9 +179,13 @@ compileFile = async (compilerVersion, input) => {
     return await new Promise((resolve,reject) => {
         solc.loadRemoteVersion(compilerVersion, (e, solcVersion) => {
             e ? reject(e) 
-            : resolve(JSON.parse(solcVersion.compile(JSON.stringify(input))));
+            : resolve(JSON.parse(solcVersion.compile(JSON.stringify(input), { import: findImports})));
         });
     })
+}
+
+findImports = (path) => {
+    console.log(path);
 }
 
 getArgTypes = (abi) => {
@@ -213,7 +224,7 @@ removeHexPrefix = (encodedString) => {
 getPartialResult = (compiledByteCode, deployedByteCode) => {
     const difIndex = findFirstDiffPos(compiledByteCode, deployedByteCode);
 
-    const cByteCount = getMetaByteCount(compiledBytecode);
+    const cByteCount = getMetaByteCount(compiledByteCode);
     const compiledMeta = byteCode.slice(difIndex);
 
     const dByteCount = getMetaByteCount(deployedByteCode);
@@ -232,9 +243,8 @@ getMetaByteCount = (bytecode) => {
     return parseInt(hexByte, 16);
 }
 
-upload = async (address, object, filename) => {
-    const name = obj => Object.keys(obj)[0];
-    const test = name({object});
+upload = async (address, object) => {
+    const filename = Object.keys({object})[0];
     const contentType = 'application/json';
     const buffer = new Buffer.from(JSON.stringify(object));
     await uploadObject(`${address}/${filename}.json`, buffer, contentType);
