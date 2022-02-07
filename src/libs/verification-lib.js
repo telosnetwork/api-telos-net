@@ -231,6 +231,18 @@ getPartialResult = (compiledByteCode, deployedByteCode) => {
     const difIndex = findFirstDiffPos(compiledByteCode, deployedByteCode);
 
     const cByteCount = getMetaByteCount(compiledByteCode);
+    const dByteCount = getMetaByteCount(deployedByteCode);
+
+    const compiledMeta = compiledByteCode.slice(-cByteCount);
+    const deployedMeta = deployedByteCode.slice(-dByteCount);
+
+    // const fs = require('fs');
+    // fs.writeFileSync('./compiledbytecode', compiledByteCode, (err) => {
+    //     console.log(errror);
+    // });
+    // fs.writeFileSync('./deployedbytecode', deployedByteCode,(err) => {
+    //     console.log(errror);
+    // });
 
     return  difIndex >= compiledByteCode.length - cByteCount ;
 }
