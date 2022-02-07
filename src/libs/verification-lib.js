@@ -115,6 +115,7 @@ const verifyContract = async (formData) => {
         await upload(input, 'input');
         await upload(output, 'output');
         await upload(abi, 'abi');
+        await upload(results, 'results');
     }
 
     return JSON.stringify(results);
