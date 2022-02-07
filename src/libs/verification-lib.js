@@ -222,15 +222,17 @@ removeHexPrefix = (encodedString) => {
 }
 
 getPartialResult = (compiledByteCode, deployedByteCode) => {
+    /**
+     * compares the index of the first difference in bytecode 
+     * to see if it falls within range of metadata which has 
+     * known length indicating that source matches but metadata
+     * does not.
+     */ 
     const difIndex = findFirstDiffPos(compiledByteCode, deployedByteCode);
 
     const cByteCount = getMetaByteCount(compiledByteCode);
-    const compiledMeta = byteCode.slice(difIndex);
 
-    const dByteCount = getMetaByteCount(deployedByteCode);
-    const deployedMeta = deployedByteCode.slice(difIndex);
-
-    return  deployedMeta.length === dByteCount && compiledMeta.length === cByteCount;
+    return  difIndex >= compiledByteCode.length - cByteCount ;
 }
 
 findFirstDiffPos = (a, b) => {
