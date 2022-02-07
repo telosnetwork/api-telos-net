@@ -112,10 +112,10 @@ const verifyContract = async (formData) => {
     }
 
     if (results.full || results.partial){
-        await upload(formData.address, input, 'input');
-        await upload(formData.address, output, 'output');
-        await upload(formData.address, abi, 'abi');
-        await upload(formData.address, results, 'results');
+        await upload(formData.contractAddress, input, 'input');
+        await upload(formData.contractAddress, output, 'output');
+        await upload(formData.contractAddress, abi, 'abi');
+        await upload(formData.contractAddress, results, 'results');
     }
 
     return JSON.stringify(results);
