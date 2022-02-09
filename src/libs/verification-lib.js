@@ -168,7 +168,7 @@ decodeStream = (dataStream) => {
 }
 
 getImports = (code) => {
-    let test = code.match(new RegExp(/import[/\s]*(["'][/\w*@-]*["'])/));
+    let importresource = code.match(new RegExp(/import[/\s]*(["'][/\w*@-]*["'])/));
 }
 
 removeBrowserFormatting = (fileData) => {
@@ -185,6 +185,7 @@ compileFile = async (compilerVersion, input) => {
 }
 
 findImports = (path) => {
+    //pass external 3rd party imports populated in getImports()
     console.log(path);
 }
 
@@ -235,14 +236,6 @@ getPartialResult = (compiledByteCode, deployedByteCode) => {
 
     const compiledMeta = compiledByteCode.slice(-cByteCount);
     const deployedMeta = deployedByteCode.slice(-dByteCount);
-
-    // const fs = require('fs');
-    // fs.writeFileSync('./compiledbytecode', compiledByteCode, (err) => {
-    //     console.log(errror);
-    // });
-    // fs.writeFileSync('./deployedbytecode', deployedByteCode,(err) => {
-    //     console.log(errror);
-    // });
 
     return  difIndex >= compiledByteCode.length - cByteCount ;
 }
