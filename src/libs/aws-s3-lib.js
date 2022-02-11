@@ -1,10 +1,12 @@
 const AWS = require("aws-sdk");
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
+const SOURCE_FILENAME = 'source.json';
+const METADATA_FILENAME = 'metadata.json'
 
 async function isVerified(contractAddress){
     let headInfo;
-    const params = { Bucket , Key: `${contractAddress}/${OUTPUT_FILENAME}` };
+    const params = { Bucket , Key: `${contractAddress}/${SOURCE_FILENAME}` };
     try{
         await clientS3.headObject(params).promise();  
         return true;
@@ -38,4 +40,4 @@ async function uploadObject(contractAddress, buffer){
     }
 }
 
-module.exports = { isVerified, getSource, uploadObject }
+module.exports = { isVerified, getSource, uploadObject, SOURCE_FILENAME, METADATA_FILENAME }

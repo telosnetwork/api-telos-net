@@ -55,7 +55,8 @@ const sourceOpts = {
 };
 
 const sourceHandler = async(request, reply) => {
-    const source = await getSource(request.query.contractAddress, request.query.file);
+    const fileName = request.query.file ? request.query.file : 'source.json';
+    const source = await getSource(request.query.contractAddress, fileName);
     reply.code(200).send(source);
 };
 
