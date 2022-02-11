@@ -1,8 +1,6 @@
 const AWS = require("aws-sdk");
 const clientS3 = new AWS.S3();
 const Bucket = process.env.VERIFIED_CONTRACTS_BUCKET;
-export const SOURCE_FILENAME = 'source.json';
-export const METADATA_FILENAME = 'metadata.json';
 
 async function isVerified(contractAddress){
     let headInfo;
@@ -16,16 +14,16 @@ async function isVerified(contractAddress){
     }
 }
   
-  export async function getSource(contractAddress, fileName ){
+async function getSource(contractAddress, fileName ){
     const params = { Bucket , Key: `${contractAddress}/${fileName}` };
     try{
         return await clientS3.getObject(params).promise();
     }catch(e){
         return { status: 404, message: 'file not found'}
     }
-  }
+}
   
-  export async function uploadObject(contractAddress, buffer){
+async function uploadObject(contractAddress, buffer){
     const params = { 
         Bucket , 
         Key: contractAddress, 
@@ -38,6 +36,6 @@ async function isVerified(contractAddress){
     }catch(e){
         return e;
     }
-  }
+}
 
 module.exports = { isVerified, getSource, uploadObject }
