@@ -28,14 +28,7 @@ const statusOpts = {
 };
 
 const statusHandler = async(request, reply) => {
-    const contractAddress = request.query.contractAddress;
-    const isContract = await verificationLib.isContract(contractAddress.substring(0,42));//@TODO may not need this 
-
-    if (!isContract){
-        return reply.code(400).send(`${contractAddress} is not a valid contract address`);
-    }
-
-    const status = await isVerified(contractAddress);
+    const status = await isVerified(request.query.contractAddress);
     reply.code(200).send(status);
 };
 
@@ -62,15 +55,12 @@ const sourceOpts = {
 };
 
 const sourceHandler = async(request, reply) => {
-    const contractAddress = request.query.contractAddress;
-
-    const sources = await getSource(contractAddress);
-
-    reply.code(200).send(sources);
+    const source = await getSource(request.query.contractAddress, request.query.file);
+    reply.code(200).send(source);
 };
 
 module.exports = async (fastify, options) => {
     fastify.get('contracts/status:contractAddress', statusOpts, statusHandler);
-    fastify.get('contracts/source:contractAddress', sourceOpts, sourceHandler);
+    fastify.get('contracts/source:contractAddress:file?', sourceOpts, sourceHandler);
     fastify.addContentTypeParser('multipart/form-data', parseMultiForm); //@TODO may not need this
 }

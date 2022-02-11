@@ -14,20 +14,10 @@ async function isVerified(contractAddress){
         //aws returns 404 if key isn't found
         return false; 
     }
-    return { status: true, message: headInfo.LastModified};    
 }
-
-export async function getMetadata(contractAddress){
-    const params = { Bucket , Key: `${contractAddress}/${METADATA_FILENAME}` };
-    try{
-        return await clientS3.getObject(params).promise();
-    }catch(e){
-        return { status: 404, message: 'file not found'}
-    }
-  }
   
-  export async function getSource(contractAddress){
-    const params = { Bucket , Key: `${contractAddress}/${SOURCE_FILENAME}` };
+  export async function getSource(contractAddress, fileName ){
+    const params = { Bucket , Key: `${contractAddress}/${fileName}` };
     try{
         return await clientS3.getObject(params).promise();
     }catch(e){
@@ -50,4 +40,4 @@ export async function getMetadata(contractAddress){
     }
   }
 
-module.exports = { isVerified, getMetadata, getSource, uploadObject }
+module.exports = { isVerified, getSource, uploadObject }
