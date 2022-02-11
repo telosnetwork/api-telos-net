@@ -44,7 +44,7 @@ const sourceOpts = {
     },
     response: {
         200: {
-            description: 'returns metadata and source files',
+            description: 'returns source file containing all sources',
             type: 'array'
         },
         400: {
@@ -61,6 +61,6 @@ const sourceHandler = async(request, reply) => {
 
 module.exports = async (fastify, options) => {
     fastify.get('contracts/status:contractAddress', statusOpts, statusHandler);
-    fastify.get('contracts/source:contractAddress:file?', sourceOpts, sourceHandler);
+    fastify.get('contracts/source:contractAddress:file', sourceOpts, sourceHandler);
     fastify.addContentTypeParser('multipart/form-data', parseMultiForm); //@TODO may not need this
 }
