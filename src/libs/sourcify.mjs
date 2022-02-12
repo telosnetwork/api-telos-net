@@ -56,5 +56,5 @@ async function updateVerifiedContractsData(verifiedList,chainId, bucket){
   console.log(`Added ${updateCount} new verified contracts added on mainnet`)
   verifiedList = await getVerifiedContracts(TESTNET_CHAIN_ID);
   updateCount = await updateVerifiedContractsData(verifiedList.data.full,TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
-  console.log(`Added ${updateCount} new verified contracts added on testnet`)
+  console.log(`Added ${updateCount} new verified contracts added on testnet`);
 })();
