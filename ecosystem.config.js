@@ -38,9 +38,7 @@ const envDev = {
   MODE: 'dev',
   SERVER_ENDPOINT: 'api-dev.telos.net',
   SERVER_PORT: 3000,
-  TIME_SPAN: 5,
-  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts-testnet',
-  EVM_CHAIN_ID: 41
+  TIME_SPAN: 5
 };
 
 const envProd = {
@@ -56,9 +54,7 @@ const envProd = {
   MODE: 'prod',
   SERVER_ENDPOINT: 'api.telos.net',
   SERVER_PORT: 4000,
-  TIME_SPAN: 10080,
-  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts',
-  EVM_CHAIN_ID: 40
+  TIME_SPAN: 10080
 };
 
 const sharedConfig = {

@@ -25,7 +25,7 @@ async function getSource(contractAddress, fileName ){
     }
 }
   
-async function uploadObject(contractAddress, buffer){
+async function uploadObject(contractAddress, buffer, Bucket){
     const params = { 
         Bucket , 
         Key: contractAddress, 
