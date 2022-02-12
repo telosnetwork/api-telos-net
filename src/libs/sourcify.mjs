@@ -47,8 +47,8 @@ async function updateVerifiedContractsData(verifiedList,chainId, bucket){
 }
 
 /**
- * run this file with node to get all contract verified addresses from sourcify 
- * and upload the new ones to s3 for querying
+ * run this file with node to get all contract verified addresses from sourcify,
+ * fetch the source files, and upload to s3 for querying & rendering in app 
  */
 (async function() { 
   let verifiedList = await getVerifiedContracts(CHAIN_ID);
