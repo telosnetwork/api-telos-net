@@ -1,6 +1,6 @@
 const { isVerified, getSource } = require("../libs/aws-s3-lib");
 
-const parseMultiForm = (request, done) => { //@TODO check if needed
+const parseMultiForm = (request, done) => { 
     /* interceptor for multi-form (files) */
     done();  
 };
@@ -44,7 +44,7 @@ const sourceOpts = {
     },
     response: {
         200: {
-            description: 'returns source file containing all sources',
+            description: 'returns all source files',
             type: 'array'
         },
         400: {
@@ -55,13 +55,12 @@ const sourceOpts = {
 };
 
 const sourceHandler = async(request, reply) => {
-    const fileName = request.query.file ? request.query.file : 'source.json';
-    const source = await getSource(request.query.contractAddress, fileName);
+    const source = await getSource(request.query.contractAddress, 'metadata.json');
     reply.code(200).send(source);
 };
 
 module.exports = async (fastify, options) => {
     fastify.get('contracts/status:contractAddress', statusOpts, statusHandler);
-    fastify.get('contracts/source:contractAddress:file', sourceOpts, sourceHandler);
-    fastify.addContentTypeParser('multipart/form-data', parseMultiForm); //@TODO may not need this
+    fastify.get('contracts/metadata:contractAddress', sourceOpts, sourceHandler);
+    fastify.addContentTypeParser('multipart/form-data', parseMultiForm); 
 }
