@@ -55,8 +55,9 @@ const sourceOpts = {
 };
 
 const sourceHandler = async(request, reply) => {
-    const source = await getSource(request.query.contractAddress, 'metadata.json');
-    reply.code(200).send(source);
+    const sourceBuffer = await getSource(request.query.contractAddress, 'metadata.json');
+    const metadata = JSON.parse(sourceBuffer.Body.toString('utf8'));
+    reply.code(200).send(metadata);
 };
 
 module.exports = async (fastify, options) => {
