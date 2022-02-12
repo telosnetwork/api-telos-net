@@ -1,7 +1,6 @@
-const verificationLib = require("../libs/verification-lib");
-const { isVerified, getInput, getOutput, getAbi } = require("../libs/aws-s3-lib");
+const { isVerified, getSource } = require("../libs/aws-s3-lib");
 
-const parseMultiForm = (request, done) => {
+const parseMultiForm = (request, done) => { 
     /* interceptor for multi-form (files) */
     done();  
 };
@@ -29,14 +28,7 @@ const statusOpts = {
 };
 
 const statusHandler = async(request, reply) => {
-    const contractAddress = request.query.contractAddress;
-    const isContract = await verificationLib.isContract(contractAddress.substring(0,42));
-
-    if (!isContract){
-        return reply.code(400).send(`${contractAddress} is not a valid contract address`);
-    }
-
-    const status = await isVerified(contractAddress);
+    const status = await isVerified(request.query.contractAddress);
     reply.code(200).send(status);
 };
 
@@ -52,7 +44,7 @@ const sourceOpts = {
     },
     response: {
         200: {
-            description: 'returns source code, metadata output, and abi',
+            description: 'returns all source files',
             type: 'array'
         },
         400: {
@@ -63,140 +55,13 @@ const sourceOpts = {
 };
 
 const sourceHandler = async(request, reply) => {
-    const contractAddress = request.query.contractAddress;
-
-    const inputBuffer = await getInput(contractAddress);
-    const input = JSON.parse(inputBuffer.Body.toString('utf8'));
-
-    const sources = input.sources;
-
-    const outputBuffer = await getOutput(contractAddress);
-    const output = JSON.parse(outputBuffer.Body.toString('utf8'));
-    const sourcePath = Object.keys(output.contracts)[0];
-    
-    const metadata = JSON.parse((Object.values(output.contracts[sourcePath])[0]).metadata);
-
-    const abiBuffer = await getAbi(contractAddress);
-    const abi = JSON.parse(abiBuffer.Body.toString('utf8'));
-
-    const source = { sources, abi, metadata }
-    reply.code(200).send(source);
+    const sourceBuffer = await getSource(request.query.contractAddress, 'metadata.json');
+    const metadata = JSON.parse(sourceBuffer.Body.toString('utf8'));
+    reply.code(200).send(metadata);
 };
-
-const verificationOpts = {
-    schema: {
-        summary: 'verifies source code for solidity contract',
-        tags: ['evm'],
-        body: {
-            required: ['compilerVersion','files', 'contractAddress', 'optimizer', 'runs', 'targetEvm'],
-            type: 'object',
-            properties: {
-                contractAddress: {
-                    description: 'address of deployed contract',
-                    type: 'string',
-                    example: '0xc4c89dD46524c6f704e92a9Cd012a3EbaDAdFF36'
-                },
-                compilerVersion: {
-                    description: "compiler version. see https://github.com/ethereum/solc-bin/blob/gh-pages/bin/list.json",
-                    type: 'string',
-                    example: 'v0.4.23+commit.124ca40d'
-                },
-                files: {
-                    description: "a single file object, array of file objects, or string containing contract code",
-                    type: ['array', 'object', 'string'],
-                    example: `[{ name: 'test.sol', code: 'pragma solidity 0.8.7 ...}, { name: test2.sol ...} ...]` 
-                },
-                sourceName: {
-                    description: 'source or file name for contract. required when submitting raw contract code as string'
-                },
-                optimizer: {
-                    description: 'flag for optimization when compiling',
-                    type: 'boolean',
-                    example: false
-                },
-                runs: {
-                    description: 'Optimization value for frequency',
-                    type: 'number',
-                    example: 200
-                },
-                targetEvm: {
-                    description: 'Target EVM',
-                    type: 'string',
-                    example: 'byzantium'
-                }
-            }
-        },
-        response: {
-            200: {
-                description: 'request succeeded',
-                type: 'null'
-            },
-            400: {
-                description: 'request failed',
-                type: 'string'
-            }
-        }
-    }
-}
-
-const verificationHandler = async(request, reply) => {
-    const contractAddress = request.body.contractAddress;
-    const compilerVersion = request.body.compilerVersion;
-    const contractCode = request.body.files;
-
-    if (!contractAddress ) {
-        return reply.code(400).send("Must specify deployed contract address");
-    }
-
-    const isContractAddress = await verificationLib.isContract(contractAddress);
-
-    if (!isContractAddress) {
-        return reply.code(400).send(`${contractAddress} is not a valid contract address`);
-    }
-
-    if (!compilerVersion ) {
-        return reply.code(400).send("Must specify compiler version");
-    }
-
-    if (!contractCode ) {
-        return reply.code(400).send("No contract code submitted");
-    }
-
-    const verificationStatus = await verificationLib.verifyContract(request.body);
-    
-    const result = getResponseObj(JSON.parse(verificationStatus));
-    reply.send(JSON.stringify(result));
-}
-
-const getResponseObj = (results) => {
-    let responseObj = { message: 'Verification failed. Check that settings match those used during deployment. Click here for troubleshooting tips.', type: 'negative'};
-    const partial = 'Verification incomplete! Please resubmit with correct information to complete verification. Reason: ';
-    const constructor = 'Constructor args missing or do not match those provided during deployment. ';
-    const meta = 'Metadata does not match deployed';
-
-    if (results.full){
-        if (results.args || results.args == null){
-            responseObj.message = 'Success! Contract verified!'
-            responseObj.type ='positive'  ;
-        }else{
-            responseObj.message = `${partial}${constructor}`
-            responseObj.type ='warning'  ;
-        }
-    }else if(results.partial){
-        if (results.args || results.args == null){
-            responseObj.message = `${partial}${meta}`
-            responseObj.type ='warning'  ;
-        }else{
-            responseObj.message = `${partial}${meta}${constructor}`
-            responseObj.type ='warning'  ;
-        }
-    }
-    return responseObj;
-}
 
 module.exports = async (fastify, options) => {
     fastify.get('contracts/status:contractAddress', statusOpts, statusHandler);
-    fastify.get('contracts/source:contractAddress', sourceOpts, sourceHandler);
-    fastify.post('contracts/verify', verificationOpts, verificationHandler);
-    fastify.addContentTypeParser('multipart/form-data', parseMultiForm);
+    fastify.get('contracts/metadata:contractAddress', sourceOpts, sourceHandler);
+    fastify.addContentTypeParser('multipart/form-data', parseMultiForm); 
 }

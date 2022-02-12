@@ -38,8 +38,7 @@ const envDev = {
   MODE: 'dev',
   SERVER_ENDPOINT: 'api-dev.telos.net',
   SERVER_PORT: 3000,
-  TIME_SPAN: 5,
-  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts-testnet'
+  TIME_SPAN: 5
 };
 
 const envProd = {
@@ -55,8 +54,7 @@ const envProd = {
   MODE: 'prod',
   SERVER_ENDPOINT: 'api.telos.net',
   SERVER_PORT: 4000,
-  TIME_SPAN: 10080,
-  VERIFIED_CONTRACTS_BUCKET: 'verified-evm-contracts'
+  TIME_SPAN: 10080
 };
 
 const sharedConfig = {
@@ -70,7 +68,7 @@ const localConfig = {
   name: 'api-local',
   watch: true,
   autorestart: false,
-  env: { ...envShared,...envDev, ...envLocal}
+  env: { ...envShared,...envProd, ...envLocal}
 };
 
 const devConfig = {
