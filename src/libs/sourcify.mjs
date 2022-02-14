@@ -3,7 +3,7 @@ import { isVerified, uploadObject, SOURCE_FILENAME, METADATA_FILENAME } from './
 const CHAIN_ID = 40; 
 const TESTNET_CHAIN_ID = 41;
 const CONTRACTS_BUCKET = 'verified-evm-contracts';
-const TESTNET_CONTRACTS_BUCKET = 'verfied-evm-contracts-testnet';
+const TESTNET_CONTRACTS_BUCKET = 'verified-evm-contracts-testnet';
 
 async function getVerifiedContracts(chainId){
   try{
@@ -19,7 +19,7 @@ async function getVerifiedContracts(chainId){
 async function getSource(contractAddress, chainId){
   try{
     return await axios.get(
-      `https://sourcify.dev/server/files/${chainId}/${contractAddress}`
+      `https://sourcify.dev/server/files/any/${chainId}/${contractAddress}`
       );
   }catch(e){
     console.log(e);
@@ -31,7 +31,7 @@ async function updateVerifiedContractsData(verifiedList,chainId, bucket){
   for (let address of verifiedList){
     if(isVerified(address)){ //check if already in bucket
       const source = await getSource(address, chainId);   
-      const metadata = source.data.find(file => file.name === 'metadata.json');
+      const metadata = source.data.files.find(file => file.name === 'metadata.json');
       try{
         let buffer = new Buffer.from(JSON.stringify(metadata));
         await uploadObject(`${address}/${METADATA_FILENAME}`, buffer, bucket);
@@ -52,9 +52,9 @@ async function updateVerifiedContractsData(verifiedList,chainId, bucket){
  */
 (async function() { 
   let verifiedList = await getVerifiedContracts(CHAIN_ID);
-  let updateCount = await updateVerifiedContractsData(verifiedList.data.full,CHAIN_ID, CONTRACTS_BUCKET);
+  let updateCount = await updateVerifiedContractsData([...verifiedList.data.full, ...verifiedList.data.partial],CHAIN_ID, CONTRACTS_BUCKET);
   console.log(`Added ${updateCount} new verified contracts added on mainnet`)
   verifiedList = await getVerifiedContracts(TESTNET_CHAIN_ID);
-  updateCount = await updateVerifiedContractsData(verifiedList.data.full,TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
+  updateCount = await updateVerifiedContractsData([...verifiedList.data.full, ...verifiedList.data.partial],TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
   console.log(`Added ${updateCount} new verified contracts added on testnet`);
 })();
