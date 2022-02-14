@@ -3,7 +3,7 @@ import { isVerified, uploadObject, SOURCE_FILENAME, METADATA_FILENAME } from './
 const CHAIN_ID = 40; 
 const TESTNET_CHAIN_ID = 41;
 const CONTRACTS_BUCKET = 'verified-evm-contracts';
-const TESTNET_CONTRACTS_BUCKET = 'verfied-evm-contracts-testnet';
+const TESTNET_CONTRACTS_BUCKET = 'verified-evm-contracts-testnet';
 
 async function getVerifiedContracts(chainId){
   try{
