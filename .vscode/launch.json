@@ -2,20 +2,15 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    //launch proccess program with `yarn local` or the following:
+    // `pm2 start ecosystem.config.js --only api-local  --node-args="--inspect-brk"`
     "version": "0.2.0",
     "configurations": [
         {
             "type": "node",
-            "outputCapture": "std",
-            "request": "launch",
-            "name": "Launch API",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/src/app.js",
-            "env": {
-                "AWS_SDK_LOAD_CONFIG": "1"
-            }
-        }
+            "request": "attach",
+            "name": "Attach to Process",
+            "processId": "${command:PickProcess}"  
+       }       
     ]
 }
