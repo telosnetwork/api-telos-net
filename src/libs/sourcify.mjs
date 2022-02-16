@@ -29,7 +29,7 @@ async function getSource(contractAddress, chainId){
 async function updateVerifiedContractsData(verifiedList,chainId, bucket){
   let newCount = 0;
   for (let address of verifiedList){
-    if(!isVerified(address, bucket)){ //check if already in bucket
+    if(!await isVerified(address, bucket)){ //check if already in bucket
       const source = await getSource(address, chainId);   
       const metadata = source.data.files.find(file => file.name === 'metadata.json');
       try{
