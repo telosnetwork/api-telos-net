@@ -33,7 +33,7 @@ async function totalStaked(event, context) {
 async function rexApr() {
     const rex = await getRexStats();
     const totalLendable = parseFloat(rex.total_lendable);
-    return ((12000000 / totalLendable) * 100).toFixed(2);
+    return ((1.7e6 * 12 / totalLendable) * 100).toFixed(2);
 }
 
 async function rexStaked() {
