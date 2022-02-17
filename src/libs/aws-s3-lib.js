@@ -5,7 +5,6 @@ const SOURCE_FILENAME = 'source.json';
 const METADATA_FILENAME = 'metadata.json'
 
 async function isVerified(contractAddress, bucket = Bucket){
-    let headInfo;
     const params = { Bucket: bucket , Key: `${contractAddress}/${SOURCE_FILENAME}` };
     try{
         await clientS3.headObject(params).promise();  
