@@ -8,7 +8,7 @@ async function exclude(stats, exclusions, contract = '', symbol){
 
     for (let i = 0; i < exclusions.length; i++) {
         let accountToCheck = exclusions[i];
-        let balanceString = await getCurrencyBalance(accountToCheck, contract, symbol);
+        let balanceString = await getCurrencyBalance(accountToCheck, contract, symbol.toUpperCase());
         let bal = parseFloat(balanceString, 10);
         if (isNaN(bal)){
             throw new Error("Failed to get balance for " + accountToCheck + " instead got " + bal);

@@ -119,7 +119,7 @@ async function getCurrencyStats(code = "eosio.token", symbol = "TLOS") {
   let statRow = await rpc.get_table_rows({
     json: true,
     code: code,
-    scope: symbol,
+    scope: symbol.toUpperCase(),
     table: 'stat'
   });
   return statRow.rows[0];
