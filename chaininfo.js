@@ -16,7 +16,7 @@ export async function circulatingSupply(event, context) {
     }
 
     const stats = await getCurrencyStats();
-    const supply = await exclude(stats, exclusions)
+    const supply = await exclude(stats, exclusions, includeSymbol=false);
 
     console.log('supply: ' + supply + ' was ' + stats.supply);
     return respond(200, supply);

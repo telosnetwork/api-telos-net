@@ -4,14 +4,21 @@ const { exclude } = require("../utils/exclude");
 
 async function tokenSupplyHandler(request, reply) {
     const contract = request.params.contract;
-    const symbol = request.params.symbol;
-    const numeric = request.query.numeric;
+    const symbol = request.params.symbol.toUpperCase();
+    const numeric = (request.query.numeric + '') === 'true';
+    console.log(request.query.numeric);
+    console.log(numeric);
     const stats = await getCurrencyStats(contract, symbol);
+    let supply = stats.supply;
+    if (numeric)
+        console.log("Numeric is true");
     if (request.query.exclude){
         const exclusions = request.query.exclude.split(',');
-        return await exclude(stats, exclusions, contract, symbol);
-    } 
-    return numeric ? stats.supply.split(' ')[0] : stats.supply;
+        supply = await exclude(stats, exclusions, contract, symbol);
+        // Hacky, but easier for now than trying to fix the logic of the exclude function and the other consumers of it to add an argument for "includeSymbol"
+        return numeric ? supply : `${supply} ${symbol}`;
+    }
+    return numeric ? supply.split(' ')[0] : supply;
 }
 
 module.exports = async (fastify, options) => {
