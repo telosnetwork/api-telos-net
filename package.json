@@ -19,14 +19,14 @@
     "fastify-file-upload": "2.1.0",
     "serverless-bundle": "^1.2.2",
     "serverless-offline": "^5.3.3",
-    "serverless-webpack": "^5.3.1",
+    "serverless-webpack": "^5.10.0",
     "webpack": "^4.40.2",
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
     "@sentry/node": "^5.6.2",
     "@telosnetwork/telosevm-js": "0.2.0",
-    "aws-sdk": "^2.788.0",
+    "aws-sdk": "^2.1231.0",
     "axios": "^0.21.0",
     "crypto": "^1.0.1",
     "eosjs": "^20.0.0",
@@ -39,12 +39,12 @@
     "fastify-swagger": "^2.5.0",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
-    "pino": "^6.3.2",
+    "pino": "^6.14.0",
     "pino-pretty": "^4.0.0",
     "pm2": "^5.2.0",
-    "solc": "^0.8.11",
-    "twilio": "^3.34.0",
+    "solc": "^0.8.17",
+    "twilio": "^3.82.2",
     "util": "^0.12.1",
-    "web3-eth": "^1.6.1"
+    "web3-eth": "^1.8.0"
   }
 }
