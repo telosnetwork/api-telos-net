@@ -49,7 +49,7 @@ export async function totalStaked(event, context) {
  * @param   {string} tvl      - total volume locked in wei, as a string
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
- export async function fetchStlosApy($api, tvl) {
+ export async function fetchStlosApy(tvl) {
     const tvlBn = BigNumber.from(tvl);
 
     if (tvlBn.eq('0')) {
