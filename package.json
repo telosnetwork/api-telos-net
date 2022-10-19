@@ -31,6 +31,7 @@
     "crypto": "^1.0.1",
     "eosjs": "^20.0.0",
     "eosjs-ecc": "^4.0.4",
+    "ethers": "^5.7.1",
     "fastify": "^2.12.0",
     "fastify-autoload": "^1.2.1",
     "fastify-cors": "^3.0.3",
