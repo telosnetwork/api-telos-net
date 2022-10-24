@@ -102,8 +102,8 @@ module.exports = async (fastify, options) => {
             tags: ['stats'],
             querystring: {
                 tvl: {
-                    example: 123456.7890,
-                    type: 'number'
+                    example: "1234567890",
+                    type: 'string'
                 }
             },
             response: {
@@ -122,8 +122,8 @@ module.exports = async (fastify, options) => {
             tags: ['stats'],
             querystring: {
                 tvl: {
-                    example: 123456.7890,
-                    type: 'number'
+                    example: "1234567890",
+                    type: 'string'
                 }
             },
             response: {
