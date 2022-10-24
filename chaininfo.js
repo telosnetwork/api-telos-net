@@ -50,10 +50,57 @@ export async function totalStaked(event, context) {
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
  export async function fetchStlosApy(tvl) {
+    const apyStats = await getApyStats(tvl);
+
+    if (!apyStats){
+        return;
+    }
+
+    if (apyStats.balanceRatio === 0){
+        return "0";
+    }
+
+    const stlosPayout = annualPayout.minus(rexPayout);
+    const apy = stlosPayout.div(stlosTotal).times(100).toFixed(2);
+
+    return apy;
+}
+
+/**
+ * Calculates and returns the current APY (annual percentage yield) for native
+ *
+ * @param   {string} tvl      - total volume locked in wei, as a string
+ * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
+ */
+ export async function fetchNativeApy(tvl) {
+    const apyStats = await getApyStats(tvl);
+
+    if (!apyStats){
+        return;
+    }
+
+    if (apyStats.balanceRatio === 0){
+        return "0";
+    }
+
+    const rexPayout = apyStats.annualPayout.div(apyStats.balanceRatio.plus(1));
+    const apy = rexPayout.div(rexTotal).times(100).toFixed(2);
+
+    return apy;
+}
+
+/**
+ * Calculates and returns the current APY (annual percentage yield) for native
+ *
+ * @param   {string} tvl      - total volume locked in wei, as a string
+ * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
+ */
+
+async function getApyStats(tvl) {
     const tvlBn = BigNumber.from(tvl);
 
     if (tvlBn.eq('0')) {
-        return '0';
+        return {balanceRatio: 0, annualPayout: 0};
     }
 
     const rexPoolResponse = await getTableRows({
@@ -65,7 +112,7 @@ export async function totalStaked(event, context) {
 
     if (!rexPoolResponse || !rexPoolResponse.rows.length) {
         console.error('Failed to fetch rexpool');
-        return;
+        return false;
     }
 
     const distConfigResponse = await getTableRows({
@@ -77,7 +124,7 @@ export async function totalStaked(event, context) {
 
     if (!distConfigResponse || !distConfigResponse.rows.length) {
         console.error('Failed to fetch exrsrv.tf config');
-        return;
+        return false;
     }
 
     const payoutsResponse = await getTableRows({
@@ -89,7 +136,7 @@ export async function totalStaked(event, context) {
 
     if (!payoutsResponse || !payoutsResponse.rows.length) {
         console.error('Failed to fetch exrsrv.tf payouts');
-        return;
+        return false;
     }
 
     const rexStats = rexPoolResponse.rows[0];
@@ -103,16 +150,11 @@ export async function totalStaked(event, context) {
 
     const balanceRatio = rexTotal.eq(0) ? -1 : stlosTotal.times(fixedRatio).div(rexTotal.add(stlosTotal));
 
-    if (balanceRatio.eq(0)) {
-        return '0';
+    if (apyStats.balanceRatio.eq(0)) {
+        return {balanceRatio: 0, annualPayout: 0};
     }
 
-    const rexPayout = annualPayout.div(balanceRatio.plus(1));
-    const stlosPayout = annualPayout.minus(rexPayout);
-
-    const apy = stlosPayout.div(stlosTotal).times(100).toFixed(2);
-
-    return apy;
+    return  { balanceRatio, annualPayout };
 }
 
 
