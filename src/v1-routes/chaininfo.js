@@ -1,4 +1,5 @@
 const moment = require('moment');
+const { fetchNativeApy, fetchStlosApy } = require('../../chaininfo');
 const { getCurrencyStats, getCurrencyBalance, getRexStats, getActionStats } = require("../libs/eosio-lib");
 const { exclude } = require('../utils/exclude');
 
@@ -94,6 +95,46 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await totalStaked()
+    })
+
+    fastify.get('apy/evm', {
+        schema: {
+            tags: ['stats'],
+            querystring: {
+                tvl: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            },
+            response: {
+                200: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await fetchStlosApy(request.query.tvl)
+    })
+
+    fastify.get('apy/rex', {
+        schema: {
+            tags: ['stats'],
+            querystring: {
+                tvl: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            },
+            response: {
+                200: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await fetchNativeApy(request.query.tvl)
     })
 
     fastify.get('supply/circulating', {
