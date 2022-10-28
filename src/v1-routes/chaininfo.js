@@ -11,6 +11,7 @@ const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "
 const standardCirculationExclusions = ["exrsrv.tf", "tlosrecovery"];
 
 async function circulatingSupply(requestor) {
+    debugger;
 
     //let exclusions = requestor === 'cmc' ? cmcCirculationExclusions : standardCirculationExclusions;
     let exclusions = standardCirculationExclusions;
@@ -23,7 +24,9 @@ async function circulatingSupply(requestor) {
 }
 
 async function totalSupply() {
+    debugger;
     const stats = await getCurrencyStats();
+    console.log(stats);
     return parseFloat(stats.supply, 10);
 }
 
@@ -68,20 +71,16 @@ async function blocktivityHourly() {
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
  async function fetchStlosApy(tvl) {
-    const apyStats = await getApyStats(tvl);
+    let apy;
 
-    if (!apyStats){
+    try {
+        apy = await getApyStats(tvl);
+    }catch(e){
+        console.error(e);
         return;
     }
 
-    if (apyStats.balanceRatio === 0){
-        return apyStats.balanceRatio.toString();
-    }
-
-    const stlosPayout = annualPayout.minus(rexPayout);
-    const apy = stlosPayout.div(stlosTotal).times(100).toFixed(2);
-
-    return apy;
+    return apy.evm;
 }
 
 /**
@@ -91,23 +90,16 @@ async function blocktivityHourly() {
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
  async function fetchNativeApy(tvl) {
-    let apyStats;
+    let apy;
 
     try {
-        apyStats = await getApyStats(tvl);
+        apy = await getApyStats(tvl);
     }catch(e){
         console.error(e);
         return;
     }
 
-    if (apyStats.balanceRatio === 0){
-        return apyStats.balanceRatio.toString();
-    }
-
-    const rexPayout = apyStats.annualPayout.div(apyStats.balanceRatio.plus(1));
-    const apy = rexPayout.div(rexTotal).times(100).toFixed(2);
-
-    return apy;
+    return apy.native;
 }
 
 /**
@@ -119,7 +111,7 @@ async function blocktivityHourly() {
 
 async function getApyStats(tvl) {
     const tvlBn = BigNumber.from(tvl);
-    const zeroBal = {balanceRatio: 0, annualPayout: 0};
+    const zeroBal = {native: 0, evm: 0};
 
     if (tvlBn.eq('0')) {
         return zeroBal;
@@ -159,6 +151,7 @@ async function getApyStats(tvl) {
     }
 
     const rexStats = rexPoolResponse.rows[0];
+    console.log(rexStats);
     const distConfig = distConfigResponse.rows[0];
     const payoutRow = payoutsResponse.rows.find((row) => row.to === 'eosio.rex');
 
@@ -169,11 +162,17 @@ async function getApyStats(tvl) {
 
     const balanceRatio = rexTotal.eq(0) ? -1 : stlosTotal.times(fixedRatio).div(rexTotal.add(stlosTotal));
 
-    if (apyStats.balanceRatio.eq(0)) {
+    if (balanceRatio.eq(0)) {
         return zeroBal;
     }
 
-    return  { balanceRatio, annualPayout };
+    const rexPayout = annualPayout.div(balanceRatio.plus(1));
+    const rexApy = rexPayout.div(apyStats.rexTotal).times(100).toFixed(2);
+
+    const stlosPayout = annualPayout.minus(rexPayout);
+    const evmApy = stlosPayout.div(stlosTotal).times(100).toFixed(2);
+
+    return  { native: rexApy, evm: evmApy };
 }
 
 
@@ -218,11 +217,15 @@ module.exports = async (fastify, options) => {
     fastify.get('apy/evm', {
         schema: {
             tags: ['stats'],
-            querystring: {
-                tvl: {
-                    example: "1234567890",
-                    type: 'string'
-                }
+            params: {
+                type: 'object',
+                properties: {
+                    'tvl': {
+                        description: '',
+                        type: 'string'
+                    }
+                },
+                required: ['tvl']
             },
             response: {
                 200: {
@@ -240,7 +243,7 @@ module.exports = async (fastify, options) => {
             tags: ['stats'],
             querystring: {
                 tvl: {
-                    example: "1234567890",
+                    default: 'any',
                     type: 'string'
                 }
             },
@@ -252,7 +255,9 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await fetchNativeApy(request.query.tvl)
+        debugger;
+
+        return await  fetchNativeApy(request.query.tvl);
     })
 
     fastify.get('supply/circulating', {
@@ -286,6 +291,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
+        debugger;
         return await totalSupply()
     })
 
