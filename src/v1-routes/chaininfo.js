@@ -32,12 +32,6 @@ async function totalStaked(event, context) {
     return parseFloat(rex.total_lendable) + parseFloat(stakeBalance);
 }
 
-async function rexApr() {
-    const rex = await getRexStats();
-    const totalLendable = parseFloat(rex.total_lendable);
-    return ((1.7e6 * 12 / totalLendable) * 100).toFixed(2);
-}
-
 async function rexStaked() {
     const rex = await getRexStats();
     const totalLendable = parseFloat(rex.total_lendable);
@@ -292,20 +286,6 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await rexStaked()
-    })
-
-    fastify.get('/rex/apr', {
-        schema: {
-            tags: ['stats'],
-            response: {
-                200: {
-                    example: 12.3,
-                    type: 'number'
-                }
-            }
-        }
-    }, async (request, reply) => {
-        return await rexApr()
     })
 
     fastify.get('/rex/price', {
