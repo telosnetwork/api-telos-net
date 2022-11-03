@@ -216,7 +216,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await fetchStlosApy(request.query.tvl)
+        return await fetchStlosApy()
     })
 
     fastify.get('apy/native', {
