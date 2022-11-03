@@ -89,8 +89,8 @@ async function blocktivityHourly() {
  */
 
 async function getApyStats() {
-    const tvlTest = await getTvl();
-    const tvlBn = BigNumber.from(tvlTest);
+    const tvl = await getTvl();
+    const tvlBn = BigNumber.from(tvl);
     const zeroBal = {native: 0, evm: 0};
 
     if (tvlBn.eq('0')) {
