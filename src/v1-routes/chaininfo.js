@@ -55,7 +55,7 @@ async function blocktivityHourly() {
 }
 
 /**
- * Calculates and returns the current APY (annual percentage yield) for sTLOS
+ * Calculates and returns the current APY (annual percentage yield) for evm (STLOS)
  *
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
@@ -83,9 +83,9 @@ async function blocktivityHourly() {
 }
 
 /**
- * Calculates and returns the current APY (annual percentage yield) for native
+ * Calculates and returns the current APY (annual percentage yield) for evm and native
  *
- * @returns {Promise<{balanceRatio: number, annualPayout: number}>} - calculated APY as a unitless number, eg. "33.25"
+ * @returns {Promise<{evm: number, native: number}>} - calculated APY as a unitless number, eg. "33.25"
  */
 
 async function getApyStats() {
