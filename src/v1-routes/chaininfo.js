@@ -219,7 +219,7 @@ module.exports = async (fastify, options) => {
         return await fetchStlosApy(request.query.tvl)
     })
 
-    fastify.get('apy/rex', {
+    fastify.get('apy/native', {
         schema: {
             tags: ['stats'],
             response: {
