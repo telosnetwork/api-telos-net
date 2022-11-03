@@ -237,6 +237,52 @@ module.exports = async (fastify, options) => {
         schema: {
             tags: ['stats'],
             querystring: {
+                type: 'object',
+                  properties: {
+                    tvl: {
+                      type: 'string'
+                    },
+                },
+                required: ['tvl']
+            },
+            response: {
+                200: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await fetchStlosApy(request.query.tvl)
+    })
+
+    fastify.get('apy/rex', {
+        schema: {
+            tags: ['stats'],
+            querystring: {
+                type: 'object',
+                  properties: {
+                    tvl: {
+                      type: 'string'
+                    },
+                },
+                required: ['tvl']
+            },
+            response: {
+                200: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await  fetchNativeApy(request.query.tvl);
+    })
+
+    fastify.get('supply/circulating', {
+        schema: {
+            tags: ['stats'],
+            querystring: {
                 requestor: {
                     default: 'any',
                     type: 'string'
