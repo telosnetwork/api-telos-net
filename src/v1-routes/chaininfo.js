@@ -55,14 +55,13 @@ async function blocktivityHourly() {
 }
 
 /**
- * Calculates and returns the current APY (annual percentage yield) for sTLOS
+ * Calculates and returns the current APY (annual percentage yield) for evm (STLOS)
  *
- * @param   {string} tvl      - total volume locked in wei, as a string
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
- async function fetchStlosApy(tvl) {
+ async function fetchStlosApy() {
     try {
-        return (await getApyStats(tvl)).evm;
+        return (await getApyStats()).evm;
     }catch(e){
         console.error(e);
         return;
@@ -72,12 +71,11 @@ async function blocktivityHourly() {
 /**
  * Calculates and returns the current APY (annual percentage yield) for native
  *
- * @param   {string} tvl      - total volume locked in wei, as a string
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
- async function fetchNativeApy(tvl) {
+ async function fetchNativeApy() {
     try {
-        return (await getApyStats(tvl)).native;
+        return (await getApyStats()).native;
     }catch(e){
         console.error(e);
         return;
@@ -85,13 +83,13 @@ async function blocktivityHourly() {
 }
 
 /**
- * Calculates and returns the current APY (annual percentage yield) for native
+ * Calculates and returns the current APY (annual percentage yield) for evm and native
  *
- * @param   {string} tvl      - total volume locked in wei, as a string
- * @returns {Promise<{balanceRatio: number, annualPayout: number}>} - calculated APY as a unitless number, eg. "33.25"
+ * @returns {Promise<{evm: number, native: number}>} - calculated APY as a unitless number, eg. "33.25"
  */
 
-async function getApyStats(tvl) {
+async function getApyStats() {
+    const tvl = await getTvl();
     const tvlBn = BigNumber.from(tvl);
     const zeroBal = {native: 0, evm: 0};
 
@@ -155,6 +153,19 @@ async function getApyStats(tvl) {
     return  { native: rexApy, evm: evmApy };
 }
 
+async function getTvl(){
+    const provider =  getEthersProvider();   
+    const contract = new ethers.Contract(process.env.STLOS_CONTRACT, process.env.STLOS_ABI, provider);
+
+    const stlosTvl = (await contract.totalAssets()).toString();
+    
+    return stlosTvl; 
+}
+
+function getEthersProvider() {
+    return new ethers.providers.JsonRpcProvider(process.env.NETWORK_EVM_RPC);
+}
+
 
 module.exports = async (fastify, options) => {
     fastify.get('stats/blocktivity', {
@@ -195,6 +206,34 @@ module.exports = async (fastify, options) => {
     })
 
     fastify.get('apy/evm', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    example: 12.34,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await fetchStlosApy()
+    })
+
+    fastify.get('apy/native', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    example: 12.34,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await  fetchNativeApy();
+    })
+
+    fastify.get('supply/circulating', {
         schema: {
             tags: ['stats'],
             querystring: {
