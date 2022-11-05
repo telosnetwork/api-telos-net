@@ -2,6 +2,11 @@
 
 APIs for the Telos network, app.telos.net and other systems
 
+## Links
+
+[Swagger Interface - Mainnet](http://api.telos.net/v1/docs/index.html)
+[Swagger Interface - Testnet](http://api-dev.telos.net/v1/docs/index.html)
+
 ## Issues / Questions
 
 Please create issue.
