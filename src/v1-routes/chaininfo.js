@@ -141,14 +141,17 @@ async function getApyStats() {
 
     const balanceRatio = rexTotal.eq(0) ? -1 : stlosTotal.times(fixedRatio).div(rexTotal.add(stlosTotal));
 
+
+
     if (balanceRatio.eq(0)) {
         return zeroBal;
     }
 
-    const rexPayout = annualPayout.div(balanceRatio.plus(1));
-    const rexApy = rexPayout.div(rexTotal).times(100).toFixed(2);
-    const stlosPayout = annualPayout.minus(rexPayout);
+    const stlosPayout = annualPayout.times(balanceRatio);
     const evmApy = stlosPayout.div(stlosTotal).times(100).toFixed(2);
+
+    const rexPayout = annualPayout.minus(stlosPayout);
+    const rexApy = rexPayout.div(rexTotal).times(100).toFixed(2);
 
     return  { native: rexApy, evm: evmApy };
 }
