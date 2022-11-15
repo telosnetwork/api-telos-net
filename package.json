@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "fastify-file-upload": "2.1.0",
-    "serverless-bundle": "^1.2.2",
+    "serverless-bundle": "^5.5.0",
     "serverless-offline": "^5.3.3",
     "serverless-webpack": "^5.3.1",
     "webpack": "^4.40.2",
