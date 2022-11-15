@@ -16,7 +16,7 @@
     "url": "https://gitlab.com/telos-kitchen/api-telos-net.git"
   },
   "devDependencies": {
-    "fastify-file-upload": "2.1.0",
+    "fastify-file-upload": "4.0.0",
     "serverless-bundle": "^5.5.0",
     "serverless-offline": "^11.3.0",
     "serverless-webpack": "^5.10.0",
@@ -37,7 +37,7 @@
     "fastify-cors": "^3.0.3",
     "fastify-graceful-shutdown": "^2.0.1",
     "fastify-oas": "^2.5.0",
-    "fastify-swagger": "^2.5.0",
+    "fastify-swagger": "^5.2.0",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "pino": "^6.3.2",
