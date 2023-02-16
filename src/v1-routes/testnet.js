@@ -5,9 +5,8 @@ const {
   create,
   faucet,
   evmFaucet,
+  accountExists,
 } = require("../libs/testnet-lib");
-
-const { accountExists } = require("../libs/eosio-lib");
 
 const faucetOpts = {
   schema: {
