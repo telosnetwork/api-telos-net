@@ -138,17 +138,19 @@ const accountOpts = {
           "31940262645f44299d1d5d02fb9b313dc9e6b9904677f1410bb63247c9dec234",
       },
       400: {
-        description: "Rotation error",
+        description: "Faucet error",
         type: "string",
-        examples: {
-          "Account exists": {
+        examples: [
+          {
+            name: "Account exists",
             value:
               "Error creating account: Account ${accountName} already exists",
           },
-          "Generic error": {
+          {
+            name: "Generic error",
             value: "Error creating account: ${message}",
           },
-        },
+        ],
       },
     },
   },
