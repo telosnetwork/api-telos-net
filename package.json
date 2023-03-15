@@ -20,7 +20,7 @@
     "serverless-bundle": "^5.5.0",
     "serverless-offline": "^11.3.0",
     "serverless-webpack": "^5.10.0",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.0",
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
