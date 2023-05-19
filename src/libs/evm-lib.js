@@ -27,8 +27,9 @@ async function getTokens(symbols){
     const results = await axios.get(TOKEN_LIST_URL);
     if(results?.data?.tokens.length > 0){
       let tokens =  results.data.tokens.filter((token) => {
-        return (parseInt(token.chainId) === proccess.env.EVM_CHAIN_ID && symbols.includes(token.symbol.toUpperCase()));
+        return (parseInt(token.chainId) === parseInt(process.env.EVM_CHAIN_ID) && symbols.includes(token.symbol.toUpperCase()));
       });
+      console.log(tokens);
       return tokens;
     }
   } catch (e) {
