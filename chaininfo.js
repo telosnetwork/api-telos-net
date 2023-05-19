@@ -2,10 +2,10 @@ import { getCurrencyStats, getCurrencyBalance, getRexStats } from "./libs/eosio-
 import { respond } from './libs/response-lib';
 import { exclude } from "./src/utils/exclude";
 
-const cmcCirculationExclusions = ["exrsrv.tf", "tf", "eosio.saving", "free.tf", "eosio.names",
-    "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf"];
+const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "works.decide", "tf", "eosio.saving", "free.tf", "eosio.names",
+    "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf", "tedp4holding"];
 
-const standardCirculationExclusions = ["exrsrv.tf"];
+const standardCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "tedp4holding"];
 
 export async function circulatingSupply(event, context) {
     let exclusions = standardCirculationExclusions;

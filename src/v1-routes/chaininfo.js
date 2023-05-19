@@ -6,9 +6,9 @@ const Big = require('big.js');
 const { BigNumber, ethers } = require('ethers');
 
 const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "works.decide", "tf", "eosio.saving", "free.tf", "eosio.names",
-    "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf"];
+    "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf", "tedp4holding"];
 
-const standardCirculationExclusions = ["exrsrv.tf", "tlosrecovery"];
+const standardCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "tedp4holding"];
 
 async function circulatingSupply(requestor) {
     //let exclusions = requestor === 'cmc' ? cmcCirculationExclusions : standardCirculationExclusions;
