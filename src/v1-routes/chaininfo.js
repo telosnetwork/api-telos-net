@@ -59,7 +59,7 @@ async function blocktivityHourly() {
  *
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
- async function fetchStlosApy() {
+async function fetchStlosApy() {
     try {
         return (await getApyStats()).evm;
     }catch(e){
@@ -73,7 +73,7 @@ async function blocktivityHourly() {
  *
  * @returns {Promise<string>} - calculated APY as a unitless number, eg. "33.25"
  */
- async function fetchNativeApy() {
+async function fetchNativeApy() {
     try {
         return (await getApyStats()).native;
     }catch(e){
@@ -155,12 +155,12 @@ async function getApyStats() {
 }
 
 async function getTvl(){
-    const provider =  getEthersProvider();   
+    const provider =  getEthersProvider();
     const contract = new ethers.Contract(process.env.STLOS_CONTRACT, process.env.STLOS_ABI, provider);
 
     const stlosTvl = (await contract.totalAssets()).toString();
-    
-    return stlosTvl; 
+
+    return stlosTvl;
 }
 
 function getEthersProvider() {
@@ -232,7 +232,7 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await  fetchNativeApy();
-    })
+})
 
     fastify.get('supply/circulating', {
         schema: {
@@ -252,7 +252,7 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await circulatingSupply(request.query.requestor)
-    })
+})
 
     fastify.get('supply/total', {
         schema: {
