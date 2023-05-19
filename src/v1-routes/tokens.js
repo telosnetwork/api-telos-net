@@ -109,8 +109,8 @@ const tokenMarketDataOpts = {
 }
 
 async function tokenMarketDataHandler(request, reply) {
-    const symbols = getSymbolsArray(request.query?.symbols);
-    if(!symbols || symbols.length === 0){
+    const symbols = getSymbolsArray(request.query?.symbols.trim())
+    if(!symbols || symbols.length === 0 || symbols.length === 1 && symbols[0] === ''){
         return reply.code(400).send('Bad request: No symbol(s) passed');
     }
     const stats = await getMarketdata(await getTokens(symbols));
