@@ -30,6 +30,32 @@ async function deleteAccount(smsHash) {
   await call("delete", delParams);
 }
 
+async function getMarketdata(tokens) {
+  let results = [];
+  for(let i in tokens){
+    let token = tokens[i];
+    token.symbol = token.symbol.toUpperCase().replace('WTLOS', 'TLOS').replace('WBTC', 'BTC');
+    const expr = 'symbol = :token'
+    let values = {};
+    const params = {
+      TableName: process.env.marketdataTableName,
+      ExpressionAttributeValues: {
+        ':token':  token.symbol,
+      },
+      KeyConditionExpression: expr,
+      ScanIndexForward: false,
+      Limit: 1
+    }
+    const result = await call("query", params);
+    console.log(result);
+    if(result.Items?.length > 0) {
+      results.push(result.Items[0]);
+    }
+  };
+  console.log(results);
+  return results;
+}
+
 async function ipCanCreate(ipAddress) {
   const readParams = {
     TableName: process.env.recaptchaTableName,
@@ -223,4 +249,4 @@ async function getBySmsHash(smsHash) {
   return result.Item;
 }
 
-module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCanTransact, ipCreated }
+module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCanTransact, ipCreated, getMarketdata }

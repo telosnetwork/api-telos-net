@@ -12,7 +12,6 @@ const envShared = {
   twilioAccountSid: 'tf-twilio-sid',
   twilioAuthToken: 'tf-twilio-auth',
   twilioSmsNumber: '+18178356742',
-  moonpaySecretKey: 'sk_live_Wd8ggfnxz4fWk0n9DSfkEKjr5T3k7Mes',
   recaptchaClientKey: '6Ld-_eIZAAAAAF6JsrFudo_uQjRL4eqPAZE40I3o',
   recaptchaServerkey: '6Ld-_eIZAAAAAHNKjH47BPSMdVltMNpSosc0hr0a',
   recaptchaTableName: 'prod-recaptcha-accounts',
@@ -32,6 +31,7 @@ const envDev = {
   testnetRotationTableName: 'dev-testnet-rotation',
   accountCreatorKey: 'tf-account-creator-key-dev',
   allowDeleteNumber: 'Y',
+  marketdataTableName: 'dev-marketdata',
   evmProvider:'https://testnet.telos.net/evm',
   evmHyperionProvider: 'https://testnet.telos.net/v2/evm',  
   eosioApiEndPoint: 'https://testnet.telos.caleos.io',
@@ -41,7 +41,8 @@ const envDev = {
   SERVER_PORT: 3000,
   TIME_SPAN: 5,
   STLOS_CONTRACT: '0xa9991e4daa44922d00a78b6d986cdf628d46c4dd',
-  NETWORK_EVM_RPC: 'https://testnet.telos.net/evm'
+  NETWORK_EVM_RPC: 'https://testnet.telos.net/evm',
+  EVM_CHAIN_ID: 41
 };
 
 const envProd = {
@@ -49,6 +50,7 @@ const envProd = {
   tableName: 'prod-accounts',
   testnetRotationTableName: 'prod-testnet-rotation',
   accountCreatorKey: 'tf-account-creator-key-prod',
+  marketdataTableName: 'prod-marketdata',
   allowDeleteNumber: 'N',
   evmProvider:'https://mainnet.telos.net/evm',
   evmHyperionProvider: 'https://mainnet.telos.net/v2/evm',  
@@ -59,7 +61,8 @@ const envProd = {
   SERVER_PORT: 4000,
   TIME_SPAN: 10080,
   STLOS_CONTRACT: '0xb4b01216a5bc8f1c8a33cd990a1239030e60c905',
-  NETWORK_EVM_RPC: 'https://mainnet.telos.net/evm'
+  NETWORK_EVM_RPC: 'https://mainnet.telos.net/evm',
+  EVM_CHAIN_ID: 40
 };
 
 const sharedConfig = {

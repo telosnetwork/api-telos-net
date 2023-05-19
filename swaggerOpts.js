@@ -15,6 +15,8 @@ module.exports = {
         tags: [
             { name: 'stats', description: 'Chain statistics endpoints' },
             { name: 'testnet', description: 'Testnet endpoints' },
+            { name: 'tokens', description: 'Token endpoints' },
+            { name: 'evm', description: 'EVM endpoints' },
             { name: 'accounts', description: 'Account creation endpoints' }
         ],
         consumes: ['application/json'],
