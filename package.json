@@ -28,7 +28,6 @@
     "@telosnetwork/telosevm-js": "0.2.0",
     "aws-sdk": "^2.788.0",
     "axios": "^0.21.0",
-    "crypto": "^1.0.1",
     "eosjs": "^20.0.0",
     "eosjs-ecc": "^4.0.4",
     "ethers": "^5.7.1",

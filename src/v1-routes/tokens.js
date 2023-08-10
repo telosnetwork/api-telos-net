@@ -2,6 +2,8 @@ const { getCurrencyStats } = require("../libs/eosio-lib");
 const { getMarketdata } = require("../libs/dynamodb-lib");
 const { getTokens, getSymbolsArray } = require("../libs/evm-lib");
 const { exclude } = require("../utils/exclude");
+const { getBootstrapToken } = require("../libs/topper-lib");
+
 
 // MARKETDATA HISTORICAL ------------------------------------------------------
 const tokenMarketDataHistoricalOpts = {
@@ -179,10 +181,31 @@ async function tokenSupplyHandler(request, reply) {
     return numeric ? supply.split(' ')[0] : supply;
 }
 
+// TOPPER BOOTSTRAP TOKEN ------------------------------------------------------
+
+const topperTokenOpts = {
+    schema: {
+        tags: ['tokens', 'evm'],
+        response: {
+            200: {
+                example: 'FjDk1lS2',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function topperTokenHandler(request, reply) {
+    const token = await getBootstrapToken();
+    return token;
+}
+
+
 // EXPORTS ------------------------------------------------------
 
 module.exports = async (fastify, options) => {
     fastify.get('evm/tokens/marketdata/historical', tokenMarketDataHistoricalOpts, tokenMarketDataHistoricalHandler);
     fastify.get('evm/tokens/marketdata', tokenMarketDataOpts, tokenMarketDataHandler);
     fastify.get('token/supply/:contract/:symbol', tokenSupplyOpts, tokenSupplyHandler);
+    fastify.get('evm/tokens/getTopperToken', topperTokenOpts, topperTokenHandler );
 }
