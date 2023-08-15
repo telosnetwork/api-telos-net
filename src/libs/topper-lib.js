@@ -20,7 +20,7 @@ function getPayload(address){
       address,
       asset: 'TLOS',
       network: 'ethereum',
-      label: 'My wallet'
+      label: 'Ethereum Mainnet Address'
     }
   };
 
