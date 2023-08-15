@@ -185,6 +185,16 @@ async function tokenSupplyHandler(request, reply) {
 
 const topperTokenOpts = {
     schema: {
+        querystring: {
+            type: 'object',
+            properties: {
+                address: {
+                    description: 'eth address for purchase deposit',
+                    type: 'string',
+                },
+            },
+            required: ['address'],
+        },
         tags: ['tokens', 'evm'],
         response: {
             200: {
@@ -196,7 +206,7 @@ const topperTokenOpts = {
 }
 
 async function topperTokenHandler(request, reply) {
-    const token = await getBootstrapToken();
+    const token = await getBootstrapToken(request.query.address);
     return token;
 }
 

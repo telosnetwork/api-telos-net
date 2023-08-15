@@ -17,17 +17,18 @@ function getPayload(address){
       asset: 'USD'
     },
     target: {
-      address: '0xb794f5ea0ba39494ce839613fffba74279579268',
+      address,
       asset: 'TLOS',
       network: 'ethereum',
       label: 'My wallet'
     }
   };
+
+  return payload;
 }
 
-
 async function fetchPrivateKey(){
-  // Load private key in JWK format from an environment variable.
+  // Load private key in JWK format from an AWS secret.
   const privateKeyJwk = JSON.parse(await getKeyBySecretName('topper-widget-key'));
 
   // Parse the JWK formatted key.
@@ -43,6 +44,7 @@ const options = {
 
 
 async function getBootstrapToken(ethAddress) {
+  const payload = getPayload(ethAddress);
   const privateKey = await fetchPrivateKey();
   const bootstrapToken = await sign(payload, privateKey, options);
   return bootstrapToken;
