@@ -20,7 +20,8 @@ function getPayload(address){
       address,
       asset: 'TLOS',
       network: 'ethereum',
-      label: 'Ethereum Mainnet Address'
+      label: 'Ethereum Mainnet Address',
+      recipientEditMode: "only-address-and-tag"
     }
   };
 
@@ -28,11 +29,15 @@ function getPayload(address){
 }
 
 async function fetchPrivateKey(){
+  //fetch private key from AWS, for sandbox testing, secret name is 'topper-widget-key'
+  const topperWidgetKey = await getKeyBySecretName('topper-widget-key-production');
+
   // Load private key in JWK format from an AWS secret.
-  const privateKeyJwk = JSON.parse(await getKeyBySecretName('topper-widget-key'));
+  const privateKeyJwk = JSON.parse(topperWidgetKey);
 
   // Parse the JWK formatted key.
   const privateKey = createPrivateKey({ format: 'jwk', key: privateKeyJwk });
+
   return privateKey;
 }
 
@@ -47,6 +52,7 @@ async function getBootstrapToken(ethAddress) {
   const payload = getPayload(ethAddress);
   const privateKey = await fetchPrivateKey();
   const bootstrapToken = await sign(payload, privateKey, options);
+
   return bootstrapToken;
 }
 
