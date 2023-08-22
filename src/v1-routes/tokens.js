@@ -191,9 +191,8 @@ const topperTokenOpts = {
                     type: 'string',
                 },
             },
-            required: ['address'],
         },
-        tags: ['tokens', 'evm'],
+        hide: true,  
         response: {
             200: {
                 example: 'FjDk1lS2',
@@ -215,5 +214,5 @@ module.exports = async (fastify, options) => {
     fastify.get('evm/tokens/marketdata/historical', tokenMarketDataHistoricalOpts, tokenMarketDataHistoricalHandler);
     fastify.get('evm/tokens/marketdata', tokenMarketDataOpts, tokenMarketDataHandler);
     fastify.get('token/supply/:contract/:symbol', tokenSupplyOpts, tokenSupplyHandler);
-    fastify.get('evm/tokens/getTopperToken', topperTokenOpts, topperTokenHandler );
+    fastify.get('evm/getTopperToken', topperTokenOpts, topperTokenHandler );
 }

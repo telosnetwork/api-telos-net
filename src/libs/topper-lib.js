@@ -3,6 +3,13 @@ const { createPrivateKey, randomUUID } = require('crypto');
 const { promisify } = require('util');
 const jsonwebtoken = require('jsonwebtoken');
 
+// Note: must have aws cli configured locally to execute.
+// Change below values for sandbox testing:
+//   payload.sub: 'e46b1cb7-9fb5-4e1d-985b-fca1b4e6f217'
+//   aws secret key name: 'topper-widget-key'
+//   options.keyid: '87c793b4-8ba5-4dba-a17d-8e49144d8766'
+
+
 // Promisify the `jsonwebtoken.sign()` method for simplicity.
 const sign = promisify(jsonwebtoken.sign);
 
@@ -11,7 +18,7 @@ function getPayload(address){
   // `jsonwebtoken.sign()` method automatically adds the `iat` claim.
   const payload = {
     jti: randomUUID(),
-    sub: 'e46b1cb7-9fb5-4e1d-985b-fca1b4e6f217',
+    sub: '13ebd307-7d82-4f67-aee1-f20202bc7651',
     source: {
       amount: '100.00',
       asset: 'USD'
@@ -29,7 +36,7 @@ function getPayload(address){
 }
 
 async function fetchPrivateKey(){
-  //fetch private key from AWS, for sandbox testing, secret name is 'topper-widget-key'
+  // fetch private key from AWS, required to generate bootstrap token
   const topperWidgetKey = await getKeyBySecretName('topper-widget-key-production');
 
   // Load private key in JWK format from an AWS secret.
@@ -44,7 +51,8 @@ async function fetchPrivateKey(){
 // Create the options the `jsonwebtoken.sign()` method.
 const options = {
   algorithm: 'ES256',
-  keyid: '87c793b4-8ba5-4dba-a17d-8e49144d8766'
+  keyid: 'a393c622-339e-4b3b-bd59-3a18ef4d9f2c' 
+
 };
 
 
