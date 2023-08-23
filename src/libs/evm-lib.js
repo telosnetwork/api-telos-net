@@ -29,7 +29,6 @@ async function getTokens(symbols){
       let tokens =  results.data.tokens.filter((token) => {
         return (parseInt(token.chainId) === parseInt(process.env.EVM_CHAIN_ID) && symbols.includes(token.symbol.toUpperCase()));
       });
-      console.log(tokens);
       return tokens;
     }
   } catch (e) {
