@@ -3,12 +3,12 @@ const { createPrivateKey, randomUUID } = require('crypto');
 const { promisify } = require('util');
 const jsonwebtoken = require('jsonwebtoken');
 
-// Note: must have aws cli configured locally to execute.
-// Change below values for sandbox testing:
+// Note: must have aws cli configured locally to execute
+
+// Values for sandbox testing:
 //   payload.sub: 'e46b1cb7-9fb5-4e1d-985b-fca1b4e6f217'
 //   aws secret key name: 'topper-widget-key'
 //   options.keyid: '87c793b4-8ba5-4dba-a17d-8e49144d8766'
-
 
 // Promisify the `jsonwebtoken.sign()` method for simplicity.
 const sign = promisify(jsonwebtoken.sign);
@@ -27,8 +27,7 @@ function getPayload(address){
       address,
       asset: 'TLOS',
       network: 'ethereum',
-      label: 'Ethereum Mainnet Address',
-      recipientEditMode: "only-address-and-tag"
+      label: 'Ethereum Mainnet Address'
     }
   };
 
