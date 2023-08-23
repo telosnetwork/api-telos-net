@@ -1,7 +1,8 @@
 const { getKeyBySecretName } = require("./auth-lib");
-const { createPrivateKey, createPublicKey, randomUUID } = require('crypto');
+const { createPrivateKey, randomUUID } = require('crypto');
 const { promisify } = require('util');
 const jsonwebtoken = require('jsonwebtoken');
+const { ethers } = require('ethers');
 
 // Note: must have aws cli configured locally to execute
 
@@ -9,6 +10,14 @@ const jsonwebtoken = require('jsonwebtoken');
 const sign = promisify(jsonwebtoken.sign);
 
 function getPayload(address, sandbox){
+  if (address) {
+    try{
+      address = ethers.utils.getAddress(address);
+    }catch(e){
+      address = null;
+      console.error("Invalid address supplied, update address in form.")
+    }
+  }
   // Create the payload for the bootstrap token, note that the
   // `jsonwebtoken.sign()` method automatically adds the `iat` claim.
   const payload = {
