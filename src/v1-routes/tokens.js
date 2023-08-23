@@ -198,6 +198,7 @@ const topperTokenOpts = {
                 }
             },
         },
+        hide: true,
         response: {
             200: {
                 example: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImEzOTNjNjIyLTMzOWUtNGIzYi1iZDU5LTNhMThlZjRkOWYyYyJ9.eyJqdGkiOiI3N2NiYTY0My1lODFjLTQ0ODgtYjRmOC00MzE2NDUzMDFiMDciLCJzdWIiOiIxM2ViZDMwNy03ZDgyLTRmNjctYWVlMS1mMjAyMDJiYzc2NTEiLCJzb3VyY2UiOnsiYW1vdW50IjoiMTAwLjAwIiwiYXNzZXQiOiJVU0QifSwidGFyZ2V0Ijp7ImFkZHJlc3MiOiIweDAiLCJhc3NldCI6IlRMT1MiLCJuZXR3b3JrIjoiZXRoZXJldW0iLCJsYWJlbCI6IkV0aGVyZXVtIE1haW5uZXQgQWRkcmVzcyJ9LCJpYXQiOjE2OTI4MTExODh9.mdRDrPiaZJarkzaKYgTqn86uR7Ej7K17crDvf9TGD1XX3EVX96uqLJvluoXuD4gXCC3DKdQzAgX8cw6fTeIwuA',
