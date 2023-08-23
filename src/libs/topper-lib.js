@@ -6,6 +6,8 @@ const { ethers } = require('ethers');
 
 // Note: must have aws cli configured locally to execute
 
+// See https://docs.topperpay.com/intro/ for documentation 
+
 // Promisify the `jsonwebtoken.sign()` method for simplicity.
 const sign = promisify(jsonwebtoken.sign);
 
