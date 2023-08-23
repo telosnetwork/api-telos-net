@@ -1,6 +1,6 @@
 {
   "name": "api-telos-net",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Backend services running at api.telos.net",
   "main": "",
   "scripts": {
@@ -28,7 +28,6 @@
     "@telosnetwork/telosevm-js": "0.2.0",
     "aws-sdk": "^2.788.0",
     "axios": "^0.21.0",
-    "crypto": "^1.0.1",
     "eosjs": "^20.0.0",
     "eosjs-ecc": "^4.0.4",
     "ethers": "^5.7.1",
@@ -42,7 +41,6 @@
     "node-fetch": "^2.6.7",
     "pino": "^6.3.2",
     "pino-pretty": "^4.0.0",
-    "pm2": "^5.2.0",
     "solc": "^0.8.11",
     "twilio": "^3.34.0",
     "util": "^0.12.1",
