@@ -26,7 +26,7 @@ function getPayload(address, sandbox){
     jti: randomUUID(),
     sub: sandbox ? 'e46b1cb7-9fb5-4e1d-985b-fca1b4e6f217' : '13ebd307-7d82-4f67-aee1-f20202bc7651',
     source: {
-      amount: '100.00',
+      amount: '50.00',
       asset: 'USD'
     },
     target: address ? {
