@@ -47,9 +47,7 @@ async function fetchPrivateKey(){
 const options = {
   algorithm: 'ES256',
   keyid: 'a393c622-339e-4b3b-bd59-3a18ef4d9f2c' 
-
 };
-
 
 async function getBootstrapToken(ethAddress) {
   const payload = getPayload(ethAddress);
