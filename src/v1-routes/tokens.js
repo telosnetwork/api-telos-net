@@ -2,6 +2,8 @@ const { getCurrencyStats } = require("../libs/eosio-lib");
 const { getMarketdata } = require("../libs/dynamodb-lib");
 const { getTokens, getSymbolsArray } = require("../libs/evm-lib");
 const { exclude } = require("../utils/exclude");
+const { getBootstrapToken } = require("../libs/topper-lib");
+
 
 // MARKETDATA HISTORICAL ------------------------------------------------------
 const tokenMarketDataHistoricalOpts = {
@@ -164,20 +166,53 @@ async function tokenSupplyHandler(request, reply) {
     const contract = request.params.contract;
     const symbol = request.params.symbol.toUpperCase();
     const numeric = (request.query.numeric + '') === 'true';
-    console.log(request.query.numeric);
-    console.log(numeric);
     const stats = await getCurrencyStats(contract, symbol);
     let supply = stats.supply;
-    if (numeric)
-        console.log("Numeric is true");
+
     if (request.query.exclude){
         const exclusions = request.query.exclude.split(',');
         supply = await exclude(stats, exclusions, contract, symbol);
         // Hacky, but easier for now than trying to fix the logic of the exclude function and the other consumers of it to add an argument for "includeSymbol"
         return numeric ? supply : `${supply} ${symbol}`;
     }
+    
     return numeric ? supply.split(' ')[0] : supply;
 }
+
+// TOPPER BOOTSTRAP TOKEN ------------------------------------------------------
+
+const topperTokenOpts = {
+    schema: {
+        querystring: {
+            type: 'object',
+            properties: {
+                address: {
+                    description: 'eth address for purchase deposit',
+                    type: 'string',
+                    default: null
+                },
+                sandbox: {
+                    description: 'generate key for sandbox testing',
+                    type: 'boolean',
+                    default: false                    
+                }
+            },
+        },
+        hide: true,
+        response: {
+            200: {
+                example: 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImEzOTNjNjIyLTMzOWUtNGIzYi1iZDU5LTNhMThlZjRkOWYyYyJ9.eyJqdGkiOiI3N2NiYTY0My1lODFjLTQ0ODgtYjRmOC00MzE2NDUzMDFiMDciLCJzdWIiOiIxM2ViZDMwNy03ZDgyLTRmNjctYWVlMS1mMjAyMDJiYzc2NTEiLCJzb3VyY2UiOnsiYW1vdW50IjoiMTAwLjAwIiwiYXNzZXQiOiJVU0QifSwidGFyZ2V0Ijp7ImFkZHJlc3MiOiIweDAiLCJhc3NldCI6IlRMT1MiLCJuZXR3b3JrIjoiZXRoZXJldW0iLCJsYWJlbCI6IkV0aGVyZXVtIE1haW5uZXQgQWRkcmVzcyJ9LCJpYXQiOjE2OTI4MTExODh9.mdRDrPiaZJarkzaKYgTqn86uR7Ej7K17crDvf9TGD1XX3EVX96uqLJvluoXuD4gXCC3DKdQzAgX8cw6fTeIwuA',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function topperTokenHandler(request, reply) {
+    const token = await getBootstrapToken(request.query.address, request.query.sandbox);
+    return token;
+}
+
 
 // EXPORTS ------------------------------------------------------
 
@@ -185,4 +220,5 @@ module.exports = async (fastify, options) => {
     fastify.get('evm/tokens/marketdata/historical', tokenMarketDataHistoricalOpts, tokenMarketDataHistoricalHandler);
     fastify.get('evm/tokens/marketdata', tokenMarketDataOpts, tokenMarketDataHandler);
     fastify.get('token/supply/:contract/:symbol', tokenSupplyOpts, tokenSupplyHandler);
+    fastify.get('evm/getTopperToken', topperTokenOpts, topperTokenHandler );
 }
