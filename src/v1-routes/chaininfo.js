@@ -5,6 +5,8 @@ const { getTableRows } = require("../libs/eosio-lib");
 const Big = require('big.js');
 const { BigNumber, ethers } = require('ethers');
 
+const EVM_DECIMALS_DIVISOR = 1000000000000000000;
+
 const cmcCirculationExclusions = ["exrsrv.tf", "tlosrecovery", "treasury.tcd", "works.decide", "tf", "eosio.saving", "free.tf", "eosio.names",
     "econdevfunds", "eosio.ram", "ramadmin.tf", "ramlaunch.tf", "treasury.tf", "accounts.tf", "grants.tf", "tedp4holding"];
 
@@ -26,7 +28,7 @@ async function totalSupply() {
     return parseFloat(stats.supply, 10);
 }
 
-async function totalStaked(event, context) {
+async function totalRexStaked(event, context) {
     const rex = await getRexStats();
     const stakeBalance = await getCurrencyBalance('eosio.stake');
     return parseFloat(rex.total_lendable) + parseFloat(stakeBalance);
@@ -44,6 +46,21 @@ async function rexPrice() {
     const totalRex = parseFloat(rex.total_rex);
     const rexTelosPrice = (totalLendable / totalRex);
     return rexTelosPrice;
+}
+
+async function totalStaked() {
+    const totalRex = await totalRexStaked();
+    const totalEvm = (await evmStaked()) / EVM_DECIMALS_DIVISOR;
+    return totalRex + totalEvm;
+}
+
+async function evmStaked(){
+    const provider =  getEthersProvider();
+    const contract = new ethers.Contract(process.env.STLOS_CONTRACT, process.env.STLOS_ABI, provider);
+
+    const stlosTvl = (await contract.totalAssets()).toString();
+
+    return stlosTvl;
 }
 
 async function blocktivityHourly() {
@@ -89,7 +106,7 @@ async function fetchNativeApy() {
  */
 
 async function getApyStats() {
-    const tvl = await getTvl();
+    const tvl = await evmStaked();
     const tvlBn = BigNumber.from(tvl);
     const zeroBal = {native: 0, evm: 0};
 
@@ -154,19 +171,9 @@ async function getApyStats() {
     return  { native: rexApy, evm: evmApy };
 }
 
-async function getTvl(){
-    const provider =  getEthersProvider();
-    const contract = new ethers.Contract(process.env.STLOS_CONTRACT, process.env.STLOS_ABI, provider);
-
-    const stlosTvl = (await contract.totalAssets()).toString();
-
-    return stlosTvl;
-}
-
 function getEthersProvider() {
     return new ethers.providers.JsonRpcProvider(process.env.NETWORK_EVM_RPC);
 }
-
 
 module.exports = async (fastify, options) => {
     fastify.get('stats/blocktivity', {
@@ -203,7 +210,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await totalStaked()
+        return await totalRexStaked()
     })
 
     fastify.get('apy/evm', {
@@ -234,7 +241,7 @@ module.exports = async (fastify, options) => {
         return await  fetchNativeApy();
     })
 
-    fastify.get('evm/stlos-tvl', {
+    fastify.get('staked/evm', {
         schema: {
             tags: ['stats', 'evm'],
             response: {
@@ -245,7 +252,35 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await getTvl();
+        return (await evmStaked() / EVM_DECIMALS_DIVISOR) ;
+    })
+
+    fastify.get('staked/zero', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    example: 123456.7890,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await totalRexStaked()
+    })
+
+    fastify.get('staked/total', {
+        schema: {
+            tags: ['stats'],
+            response: {
+                200: {
+                    example: 123456,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await totalStaked();
     })
 
     fastify.get('supply/circulating', {
