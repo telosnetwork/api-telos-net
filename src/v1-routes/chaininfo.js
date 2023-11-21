@@ -208,7 +208,7 @@ module.exports = async (fastify, options) => {
 
     fastify.get('apy/evm', {
         schema: {
-            tags: ['stats'],
+            tags: ['stats', 'evm'],
             response: {
                 200: {
                     example: 12.34,
@@ -232,7 +232,21 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await  fetchNativeApy();
-})
+    })
+
+    fastify.get('evm/stlos-tvl', {
+        schema: {
+            tags: ['stats', 'evm'],
+            response: {
+                200: {
+                    example: 123456,
+                    type: 'number'
+                }
+            }
+        }
+    }, async (request, reply) => {
+        return await getTvl();
+    })
 
     fastify.get('supply/circulating', {
         schema: {
@@ -252,7 +266,7 @@ module.exports = async (fastify, options) => {
         }
     }, async (request, reply) => {
         return await circulatingSupply(request.query.requestor)
-})
+    })
 
     fastify.get('supply/total', {
         schema: {
