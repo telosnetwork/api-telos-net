@@ -28,7 +28,8 @@ async function totalSupply() {
     return parseFloat(stats.supply, 10);
 }
 
-async function totalRexStaked(event, context) {
+// includes staked resources
+async function totalStaked(event, context) {
     const rex = await getRexStats();
     const stakeBalance = await getCurrencyBalance('eosio.stake');
     return parseFloat(rex.total_lendable) + parseFloat(stakeBalance);
@@ -48,8 +49,8 @@ async function rexPrice() {
     return rexTelosPrice;
 }
 
-async function totalStaked() {
-    const totalRex = await totalRexStaked();
+async function totalStakedTokens() {
+    const totalRex = await rexStaked();
     const totalEvm = (await evmStaked()) / EVM_DECIMALS_DIVISOR;
     return totalRex + totalEvm;
 }
@@ -201,6 +202,7 @@ module.exports = async (fastify, options) => {
 
     fastify.get('supply/staked', {
         schema: {
+            description: 'total staked including resources',
             tags: ['stats'],
             response: {
                 200: {
@@ -210,7 +212,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await totalRexStaked()
+        return await totalStaked()
     })
 
     fastify.get('apy/evm', {
@@ -255,6 +257,7 @@ module.exports = async (fastify, options) => {
         return (await evmStaked() / EVM_DECIMALS_DIVISOR) ;
     })
 
+    // same as legacy route rex/staked
     fastify.get('staked/zero', {
         schema: {
             tags: ['stats'],
@@ -266,7 +269,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await totalRexStaked()
+        return await rexStaked() 
     })
 
     fastify.get('staked/total', {
@@ -280,7 +283,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        return await totalStaked();
+        return await totalStakedTokens();
     })
 
     fastify.get('supply/circulating', {
@@ -317,6 +320,7 @@ module.exports = async (fastify, options) => {
         return await totalSupply()
     })
 
+    // legacy route, same as staked/total
     fastify.get('/rex/staked', {
         schema: {
             tags: ['stats'],
