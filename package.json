@@ -1,6 +1,6 @@
 {
   "name": "api-telos-net",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "Backend services running at api.telos.net",
   "main": "",
   "scripts": {
