@@ -466,10 +466,58 @@ async function recaptchaCreateHandler(request, reply) {
     }
 }
 
+const createRandomAccountOpts = {
+    schema: {
+        tags: ['accounts'],
+        body: {
+            required: ['activeKey','ownerKey'],
+            type: 'object',
+            description: 'Creates a randomly generated account and links to provided public keys',
+            properties: {
+                ownerKey: {
+                    type: 'string',
+                    description: 'Owner public key',
+                    example: 'EOS1234...'
+                },
+                activeKey: {
+                    type: 'string',
+                    description: 'Active public key',
+                    example: 'EOS4321...'
+                }
+            }
+        },
+        response: {
+            204: {
+                description: 'Account generation and linked to public key(s) successful',
+                type: 'null'
+            },
+            400: {
+                description: 'Error generating account and linking to public keys',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function createRandomAccountHandler(request, reply) {
+    try {
+        const accountName = await eosioLib.generateRandomAccount();
+        result = await eosioLib.create(accountName, request.body.ownerKey, request.body.activeKey);
+        return reply.send({
+            success: true,
+            accountName
+        })
+    } catch (e) {
+        request.log.error(e)
+        reply.code(500).send(e.message);
+    }
+}
+
 module.exports = async (fastify, options) => {
     fastify.post('registrations', registrationOpts, registrationHandler)
     fastify.post('accounts', createOpts, createHandler)
     fastify.post('recaptchaCreate', recaptchaCreateOpts, recaptchaCreateHandler)
+    fastify.post('accounts/random', createRandomAccountOpts, createRandomAccountHandler);
 
     fastify.get('keys', keygenOpts, keygenHandler)
     fastify.get('accounts/:telosAccount', checkAccountOpts, checkAccountHandler)
