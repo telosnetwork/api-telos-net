@@ -95,7 +95,7 @@ function getRandomAccountString(){
   return result;
 }
 
-async function validAccountFormat(accountName) {
+function validAccountFormat(accountName) {
   var telosAccountRegex = RegExp("^([a-z]|[1-5]|[\.]){1,12}$", "g"); // does it match EOSIO account format?
   if (!telosAccountRegex.test(accountName)) {
     return false;

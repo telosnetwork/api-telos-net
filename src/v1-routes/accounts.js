@@ -68,7 +68,7 @@ async function registrationHandler(request, reply) {
         }
 
         if (request.body.telosAccount) {
-            if (!await eosioLib.validAccountFormat(request.body.telosAccount)) {
+            if (!eosioLib.validAccountFormat(request.body.telosAccount)) {
                 return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
             }
             if (await eosioLib.accountExists(request.body.telosAccount)) {
@@ -217,7 +217,7 @@ async function createHandler(request, reply) {
         }
 
         if (data.telosAccount) {
-            if (!await eosioLib.validAccountFormat(data.telosAccount)) {
+            if (!eosioLib.validAccountFormat(data.telosAccount)) {
                 return reply.code(400).send(`Requested Telos account name (${data.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
             }
             if (await eosioLib.accountExists(data.telosAccount)) {
@@ -362,7 +362,7 @@ async function checkAccountHandler(request, reply) {
     Sentry.configureScope(scope => scope.setExtra('Request Body', request.body));
 
     try {
-        if (!await eosioLib.validAccountFormat(request.params.telosAccount)) {
+        if (!eosioLib.validAccountFormat(request.params.telosAccount)) {
             return reply.code(400).send(`Requested Telos account name ${request.params.telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
         }
 
