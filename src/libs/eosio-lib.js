@@ -65,6 +65,16 @@ async function genRandomKeys(numKeys = 2) {
   return keys;
 }
 
+async function generateRandomAccount() {
+  let randomAccount = '';
+  let accountTaken = false;
+  do {
+    randomAccount = getRandomAccountString();
+    accountTaken = await accountExists(randomAccount);
+  } while (accountTaken)
+  return randomAccount;
+}
+
 async function accountExists(accountName) {
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
   try {
@@ -73,6 +83,16 @@ async function accountExists(accountName) {
   } catch (e) {
     return false;
   }
+}
+
+function getRandomAccountString(){
+  const validChars ='abcdefghijklmnopqrstuvwxyz12345';
+  const accountNamelength = 12;
+  let result = '';
+  for ( let i = 0; i < accountNamelength; i++ ) {
+      result += validChars.charAt(Math.floor(Math.random() * validChars.length));
+  }
+  return result;
 }
 
 async function validAccountFormat(accountName) {
@@ -149,4 +169,4 @@ async function getActionStats(byHour, endMoment) {
   return actionsResult.data;
 }
 
-module.exports = { create, genRandomKey, genRandomKeys, accountExists, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats, getTableRows }
+module.exports = { create, genRandomKey, genRandomKeys, accountExists, generateRandomAccount, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats, getTableRows }
