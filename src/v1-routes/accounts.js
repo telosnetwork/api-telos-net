@@ -486,6 +486,7 @@ const createRandomAccountOpts = {
                 }
             }
         },
+        hide: true,
         response: {
             204: {
                 description: 'Account generation and linked to public key(s) successful',
