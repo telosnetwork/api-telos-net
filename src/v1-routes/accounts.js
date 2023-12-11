@@ -68,7 +68,7 @@ async function registrationHandler(request, reply) {
         }
 
         if (request.body.telosAccount) {
-            if (!await eosioLib.validAccountFormat(request.body.telosAccount)) {
+            if (!eosioLib.validAccountFormat(request.body.telosAccount)) {
                 return reply.code(400).send(`Requested Telos account name (${request.body.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
             }
             if (await eosioLib.accountExists(request.body.telosAccount)) {
@@ -217,7 +217,7 @@ async function createHandler(request, reply) {
         }
 
         if (data.telosAccount) {
-            if (!await eosioLib.validAccountFormat(data.telosAccount)) {
+            if (!eosioLib.validAccountFormat(data.telosAccount)) {
                 return reply.code(400).send(`Requested Telos account name (${data.telosAccount}) is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
             }
             if (await eosioLib.accountExists(data.telosAccount)) {
@@ -362,7 +362,7 @@ async function checkAccountHandler(request, reply) {
     Sentry.configureScope(scope => scope.setExtra('Request Body', request.body));
 
     try {
-        if (!await eosioLib.validAccountFormat(request.params.telosAccount)) {
+        if (!eosioLib.validAccountFormat(request.params.telosAccount)) {
             return reply.code(400).send(`Requested Telos account name ${request.params.telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
         }
 
@@ -466,10 +466,59 @@ async function recaptchaCreateHandler(request, reply) {
     }
 }
 
+const createRandomAccountOpts = {
+    schema: {
+        tags: ['accounts'],
+        body: {
+            required: ['activeKey','ownerKey'],
+            type: 'object',
+            description: 'Creates a randomly generated account and links to provided public keys',
+            properties: {
+                ownerKey: {
+                    type: 'string',
+                    description: 'Owner public key',
+                    example: 'EOS1234...'
+                },
+                activeKey: {
+                    type: 'string',
+                    description: 'Active public key',
+                    example: 'EOS4321...'
+                }
+            }
+        },
+        hide: true,
+        response: {
+            204: {
+                description: 'Account generation and linked to public key(s) successful',
+                type: 'null'
+            },
+            400: {
+                description: 'Error generating account and linking to public keys',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function createRandomAccountHandler(request, reply) {
+    try {
+        const accountName = await eosioLib.generateRandomAccount();
+        result = await eosioLib.create(accountName, request.body.ownerKey, request.body.activeKey);
+        return reply.send({
+            success: true,
+            accountName
+        })
+    } catch (e) {
+        request.log.error(e)
+        reply.code(500).send(e.message);
+    }
+}
+
 module.exports = async (fastify, options) => {
     fastify.post('registrations', registrationOpts, registrationHandler)
     fastify.post('accounts', createOpts, createHandler)
     fastify.post('recaptchaCreate', recaptchaCreateOpts, recaptchaCreateHandler)
+    fastify.post('accounts/random', createRandomAccountOpts, createRandomAccountHandler);
 
     fastify.get('keys', keygenOpts, keygenHandler)
     fastify.get('accounts/:telosAccount', checkAccountOpts, checkAccountHandler)
