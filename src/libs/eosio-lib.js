@@ -13,7 +13,6 @@ async function create(accountName, ownerKey, activeKey) {
   const pk = secretStringObj[process.env.accountCreatorKey];
 
   const signatureProvider = new JsSignatureProvider([pk]);
-  console.log(process.env.eosioApiEndPoint);
 
   const rpc = new JsonRpc(process.env.eosioApiEndPoint, { fetch });
 
@@ -43,9 +42,7 @@ async function create(accountName, ownerKey, activeKey) {
       }
     }
   ];
-  console.log("EOSLIB-CREATE::CREATE-- Actions: ", JSON.stringify(actions));
   const result = await api.transact({ actions: actions }, { blocksBehind: 3, expireSeconds: 30 });
-  console.log("EOSLIB-CREATE::CREATE-- Result:", JSON.stringify(result));
   return result;
 }
 
@@ -65,9 +62,13 @@ async function genRandomKeys(numKeys = 2) {
   return keys;
 }
 
-async function generateRandomAccount() {
-  let randomAccount = '';
+async function generateRandomAccount(suggestedName = '') {
+  let randomAccount = suggestedName;
   let accountTaken = false;
+  if (checkAccountNameIntegrity(randomAccount)) {
+    accountTaken = await accountExists(randomAccount);
+    if (!accountTaken) return randomAccount;
+  }
   do {
     randomAccount = getRandomAccountString();
     accountTaken = await accountExists(randomAccount);
@@ -85,14 +86,26 @@ async function accountExists(accountName) {
   }
 }
 
+
 function getRandomAccountString(){
   const validChars ='abcdefghijklmnopqrstuvwxyz12345';
   const accountNamelength = 12;
   let result = '';
   for ( let i = 0; i < accountNamelength; i++ ) {
-      result += validChars.charAt(Math.floor(Math.random() * validChars.length));
+    result += validChars.charAt(Math.floor(Math.random() * validChars.length));
   }
   return result;
+}
+
+function checkAccountNameIntegrity(accountName) {
+  if (accountName.length < 12) {
+    return false;
+  }
+  var telosAccountRegex = RegExp("^([a-z]|[1-5]){1,12}$", "g");
+  if (!telosAccountRegex.test(accountName)) {
+    return false;
+  }
+  return true;
 }
 
 function validAccountFormat(accountName) {
