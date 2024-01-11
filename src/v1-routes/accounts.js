@@ -6,8 +6,6 @@ const { VoipError } = require('../libs/voip-error');
 const eosioLib = require("../libs/eosio-lib");
 const axios = require("axios");
 
-
-
 const CURRENT_VERSION = "v0.1";
 
 const registrationOpts = {
@@ -577,18 +575,23 @@ async function create4GoogleHandler(request, reply) {
         if (!ticket) {
             throw new Error('Invalid JWT');
         }
-        // userId can be extracted from the ticket.getPayload()['sub'];
+        // Extract userId from the ticket
+        const userId = ticket.getPayload()['sub'];
 
-        // we generate the name if we don't have a suggested name
-        const accountName = await eosioLib.generateRandomAccount(suggestedName);
+        // Check if account exists
+        const existingAccount = await dynamoDbLib.getAccountNameForGoogleUser(userId);
+        if (existingAccount) {
+            return reply.send({ success: true, accountName: existingAccount });
+        } else {
+            // Generate the account name if not suggested
+            const accountName = suggestedName || await eosioLib.generateRandomAccount();
 
-        // we create the account
-        result = await eosioLib.create(accountName, ownerKey, activeKey);
+            // Create the account and store in database
+            const result = await eosioLib.create(accountName, ownerKey, activeKey);
+            await dynamoDbLib.registerAccountNameForGoogleUser(userId, accountName);
 
-        return reply.send({
-            success: true,
-            accountName
-        })
+            return reply.send({ success: true, accountName });
+        }
     } catch (error) {
         // Enviar respuesta de error
         reply.code(400).send({
