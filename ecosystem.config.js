@@ -50,7 +50,7 @@ const envDev = {
 const envProd = {
   NODE_ENV: 'production',
   tableName: 'prod-accounts',
-  googleUsersTableName: 'prod-users-accounts',
+  googleUsersTableName: 'prod-google-users-accounts',
   testnetRotationTableName: 'prod-testnet-rotation',
   accountCreatorKey: 'tf-account-creator-key-prod',
   marketdataTableName: 'prod-marketdata',
