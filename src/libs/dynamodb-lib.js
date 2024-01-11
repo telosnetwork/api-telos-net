@@ -259,7 +259,7 @@ async function getAccountNameForGoogleUser(userId) {
   };
 
   try {
-    const result = await dynamoDb.get(params).promise();
+    const result = await call("get", params);
     return result.Item ? result.Item.accountName : null;
   } catch (error) {
     console.error(error);
@@ -278,7 +278,7 @@ async function registerAccountNameForGoogleUser(userId, accountName) {
   };
 
   try {
-    await dynamoDb.put(params).promise();
+    await call("put", params);
     return true;
   } catch (error) {
     console.error(error);
