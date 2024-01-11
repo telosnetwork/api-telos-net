@@ -29,6 +29,7 @@ const envLocal = {
 const envDev = {
   NODE_ENV: 'development',
   tableName: 'dev-accounts',
+  googleUsersTableName: 'dev-google-users-accounts',
   testnetRotationTableName: 'dev-testnet-rotation',
   accountCreatorKey: 'tf-account-creator-key-dev',
   allowDeleteNumber: 'Y',
@@ -49,6 +50,7 @@ const envDev = {
 const envProd = {
   NODE_ENV: 'production',
   tableName: 'prod-accounts',
+  googleUsersTableName: 'prod-users-accounts',
   testnetRotationTableName: 'prod-testnet-rotation',
   accountCreatorKey: 'tf-account-creator-key-prod',
   marketdataTableName: 'prod-marketdata',

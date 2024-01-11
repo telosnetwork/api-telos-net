@@ -249,4 +249,54 @@ async function getBySmsHash(smsHash) {
   return result.Item;
 }
 
-module.exports = { call, save, deleteAccount, exists, getBySmsHash, ipCanCreate, ipCanTransact, ipCreated, getMarketdata }
+
+async function getAccountNameForGoogleUser(userId) {
+  const params = {
+    TableName: process.env.googleUsersTableName,
+    Key: {
+      userId: userId
+    }
+  };
+
+  try {
+    const result = await dynamoDb.get(params).promise();
+    return result.Item ? result.Item.accountName : null;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+
+async function registerAccountNameForGoogleUser(userId, accountName) {
+  const params = {
+    TableName: process.env.googleUsersTableName,
+    Item: {
+      userId: userId,
+      accountName: accountName
+    }
+  };
+
+  try {
+    await dynamoDb.put(params).promise();
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+
+module.exports = {
+  call,
+  save,
+  deleteAccount,
+  exists,
+  getBySmsHash,
+  ipCanCreate,
+  ipCanTransact,
+  ipCreated,
+  getMarketdata,
+  getAccountNameForGoogleUser,
+  registerAccountNameForGoogleUser
+}
