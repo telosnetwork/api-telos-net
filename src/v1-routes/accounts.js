@@ -6,7 +6,7 @@ const { VoipError } = require('../libs/voip-error');
 const eosioLib = require("../libs/eosio-lib");
 const axios = require("axios");
 
-const CURRENT_VERSION = "v0.1";
+const CURRENT_VERSION = "v0.1.1";
 
 const registrationOpts = {
     schema: {
@@ -604,6 +604,30 @@ async function create4GoogleHandler(request, reply) {
 // ------------------------------------------------------------------
 
 
+async function accountsEndpointVersion(request, reply) {
+    return reply.send({ success: true, version: CURRENT_VERSION });
+}
+
+const endpointVersionOpts = {
+    schema: {
+        tags: ['accounts'],
+        body: {
+            required: [],
+            type: 'object',
+        },
+        response: {
+            204: {
+                description: 'Endpoint version',
+                type: 'null'
+            },
+            400: {
+                description: 'Error',
+                type: 'string'
+            }
+        }
+    }
+}
+
 
 module.exports = async (fastify, options) => {
     fastify.post('registrations', registrationOpts, registrationHandler)
@@ -611,6 +635,7 @@ module.exports = async (fastify, options) => {
     fastify.post('recaptchaCreate', recaptchaCreateOpts, recaptchaCreateHandler)
     fastify.post('accounts/random', createRandomAccountOpts, createRandomAccountHandler);
     fastify.post('accounts/create4google', create4GoogleOpts, create4GoogleHandler);
+    fastify.get('accounts/version', endpointVersionOpts, accountsEndpointVersion);
 
     fastify.get('keys', keygenOpts, keygenHandler)
     fastify.get('accounts/:telosAccount', checkAccountOpts, checkAccountHandler)
