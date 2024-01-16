@@ -510,15 +510,107 @@ async function createRandomAccountHandler(request, reply) {
         })
     } catch (e) {
         request.log.error(e)
-        reply.code(500).send(e.message);
+        reply.code(400).send(e.message);
     }
 }
+
+
+
+// Acount creation secured by google --------------------------------
+const { OAuth2Client } = require('google-auth-library');
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(CLIENT_ID);
+
+
+const create4GoogleOpts = {
+    schema: {
+        tags: ['accounts'],
+        body: {
+            required: ['jwt', 'ownerKey', 'activeKey'],
+            type: 'object',
+            properties: {
+                jwt: {
+                    type: 'string',
+                    description: 'JWT token provided by Google after user authentication'
+                },
+                ownerKey: {
+                    type: 'string',
+                    description: 'Owner public key',
+                    example: 'EOS1234...'
+                },
+                activeKey: {
+                    type: 'string',
+                    description: 'Active public key',
+                    example: 'EOS4321...'
+                },
+                suggestedName: {
+                    type: 'string',
+                    description: 'Optional suggested name for the account',
+                    example: 'examplename1'
+                }
+            }
+        },
+        response: {
+            204: {
+                description: 'Account generation and linked to public key(s) successful',
+                type: 'null'
+            },
+            400: {
+                description: 'Error generating account and linking to public keys',
+                type: 'string'
+            }
+        }
+    }
+}
+
+async function create4GoogleHandler(request, reply) {
+    const { jwt, ownerKey, activeKey, suggestedName } = request.body;
+
+    try {
+        // Verificar el JWT con Google
+        const ticket = await client.verifyIdToken({
+            idToken: jwt,
+            audience: CLIENT_ID,
+        });
+        if (!ticket) {
+            throw new Error('Invalid JWT');
+        }
+        // Extract userId from the ticket
+        const userId = ticket.getPayload()['sub'];
+
+        // Check if account exists
+        const existingAccount = await dynamoDbLib.getAccountNameForGoogleUser(userId);
+        if (existingAccount) {
+            return reply.send({ success: true, accountName: existingAccount });
+        } else {
+            // Generate the account name if not suggested
+            const accountName = suggestedName || await eosioLib.generateRandomAccount();
+
+            // Create the account and store in database
+            const result = await eosioLib.create(accountName, ownerKey, activeKey);
+            await dynamoDbLib.registerAccountNameForGoogleUser(userId, accountName);
+
+            return reply.send({ success: true, accountName });
+        }
+    } catch (error) {
+        // Enviar respuesta de error
+        reply.code(400).send({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+// ------------------------------------------------------------------
+
+
 
 module.exports = async (fastify, options) => {
     fastify.post('registrations', registrationOpts, registrationHandler)
     fastify.post('accounts', createOpts, createHandler)
     fastify.post('recaptchaCreate', recaptchaCreateOpts, recaptchaCreateHandler)
     fastify.post('accounts/random', createRandomAccountOpts, createRandomAccountHandler);
+    fastify.post('accounts/create4google', create4GoogleOpts, create4GoogleHandler);
 
     fastify.get('keys', keygenOpts, keygenHandler)
     fastify.get('accounts/:telosAccount', checkAccountOpts, checkAccountHandler)
