@@ -7,12 +7,8 @@ const { generateKeyPair } = require("crypto");
 const axios = require("axios");
 
 async function create(accountName, ownerKey, activeKey) {
-  console.log('Checkpoint 7.1', accountName, ownerKey, activeKey);
 
-  console.log('Checkpoint 7.3 process.env.accountCreatorKey:', process.env.accountCreatorKey);
   const secret = await getSecret(process.env.accountCreatorKey);
-  console.log('Checkpoint 7.3 secret:', secret);
-  console.log('Checkpoint 7.4 secret.SecretString:', secret.SecretString);
   var secretStringObj = JSON.parse(secret.SecretString);
   const pk = secretStringObj[process.env.accountCreatorKey];
 
