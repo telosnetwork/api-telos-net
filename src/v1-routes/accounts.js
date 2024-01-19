@@ -565,39 +565,43 @@ const create4GoogleOpts = {
 
 async function create4GoogleHandler(request, reply) {
     const { jwt, ownerKey, activeKey, suggestedName } = request.body;
-
+    console.log('Checkpoint 1');
     try {
         // Verificar el JWT con Google
         const ticket = await client.verifyIdToken({
             idToken: jwt,
-            audience: CLIENT_ID,
         });
+        console.log('Checkpoint 2');
         if (!ticket) {
             throw new Error('Invalid JWT');
         }
         // Extract userId from the ticket
         const userId = ticket.getPayload()['sub'];
 
+        console.log('Checkpoint 3');
+
         // Check if account exists
         const existingAccount = await dynamoDbLib.getAccountNameForGoogleUser(userId);
         if (existingAccount) {
+            console.log('Checkpoint 4');
             return reply.send({ success: true, accountName: existingAccount });
         } else {
+            console.log('Checkpoint 6');
             // Generate the account name if not suggested
             const accountName = await eosioLib.generateRandomAccount(suggestedName);
 
             // Create the account and store in database
+            console.log('Checkpoint 7 accountName:', accountName, 'ownerKey:', ownerKey, 'activeKey:', activeKey);
             const result = await eosioLib.create(accountName, ownerKey, activeKey);
             await dynamoDbLib.registerAccountNameForGoogleUser(userId, accountName);
 
             return reply.send({ success: true, accountName });
         }
     } catch (error) {
+        console.log('Checkpoint ERROR');
         // Enviar respuesta de error
-        reply.code(400).send({
-            success: false,
-            message: error.message
-        });
+        request.log.error(error)
+        reply.code(400).send(error.message);
     }
 }
 

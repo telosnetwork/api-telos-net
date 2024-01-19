@@ -251,12 +251,15 @@ async function getBySmsHash(smsHash) {
 
 
 async function getAccountNameForGoogleUser(userId) {
+  console.log('Checkpoint 3.1');
   const params = {
     TableName: process.env.googleUsersTableName,
     Key: {
       userId: userId
     }
   };
+
+  console.log('Checkpoint 3.2 params:', params);
 
   try {
     const result = await call("get", params);
