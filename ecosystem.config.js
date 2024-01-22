@@ -67,7 +67,9 @@ const envProd = {
   STLOS_CONTRACT: '0xb4b01216a5bc8f1c8a33cd990a1239030e60c905',
   NETWORK_EVM_RPC: 'https://mainnet.telos.net/evm',
   EVM_CHAIN_ID: 40,
-  GOOGLE_CLIENT_ID: '56634824599-ff3iu788c32c3s7ec65cs4bieop9gpgv.apps.googleusercontent.com', // Official App id
+  // We are not ready for Mainnet yet
+  // GOOGLE_CLIENT_ID: '56634824599-ff3iu788c32c3s7ec65cs4bieop9gpgv.apps.googleusercontent.com', // Official App id
+  GOOGLE_CLIENT_ID: '639241197544-kcubenhmti6u7ef3uj360n2lcl5cmn8c.apps.googleusercontent.com', // Viter's app id
 };
 
 const sharedConfig = {
