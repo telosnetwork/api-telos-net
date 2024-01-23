@@ -584,7 +584,7 @@ async function create4GoogleHandler(request, reply) {
             return reply.send({ success: true, accountName: existingAccount });
         } else {
             // Generate the account name if not suggested
-            // const accountName = await eosioLib.generateRandomAccount(suggestedName);
+            const accountName = await eosioLib.generateRandomAccount(suggestedName);
 
             // Create the account and store in database
             // const result = await eosioLib.create(accountName, ownerKey, activeKey);
