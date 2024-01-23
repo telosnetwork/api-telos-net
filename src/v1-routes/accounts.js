@@ -550,6 +550,7 @@ const create4GoogleOpts = {
                 }
             }
         },
+        hide: true,
         response: {
             204: {
                 description: 'Account generation and linked to public key(s) successful',
@@ -588,7 +589,7 @@ async function create4GoogleHandler(request, reply) {
             // Create the account and store in database
             // const result = await eosioLib.create(accountName, ownerKey, activeKey);
             const saved = await dynamoDbLib.registerAccountNameForGoogleUser(userId, accountName);
-            
+
             return reply.send({ success: true, accountName });
         }
     } catch (error) {
