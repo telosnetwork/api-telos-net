@@ -277,7 +277,6 @@ async function registerAccountNameForGoogleUser(userId, accountName) {
       accountName: accountName
     }
   };
-
   await call("put", params);
   return true;
 }
