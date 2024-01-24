@@ -277,14 +277,8 @@ async function registerAccountNameForGoogleUser(userId, accountName) {
       accountName: accountName
     }
   };
-
-  try {
-    await call("put", params);
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
+  await call("put", params);
+  return true;
 }
 
 
