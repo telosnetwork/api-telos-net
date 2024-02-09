@@ -6,7 +6,7 @@ const { VoipError } = require('../libs/voip-error');
 const eosioLib = require("../libs/eosio-lib");
 const axios = require("axios");
 
-const CURRENT_VERSION = "v0.1.1";
+const CURRENT_VERSION = "0.1.2";
 
 const registrationOpts = {
     schema: {
@@ -466,56 +466,6 @@ async function recaptchaCreateHandler(request, reply) {
     }
 }
 
-const createRandomAccountOpts = {
-    schema: {
-        tags: ['accounts'],
-        body: {
-            required: ['activeKey','ownerKey'],
-            type: 'object',
-            description: 'Creates a randomly generated account and links to provided public keys',
-            properties: {
-                ownerKey: {
-                    type: 'string',
-                    description: 'Owner public key',
-                    example: 'EOS1234...'
-                },
-                activeKey: {
-                    type: 'string',
-                    description: 'Active public key',
-                    example: 'EOS4321...'
-                }
-            }
-        },
-        hide: true,
-        response: {
-            204: {
-                description: 'Account generation and linked to public key(s) successful',
-                type: 'null'
-            },
-            400: {
-                description: 'Error generating account and linking to public keys',
-                type: 'string'
-            }
-        }
-    }
-}
-
-async function createRandomAccountHandler(request, reply) {
-    try {
-        const accountName = await eosioLib.generateRandomAccount();
-        result = await eosioLib.create(accountName, request.body.ownerKey, request.body.activeKey);
-        return reply.send({
-            success: true,
-            accountName
-        })
-    } catch (e) {
-        request.log.error(e)
-        reply.code(400).send(e.message);
-    }
-}
-
-
-
 // Acount creation secured by google --------------------------------
 const { OAuth2Client } = require('google-auth-library');
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -631,7 +581,6 @@ module.exports = async (fastify, options) => {
     fastify.post('registrations', registrationOpts, registrationHandler)
     fastify.post('accounts', createOpts, createHandler)
     fastify.post('recaptchaCreate', recaptchaCreateOpts, recaptchaCreateHandler)
-    fastify.post('accounts/random', createRandomAccountOpts, createRandomAccountHandler);
     fastify.post('accounts/create4google', create4GoogleOpts, create4GoogleHandler);
     fastify.get('accounts/version', endpointVersionOpts, accountsEndpointVersion);
 
