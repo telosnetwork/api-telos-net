@@ -39,7 +39,11 @@ async function updateVerifiedContractsData(verifiedList,chainId, bucket){
         await uploadObject(`${address}/${SOURCE_FILENAME}`, buffer, bucket);
         newCount++;
       }catch(e){
-        console.log(e)
+        // This address is ElkRouter on mainnet and somehow was partially verified without metadata.json file (it was one of our first contracts on mainnet)
+        if (address != '0x75840EBB437981a3F3F1F004513821E0CcDCFC21') {
+          console.log(`Exception when trying to upload for address: ${address}`);
+          console.log(e)
+        }
       }
     }
   }
