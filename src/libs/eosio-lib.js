@@ -177,7 +177,7 @@ async function getCurrencyBurnt(code = "eosio.token", symbol = "TLOS") {
       burnt = burnt + BigInt(action.data.quantity.split(' ')[0]); 
     }
   }
-  return burnt.toString();
+  return burnt.toString() + " " + symbol.toUpperCase();
 }
 
 async function getActionStats(byHour, endMoment) {
