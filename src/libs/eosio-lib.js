@@ -3,7 +3,6 @@ const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const { TextEncoder, TextDecoder } = require("util");
 const { getSecret } = require("./auth-lib");
-const { generateKeyPair } = require("crypto");
 const axios = require("axios");
 
 async function create(accountName, ownerKey, activeKey) {
@@ -169,6 +168,18 @@ async function getRexStats() {
   return rexRows.rows[0];
 }
 
+async function getCurrencyBurnt(code = "eosio.token", symbol = "TLOS") {
+  let burnt = 0;
+  const data = await axios(`${process.env.hyperionEndpoint}/v2/history/get_actions?account=${code}&symbol=${symbol}&filter=${code}:retire&sort=desc&simple=true`);
+  for(action of data.data.simple_actions){
+    if (action.data?.quantity){
+      if(symbol.toLowerCase() !== action.data.quantity.split(' ')[1]?.toLowerCase()) continue;
+      burnt = burnt + parseFloat(action.data.quantity.split(' ')[0]); 
+    }
+  }
+  return burnt.toString() + " " + symbol.toUpperCase();
+}
+
 async function getActionStats(byHour, endMoment) {
   let params = {
     period: byHour ? '1h' : '24h'
@@ -182,4 +193,4 @@ async function getActionStats(byHour, endMoment) {
   return actionsResult.data;
 }
 
-module.exports = { create, genRandomKey, genRandomKeys, accountExists, generateRandomAccount, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats, getTableRows }
+module.exports = { create, genRandomKey, genRandomKeys, accountExists, generateRandomAccount, validAccountFormat, getCurrencyBalance, getCurrencyStats, getRexStats, getActionStats, getTableRows, getCurrencyBurnt }

@@ -1,4 +1,4 @@
-const { getCurrencyStats } = require("../libs/eosio-lib");
+const { getCurrencyStats, getCurrencyBurnt } = require("../libs/eosio-lib");
 const { getMarketdata } = require("../libs/dynamodb-lib");
 const { getTokens, getSymbolsArray } = require("../libs/evm-lib");
 const { exclude } = require("../utils/exclude");
@@ -179,6 +179,39 @@ async function tokenSupplyHandler(request, reply) {
     return numeric ? supply.split(' ')[0] : supply;
 }
 
+// BURNT TOKENS ------------------------------------------------------
+const burntTokenOpts = {
+    schema: {
+        params: {
+            type: 'object',
+            properties: {
+                'contract': {
+                    description: 'Token contract account name',
+                    type: 'string'
+                },
+                'symbol': {
+                    description: 'The token symbol (i.e. TLOS)',
+                    type: 'string'
+                },
+            },
+            required: ['contract','symbol']
+        },
+        tags: ['tokens'],
+        response: {
+            200: {
+                example: 123456,
+                type: 'number'
+            }
+        }
+    }
+}
+
+async function burntTokenHandler(request, reply) {
+    const contract = request.params.contract;
+    const symbol = request.params.symbol.toUpperCase();
+    return await getCurrencyBurnt(contract, symbol);
+}
+
 // TOPPER BOOTSTRAP TOKEN ------------------------------------------------------
 
 const topperTokenOpts = {
@@ -220,5 +253,6 @@ module.exports = async (fastify, options) => {
     fastify.get('evm/tokens/marketdata/historical', tokenMarketDataHistoricalOpts, tokenMarketDataHistoricalHandler);
     fastify.get('evm/tokens/marketdata', tokenMarketDataOpts, tokenMarketDataHandler);
     fastify.get('token/supply/:contract/:symbol', tokenSupplyOpts, tokenSupplyHandler);
+    fastify.get('token/supply/:contract/:symbol/burnt', burntTokenOpts, burntTokenHandler);
     fastify.get('evm/getTopperToken', topperTokenOpts, topperTokenHandler );
 }
