@@ -1,4 +1,4 @@
-const { getCurrencyStats } = require("../libs/eosio-lib");
+const { getCurrencyStats, getCurrencyBurnt } = require("../libs/eosio-lib");
 const { getMarketdata } = require("../libs/dynamodb-lib");
 const { getTokens, getSymbolsArray } = require("../libs/evm-lib");
 const { exclude } = require("../utils/exclude");
