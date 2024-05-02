@@ -169,7 +169,7 @@ async function getRexStats() {
 }
 
 async function getCurrencyBurnt(code = "eosio.token", symbol = "TLOS") {
-  let burnt = new BigInt(0);
+  let burnt = BigInt(0);
   const data = await axios(`${process.env.hyperionEndpoint}/v2/history/get_actions?limit=1000&account=${code}&filter=${code}}%3Aretire&sort=desc&simple=true`);
   for(action of data.simple_actions){
     if (action.data?.quantity){
