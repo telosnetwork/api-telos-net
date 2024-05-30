@@ -14,7 +14,7 @@ async function getVerifiedContracts(chainId) {
   while (hasNextPage) {
     try {
       const response = await axios.get(
-        `https://sourcify.dev/server/files/contracts/any/${chainId}?page=${page}&resultsPerPage=200`
+        `https://sourcify.dev/server/files/contracts/any/${chainId}?page=${page}`
       );
 
       results.full.push(...response.data.results);
