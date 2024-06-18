@@ -5,28 +5,20 @@ const CHAIN_ID = 40;
 const TESTNET_CHAIN_ID = 41;
 const CONTRACTS_BUCKET = 'verified-evm-contracts';
 const TESTNET_CONTRACTS_BUCKET = 'verified-evm-contracts-testnet';
-
+// Silenced addresses like ElkRouter on mainnet wich was somehow partially verified without metadata.json file (it was one of our first contracts on mainnet)
+const SILENCED_ADDRESSES = [
+  '0x75840EBB437981a3F3F1F004513821E0CcDCFC21'
+];
 async function getVerifiedContracts(chainId) {
-  const results = { full: [], partial: [] };
-  let page = 0;
-  let hasNextPage = true;
-
-  while (hasNextPage) {
-    try {
-      const response = await axios.get(
-        `https://sourcify.dev/server/files/contracts/any/${chainId}?page=${page}`
-      );
-
-      results.full.push(...response.data.results);
-      hasNextPage = response.data.pagination.hasNextPage;
-      page++;
-    } catch (e) {
-      console.log(e);
-      hasNextPage = false;
-    }
+  let results;
+  try {
+    results = await axios.get(
+      `https://sourcify.dev/server/files/contracts/${chainId}`
+    );
+  } catch (e) {
+    console.log(e);
   }
-
-  return results;
+  return results?.data || { full: [], partial: [] };
 }
 
 async function getSource(contractAddress, chainId) {
@@ -55,8 +47,7 @@ async function updateVerifiedContractsData(verifiedList, chainId, bucket) {
             newCount++;
           }
         } catch (e) {
-          // This address is ElkRouter on mainnet and somehow was partially verified without metadata.json file (it was one of our first contracts on mainnet)
-          if (address != '0x75840EBB437981a3F3F1F004513821E0CcDCFC21') {
+          if (!SILENCED_ADDRESSES.includes(address)) {
             console.log(`Exception when trying to upload for address: ${address}`);
             console.log(e);
           }
@@ -73,10 +64,13 @@ async function updateVerifiedContractsData(verifiedList, chainId, bucket) {
  */
 (async function () {
   let verifiedList = await getVerifiedContracts(CHAIN_ID);
-  let updateCount = await updateVerifiedContractsData(verifiedList.full, CHAIN_ID, CONTRACTS_BUCKET);
-  console.log(`Added ${updateCount} new verified contracts on mainnet`);
-  
+  if(verifiedList.full?.length > 0) {
+    let updateCount = await updateVerifiedContractsData(verifiedList.full, CHAIN_ID, CONTRACTS_BUCKET);
+    console.log(`Added ${updateCount} new verified contracts on mainnet`);
+  }
   verifiedList = await getVerifiedContracts(TESTNET_CHAIN_ID);
-  updateCount = await updateVerifiedContractsData(verifiedList.full, TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
-  console.log(`Added ${updateCount} new verified contracts on testnet`);
+  if(verifiedList.full?.length > 0) {
+    updateCount = await updateVerifiedContractsData(verifiedList.full, TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
+    console.log(`Added ${updateCount} new verified contracts on testnet`);
+  }
 })();
