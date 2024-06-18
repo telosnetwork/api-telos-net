@@ -63,9 +63,10 @@ async function updateVerifiedContractsData(verifiedList, chainId, bucket) {
  * fetch the source files, and upload to s3 for querying & rendering in app
  */
 (async function () {
+  let updateCount;
   let verifiedList = await getVerifiedContracts(CHAIN_ID);
   if(verifiedList.full?.length > 0) {
-    let updateCount = await updateVerifiedContractsData(verifiedList.full, CHAIN_ID, CONTRACTS_BUCKET);
+    updateCount = await updateVerifiedContractsData(verifiedList.full, CHAIN_ID, CONTRACTS_BUCKET);
     console.log(`Added ${updateCount} new verified contracts on mainnet`);
   }
   verifiedList = await getVerifiedContracts(TESTNET_CHAIN_ID);
