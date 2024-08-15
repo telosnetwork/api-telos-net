@@ -325,7 +325,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        reply.send(JSON.stringify({results: await circulatingSupply(request.query.requestor)}));
+        reply.send(JSON.stringify({result: await circulatingSupply(request.query.requestor)}));
     })
 
     fastify.get('supply/total', {
@@ -355,7 +355,7 @@ module.exports = async (fastify, options) => {
             }
         }
     }, async (request, reply) => {
-        reply.send(JSON.stringify({results: await totalSupply()}));
+        reply.send(JSON.stringify({result: await totalSupply()}));
     })
 
     // legacy route, same as staked/total
