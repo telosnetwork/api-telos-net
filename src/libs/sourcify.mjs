@@ -10,15 +10,27 @@ const SILENCED_ADDRESSES = [
   '0x75840EBB437981a3F3F1F004513821E0CcDCFC21'
 ];
 async function getVerifiedContracts(chainId) {
-  let results;
-  try {
-    results = await axios.get(
-      `https://sourcify.dev/server/files/contracts/${chainId}`
-    );
-  } catch (e) {
-    console.log(e);
+  let contracts = [];
+  let hasMore = true;
+  let page = 1;
+  let limit = 200;
+  while (hasMore) {
+    try {
+      let results = await axios.get(
+        `https://sourcify.dev/server/files/contracts/any/${chainId}?page=${page}&limit=${limit}`
+      );
+      if (results?.data) {
+        if (results.data.results.length < limit) {
+          hasMore = false;
+        }
+        page++;
+        contracts = contracts.concat(results.data.results);
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
-  return results?.data || { full: [], partial: [] };
+  return contracts;
 }
 
 async function getSource(contractAddress, chainId) {
@@ -65,13 +77,13 @@ async function updateVerifiedContractsData(verifiedList, chainId, bucket) {
 (async function () {
   let updateCount;
   let verifiedList = await getVerifiedContracts(CHAIN_ID);
-  if(verifiedList.full?.length > 0) {
-    updateCount = await updateVerifiedContractsData(verifiedList.full, CHAIN_ID, CONTRACTS_BUCKET);
+  if(verifiedList.length > 0) {
+    updateCount = await updateVerifiedContractsData(verifiedList, CHAIN_ID, CONTRACTS_BUCKET);
     console.log(`Added ${updateCount} new verified contracts on mainnet`);
   }
   verifiedList = await getVerifiedContracts(TESTNET_CHAIN_ID);
-  if(verifiedList.full?.length > 0) {
-    updateCount = await updateVerifiedContractsData(verifiedList.full, TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
+  if(verifiedList.length > 0) {
+    updateCount = await updateVerifiedContractsData(verifiedList, TESTNET_CHAIN_ID, TESTNET_CONTRACTS_BUCKET);
     console.log(`Added ${updateCount} new verified contracts on testnet`);
   }
 })();
