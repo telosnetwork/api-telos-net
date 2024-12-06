@@ -1,38 +1,41 @@
-const { TelosEvmApi } = require("@telosnetwork/telosevm-js");
-const  axios = require("axios");
+const { TelosEvmApi } = require('@telosnetwork/telosevm-js');
+const axios = require('axios');
+const fetch = require('node-fetch');
+const { ethers } = require('ethers');
+const { getKeyBySecretName } = require('./auth-lib');
 
-const fetch = require("node-fetch");
-const evmContractAccount = "evmcontract2";
-const evmNormalAccount = "evmaccount11";
-const SYSTEM_SYMBOL = "TLOS";
+const evmContractAccount = 'evmcontract2';
+const evmNormalAccount = 'evmaccount11';
+const SYSTEM_SYMBOL = 'TLOS';
 const TOKEN_LIST_URL = 'https://raw.githubusercontent.com/telosnetwork/token-list/main/telosevm.tokenlist.json';
 const WRAPPED_SYMBOLS = [
-    'BTC', SYSTEM_SYMBOL
+  'BTC', SYSTEM_SYMBOL
 ];
 
-const { getKeyBySecretName } = require("./auth-lib");
-
-function getSymbolsArray(symbolsStr){
+function getSymbolsArray(symbolsStr) {
   const symbols = symbolsStr?.toUpperCase().split(',');
-  for(let i in symbols){
-    if(WRAPPED_SYMBOLS.includes(symbols[i])){
-      symbols[i] = "W" + symbols[i];
+  for (let i in symbols) {
+    if (WRAPPED_SYMBOLS.includes(symbols[i])) {
+      symbols[i] = 'W' + symbols[i];
     }
   }
   return symbols;
 }
 
-async function getTokens(symbols){
+async function getTokens(symbols) {
   try {
     const results = await axios.get(TOKEN_LIST_URL);
-    if(results?.data?.tokens.length > 0){
-      let tokens =  results.data.tokens.filter((token) => {
-        return (parseInt(token.chainId) === parseInt(process.env.EVM_CHAIN_ID) && symbols.includes(token.symbol.toUpperCase()));
+    if (results?.data?.tokens.length > 0) {
+      let tokens = results.data.tokens.filter((token) => {
+        return (
+          parseInt(token.chainId) === parseInt(process.env.EVM_CHAIN_ID) &&
+          symbols.includes(token.symbol.toUpperCase())
+        );
       });
       return tokens;
     }
   } catch (e) {
-    console.error('Could not retrieve EVM token list', e)
+    console.error('Could not retrieve EVM token list', e);
   }
   return [];
 }
@@ -44,7 +47,7 @@ async function makeEvmApi() {
     endpoint: process.env.testnetApiEndPoint,
     chainId: 41,
     ethPrivateKeys: [],
-    telosContract: "eosio.evm",
+    telosContract: 'eosio.evm',
     fetch,
     telosPrivateKeys: [pk],
   });
@@ -61,6 +64,34 @@ async function evmFaucetTransfer(evmAddress, quantity) {
     to: evmAddress,
     quantity,
   });
+  return transferResult;
 }
 
-module.exports = { evmFaucetTransfer, getTokens, getSymbolsArray };
+/**
+ * zkEvmFaucetTransfer:
+ * This function uses ethers.js to send ETH to the given EVM address on the zkEVM network.
+ * It retrieves a private key from AWS secrets, creates a wallet, and sends a fixed amount of ETH.
+ */
+async function zkEvmFaucetTransfer(evmAddress) {
+  // Retrieve the private key from secrets
+  const pk = await getKeyBySecretName(process.env.zkEvmFaucetKey);
+
+  // Connect to zkEVM RPC endpoint
+  const provider = new ethers.providers.JsonRpcProvider(process.env.zkEvmRpcEndpoint);
+  const wallet = new ethers.Wallet(pk, provider);
+
+  // Define the amount of ETH to send. For example, 0.1 ETH:
+  const amountToSend = '50.0'; 
+  const tx = {
+    to: evmAddress,
+    value: ethers.utils.parseEther(amountToSend)
+  };
+
+  // Send transaction
+  const txResponse = await wallet.sendTransaction(tx);
+  await txResponse.wait();
+
+  return txResponse;
+}
+
+module.exports = { evmFaucetTransfer, getTokens, getSymbolsArray, zkEvmFaucetTransfer };

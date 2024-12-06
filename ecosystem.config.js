@@ -45,6 +45,8 @@ const envDev = {
   STLOS_CONTRACT: '0xa9991e4daa44922d00a78b6d986cdf628d46c4dd',
   NETWORK_EVM_RPC: 'https://testnet.telos.net/evm',
   EVM_CHAIN_ID: 41,
+  zkEvmFaucetKey: '751f88a52898aaabc3d534a3b4bb6c2106d4df275d46985e827c335d6ce48a02',
+  zkEvmRpcEndpoint: 'http://34.57.215.93:8123',
 };
 
 const envProd = {
@@ -66,6 +68,8 @@ const envProd = {
   STLOS_CONTRACT: '0xb4b01216a5bc8f1c8a33cd990a1239030e60c905',
   NETWORK_EVM_RPC: 'https://mainnet.telos.net/evm',
   EVM_CHAIN_ID: 40,
+  zkEvmFaucetKey: '751f88a52898aaabc3d534a3b4bb6c2106d4df275d46985e827c335d6ce48a02',
+  zkEvmRpcEndpoint: 'http://34.57.215.93:8123',
 };
 
 const sharedConfig = {
