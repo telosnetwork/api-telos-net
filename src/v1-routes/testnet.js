@@ -5,8 +5,10 @@ const {
   create,
   faucet,
   evmFaucet,
+  zkEvmFaucet,
   accountExists,
 } = require("../libs/testnet-lib");
+
 
 const faucetOpts = {
   schema: {
@@ -273,5 +275,6 @@ module.exports = async (fastify, options) => {
   );
   fastify.get("testnet/faucet/:accountName", faucetOpts, faucetHandler);
   fastify.get("testnet/evmFaucet/:evmAddress", evmFaucetOpts, evmFaucetHandler);
+  fastify.get('testnet/zkEvmFaucet/:evmAddress', zkEvmFaucetOpts, zkEvmFaucetHandler);
   fastify.post("testnet/account", accountOpts, accountHandler);
 };

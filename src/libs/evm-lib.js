@@ -1,6 +1,5 @@
 const { TelosEvmApi } = require("@telosnetwork/telosevm-js");
 const  axios = require("axios");
-
 const fetch = require("node-fetch");
 const evmContractAccount = "evmcontract2";
 const evmNormalAccount = "evmaccount11";
@@ -10,6 +9,7 @@ const WRAPPED_SYMBOLS = [
     'BTC', SYSTEM_SYMBOL
 ];
 
+const { ethers } = require("ethers");
 const { getKeyBySecretName } = require("./auth-lib");
 
 function getSymbolsArray(symbolsStr){
@@ -61,6 +61,34 @@ async function evmFaucetTransfer(evmAddress, quantity) {
     to: evmAddress,
     quantity,
   });
+  return transferResult;
 }
 
-module.exports = { evmFaucetTransfer, getTokens, getSymbolsArray };
+/**
+ * zkEvmFaucetTransfer:
+ * This function uses ethers.js to send ETH to the given EVM address on the zkEVM network.
+ * It retrieves a private key from AWS secrets, creates a wallet, and sends a fixed amount of ETH.
+ */
+async function zkEvmFaucetTransfer(evmAddress) {
+  // Retrieve the private key from secrets
+  const pk = await getKeyBySecretName(process.env.zkEvmFaucetKey);
+
+  // Connect to zkEVM RPC endpoint
+  const provider = new ethers.providers.JsonRpcProvider(process.env.zkEvmRpcEndpoint);
+  const wallet = new ethers.Wallet(pk, provider);
+
+  // Define the amount of ETH to send. For example, 0.1 ETH:
+  const amountToSend = "50.0"; 
+  const tx = {
+    to: evmAddress,
+    value: ethers.utils.parseEther(amountToSend)
+  };
+
+  // Send transaction
+  const txResponse = await wallet.sendTransaction(tx);
+  await txResponse.wait();
+
+  return txResponse;
+}
+
+module.exports = { evmFaucetTransfer, getTokens, getSymbolsArray, zkEvmFaucetTransfer };
