@@ -104,6 +104,57 @@ async function evmFaucetHandler(request, reply) {
   }
 }
 
+
+/**
+* zkEvmFaucetOpts:
+* Similar to evmFaucetOpts, but for the zkEVM network.
+*/
+const zkEvmFaucetOpts = {
+  schema: {
+      tags: ['testnet'],
+      params: {
+          type: 'object',
+          properties: {
+              evmAddress: {
+                  description: 'zkEVM address to send ETH to',
+                  type: 'string',
+              },
+          },
+          required: ['evmAddress'],
+      },
+      response: {
+          204: {
+              description: 'Faucet successful',
+              type: 'null',
+          },
+          400: {
+              description: 'Faucet error',
+              type: 'string',
+          },
+      },
+  },
+};
+
+async function zkEvmFaucetHandler(request, reply) {
+  try {
+      const ipAddress = request.ips.pop();
+      const actionAllowed = await validateUserAccount(
+          ipAddress,
+          request.params.evmAddress
+      );
+
+      if (!actionAllowed) {
+          return reply
+              .code(429)
+              .send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+      }
+      await zkEvmFaucet(request.params.evmAddress);
+      reply.code(204);
+  } catch (e) {
+      reply.code(400).send(`Error pouring the faucet: ${e.message}`);
+  }
+}
+
 const accountOpts = {
   schema: {
     tags: ["testnet"],
