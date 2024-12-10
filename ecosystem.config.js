@@ -9,7 +9,7 @@ const envShared = {
   testnetFaucetSecondaryIndex: 'AccountName',
   testnetFaucetAccount: 'faucet.tf',
   testnetFaucetKey: 'testnet-faucet-key',
-  zkEvmFaucetKey: 'zkEvm-faucet-key',
+  zkEvmFaucetKey: 'testnet-zkEvm-faucet-key',
   twilioAccountSid: 'tf-twilio-sid',
   twilioAuthToken: 'tf-twilio-auth',
   twilioSmsNumber: '+18178356742',
@@ -46,7 +46,7 @@ const envDev = {
   STLOS_CONTRACT: '0xa9991e4daa44922d00a78b6d986cdf628d46c4dd',
   NETWORK_EVM_RPC: 'https://testnet.telos.net/evm',
   EVM_CHAIN_ID: 41,
-  zkEvmRpcEndpoint: 'http://34.57.215.93:8123',
+  zkEvmRpcEndpoint: 'testnet-zkevm-rpc',
 };
 
 const envProd = {
@@ -68,7 +68,7 @@ const envProd = {
   STLOS_CONTRACT: '0xb4b01216a5bc8f1c8a33cd990a1239030e60c905',
   NETWORK_EVM_RPC: 'https://mainnet.telos.net/evm',
   EVM_CHAIN_ID: 40,
-  zkEvmRpcEndpoint: 'http://34.57.215.93:8123',
+  zkEvmRpcEndpoint: 'zkevm-rpc',
 };
 
 const sharedConfig = {
