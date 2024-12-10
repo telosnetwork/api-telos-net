@@ -65,11 +65,11 @@ async function evmFaucetTransfer(evmAddress, quantity) {
 }
 
 /**
- * zkEvmFaucetTransfer:
+ * testnetZkEvmFaucetTransfer:
  * This function uses ethers.js to send ETH to the given EVM address on the zkEVM network.
  * It retrieves a private key from AWS secrets, creates a wallet, and sends a fixed amount of ETH.
  */
-async function zkEvmFaucetTransfer(evmAddress) {
+async function testnetZkEvmFaucetTransfer(evmAddress) {
   // Retrieve the private key from secrets
   const pk = await getKeyBySecretName(process.env.zkEvmFaucetKey);
 
@@ -91,4 +91,4 @@ async function zkEvmFaucetTransfer(evmAddress) {
   return txResponse;
 }
 
-module.exports = { evmFaucetTransfer, getTokens, getSymbolsArray, zkEvmFaucetTransfer };
+module.exports = { evmFaucetTransfer, getTokens, getSymbolsArray, testnetZkEvmFaucetTransfer };
