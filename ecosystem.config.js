@@ -1,7 +1,6 @@
 const envShared = {
   accountCreatorAccount: 'accounts.tf',
   accountCreatorContract: 'free.tf',
-  sentryDsn: 'https://4fb0b518dbf74512a27bf8bb24977136@sentry.io/1749694',
   testnetApiEndPoint: 'https://testnet.telos.caleos.io',
   testnetAutorotateAccount: 'autorotate',
   testnetAutorotateKey: 'testnet-autorotate-key',
@@ -9,6 +8,8 @@ const envShared = {
   testnetFaucetSecondaryIndex: 'AccountName',
   testnetFaucetAccount: 'faucet.tf',
   testnetFaucetKey: 'testnet-faucet-key',
+  testnetZkEvmFaucetKey: 'testnet-zkevm-faucet-key',
+  testnetZkEvmRpcEndpoint: 'http://34.57.215.93:8123',
   twilioAccountSid: 'tf-twilio-sid',
   twilioAuthToken: 'tf-twilio-auth',
   twilioSmsNumber: '+18178356742',
@@ -45,6 +46,7 @@ const envDev = {
   STLOS_CONTRACT: '0xa9991e4daa44922d00a78b6d986cdf628d46c4dd',
   NETWORK_EVM_RPC: 'https://testnet.telos.net/evm',
   EVM_CHAIN_ID: 41,
+  
 };
 
 const envProd = {

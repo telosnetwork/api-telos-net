@@ -2,7 +2,7 @@ const { Api, JsonRpc, RpcError } = require("eosjs");
 const { JsSignatureProvider } = require("eosjs/dist/eosjs-jssig");
 const { TextEncoder, TextDecoder } = require("util");
 const { getKeyBySecretName } = require("./auth-lib");
-const { evmFaucetTransfer } = require("./evm-lib");
+const { evmFaucetTransfer, testnetZkEvmFaucetTransfer} = require("./evm-lib");
 const { request } = require("https");
 const fetch = require("node-fetch"); // node only; not needed in browsers
 const AWS = require("aws-sdk");
@@ -68,6 +68,16 @@ async function evmFaucet(evmAddress) {
   ];
   await faucetActions(actions);
   await evmFaucetTransfer(evmAddress, TLOS_PER_FAUCET);
+}
+
+/**
+ * testnetZkEvmFaucet:
+ * This function sends ETH from the zkEVM faucet to the given EVM address.
+ * There is no need to interact with eosio.token or deposit first, as the faucet already holds ETH on zkEVM.
+ */
+async function testnetZkEvmFaucet(evmAddress) {
+    // Directly call testnetZkEvmFaucetTransfer to send ETH to the evmAddress
+    await testnetZkEvmFaucetTransfer(evmAddress);
 }
 
 async function validateUserAccount(ipAddress, accountName) {
@@ -360,6 +370,7 @@ module.exports = {
   create,
   faucet,
   evmFaucet,
+  testnetZkEvmFaucet,
   validateUserAccount,
   accountExists,
 };

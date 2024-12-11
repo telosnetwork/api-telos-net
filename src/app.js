@@ -5,6 +5,16 @@ const LoggerFactory = require('./LoggerFactory')
 const path = require('path')
 
 const logger = LoggerFactory.create('TelosAPI')
+
+if (process.argv.includes('--local')) {
+    const config = require('../ecosystem.config.js');
+    const env = config.apps.find(app => app.name === 'api-local').env;
+    for (const key in env) {
+        process.env[key] = env[key];
+    }
+}
+
+
 const port = process.env.SERVER_PORT || 9999
 
 logger.info(`Starting API with mode ${process.env.MODE} and SERVER_ENDPOINT ${process.env.SERVER_ENDPOINT} and SERVER_PORT ${process.env.SERVER_PORT}`)
