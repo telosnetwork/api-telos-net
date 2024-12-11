@@ -5,12 +5,12 @@ const {
   create,
   faucet,
   evmFaucet,
-  zkEvmFaucet,
+  testnetZkEvmFaucet,
   accountExists,
 } = require("../libs/testnet-lib");
 
 
-const faucetOpts = {
+const testnetFaucetOpts = {
   schema: {
     tags: ["testnet"],
     params: {
@@ -36,7 +36,7 @@ const faucetOpts = {
   },
 };
 
-async function faucetHandler(request, reply) {
+async function testnetFaucetHandler(request, reply) {
   try {
     const ipAddress = request.ips.pop();
     const actionAllowed = await validateUserAccount(
@@ -57,7 +57,7 @@ async function faucetHandler(request, reply) {
   }
 }
 
-const evmFaucetOpts = {
+const testnetEvmFaucetOpts = {
   schema: {
     tags: ["testnet"],
     params: {
@@ -83,7 +83,7 @@ const evmFaucetOpts = {
   },
 };
 
-async function evmFaucetHandler(request, reply) {
+async function testnetEvmFaucetHandler(request, reply) {
   try {
     const ipAddress = request.ips.pop();
     const actionAllowed = await validateUserAccount(
@@ -101,6 +101,57 @@ async function evmFaucetHandler(request, reply) {
     reply.code(204);
   } catch (e) {
     reply.code(400).send(`Error pouring the faucet: ${e.message}`);
+  }
+}
+
+
+/**
+* testnetZkEvmFaucetOpts:
+* Similar to evmFaucetOpts, but for the zkEVM network.
+*/
+const testnetZkEvmFaucetOpts = {
+  schema: {
+      tags: ['testnet'],
+      params: {
+          type: 'object',
+          properties: {
+              evmAddress: {
+                  description: 'zkEVM address to send ETH to',
+                  type: 'string',
+              },
+          },
+          required: ['evmAddress'],
+      },
+      response: {
+          204: {
+              description: 'Faucet successful',
+              type: 'null',
+          },
+          400: {
+              description: 'Faucet error',
+              type: 'string',
+          },
+      },
+  },
+};
+
+async function testnetZkEvmFaucetHandler(request, reply) {
+  try {
+      const ipAddress = request.ips.pop();
+      const actionAllowed = await validateUserAccount(
+          ipAddress,
+          request.params.evmAddress
+      );
+
+      if (!actionAllowed) {
+          return reply
+              .code(429)
+              .send('IP or account has recieved faucet funds within the last 24 hours, please wait and try again');
+      }
+      await testnetZkEvmFaucet(request.params.evmAddress);
+      reply.code(204);
+  } catch (e) {
+      reply.code(400).send(`Error pouring the faucet: ${e.message}`);
   }
 }
 
@@ -158,7 +209,7 @@ const accountOpts = {
   },
 };
 
-async function accountHandler(request, reply) {
+async function testnetAccountHandler(request, reply) {
   try {
     const { accountName, ownerKey, activeKey } = request.body;
 
@@ -185,7 +236,7 @@ async function accountHandler(request, reply) {
   }
 }
 
-const addToRotationOpts = {
+const testnetAddToRotationOpts = {
   schema: {
     tags: ["testnet"],
     params: {
@@ -211,14 +262,14 @@ const addToRotationOpts = {
   },
 };
 
-async function addToRotationHandler(request, reply) {
+async function testnetAddToRotationHandler(request, reply) {
   let result = await rotate(request.params.bpAccount);
   if (!result.success)
     reply.code(400).send(`Error trying to rotate: ${result.message}`);
   else reply.code(204);
 }
 
-const autorotateOpts = {
+const testnetAutorotateOpts = {
   schema: {
     tags: ["testnet"],
     response: {
@@ -234,14 +285,14 @@ const autorotateOpts = {
   },
 };
 
-async function autorotateHandler(request, reply) {
+async function testnetAutorotateHandler(request, reply) {
   const result = await rotate();
   if (!result.success)
     reply.code(400).send(`Error trying to rotate: ${result.message}`);
   else reply.code(204);
 }
 
-const getRotationScheduleOpts = {
+const testnetGetRotationScheduleOpts = {
   schema: {
     tags: ["testnet"],
     response: {
@@ -257,24 +308,24 @@ const getRotationScheduleOpts = {
   },
 };
 
-async function getRotationScheduleHandler(request, reply) {
+async function testnetGetRotationScheduleHandler(request, reply) {
   reply.send(await getLastVoted());
 }
 
 module.exports = async (fastify, options) => {
   fastify.get(
     "testnet/rotation_schedule",
-    getRotationScheduleOpts,
-    getRotationScheduleHandler
+    testnetGetRotationScheduleOpts,
+    testnetGetRotationScheduleHandler
   );
-  fastify.get("testnet/rotate", autorotateOpts, autorotateHandler);
+  fastify.get("testnet/rotate", testnetAutorotateOpts, testnetAutorotateHandler);
   fastify.get(
     "testnet/produce/:bpAccount",
-    addToRotationOpts,
-    addToRotationHandler
+    testnetAddToRotationOpts,
+    testnetAddToRotationHandler
   );
-  fastify.get("testnet/faucet/:accountName", faucetOpts, faucetHandler);
-  fastify.get("testnet/evmFaucet/:evmAddress", evmFaucetOpts, evmFaucetHandler);
-  fastify.get('testnet/zkEvmFaucet/:evmAddress', zkEvmFaucetOpts, zkEvmFaucetHandler);
-  fastify.post("testnet/account", accountOpts, accountHandler);
+  fastify.get("testnet/faucet/:accountName", testnetFaucetOpts, testnetFaucetHandler);
+  fastify.get("testnet/evmFaucet/:evmAddress", testnetEvmFaucetOpts, testnetEvmFaucetHandler);
+  fastify.get('testnet/zkEvmFaucet/:evmAddress', testnetZkEvmFaucetOpts, testnetZkEvmFaucetHandler);
+  fastify.post("testnet/account", accountOpts, testnetAccountHandler);
 };

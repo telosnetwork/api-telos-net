@@ -71,13 +71,13 @@ async function evmFaucet(evmAddress) {
 }
 
 /**
- * zkEvmFaucet:
+ * testnetZkEvmFaucet:
  * This function sends ETH from the zkEVM faucet to the given EVM address.
  * There is no need to interact with eosio.token or deposit first, as the faucet already holds ETH on zkEVM.
  */
-async function zkEvmFaucet(evmAddress) {
-    // Directly call zkEvmFaucetTransfer to send ETH to the evmAddress
-    await zkEvmFaucetTransfer(evmAddress);
+async function testnetZkEvmFaucet(evmAddress) {
+    // Directly call testnetZkEvmFaucetTransfer to send ETH to the evmAddress
+    await testnetZkEvmFaucetTransfer(evmAddress);
 }
 
 async function validateUserAccount(ipAddress, accountName) {
@@ -370,7 +370,7 @@ module.exports = {
   create,
   faucet,
   evmFaucet,
-  zkEvmFaucet,
+  testnetZkEvmFaucet,
   validateUserAccount,
   accountExists,
 };
