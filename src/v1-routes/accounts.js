@@ -1,7 +1,6 @@
 const dynamoDbLib = require("../libs/dynamodb-lib");
 const sendLib = require("../libs/send-lib");
 const cryptoLib = require("../libs/crypto-lib");
-const Sentry = require('@sentry/node');
 const { VoipError } = require('../libs/voip-error');
 const eosioLib = require("../libs/eosio-lib");
 const axios = require("axios");
@@ -51,9 +50,6 @@ const registrationOpts = {
 }
 
 async function registrationHandler(request, reply) {
-    Sentry.init({ dsn: process.env.sentryDsn });
-    Sentry.configureScope(scope => scope.setExtra('Request Body', request.body));
-
     try {
         const smsNumber = await sendLib.cleanNumberFormat(request.body.smsNumber);
         const smsHash = await cryptoLib.hash(smsNumber);
@@ -92,9 +88,7 @@ async function registrationHandler(request, reply) {
 
         reply.code(204);
     } catch (e) {
-        Sentry.captureException(e);
-        await Sentry.flush(2500);
-        request.log.error(e)
+        request.log.error(e);
         if (e instanceof VoipError || e.name === 'VoipError') {
             reply.code(401).send(e.message);
         }
@@ -186,9 +180,6 @@ const createOpts = {
 }
 
 async function createHandler(request, reply) {
-    Sentry.init({ dsn: process.env.sentryDsn });
-    Sentry.configureScope(scope => scope.setExtra('Request Body', request.body));
-
     const data = request.body;
 
     if ((data.sendPrivateKeyViaSms && data.sendPrivateKeyViaSms === "Y") &&
@@ -264,8 +255,6 @@ async function createHandler(request, reply) {
         return reply.code(200).send(response);
     } catch (e) {
         request.log.error(e)
-        Sentry.captureException(e);
-        await Sentry.flush(2500);
         return reply.code(500).send(e.message);
     }
 }
@@ -313,8 +302,6 @@ const keygenOpts = {
 }
 
 async function keygenHandler(request, reply) {
-    Sentry.init({ dsn: process.env.sentryDsn });
-    Sentry.configureScope(scope => scope.setExtra('Request Body', request.body));
     try {
 
         let numKeys = 2;
@@ -325,8 +312,6 @@ async function keygenHandler(request, reply) {
         let keys = await eosioLib.genRandomKeys(numKeys);
         return reply.code(200).send({ message: `See attached keys`, keys: keys });
     } catch (e) {
-        Sentry.captureException(e);
-        await Sentry.flush(2500);
         return reply.code(500).send(e.message);
     }
 }
@@ -358,9 +343,6 @@ const checkAccountOpts = {
 }
 
 async function checkAccountHandler(request, reply) {
-    Sentry.init({ dsn: process.env.sentryDsn });
-    Sentry.configureScope(scope => scope.setExtra('Request Body', request.body));
-
     try {
         if (!eosioLib.validAccountFormat(request.params.telosAccount)) {
             return reply.code(400).send(`Requested Telos account name ${request.params.telosAccount} is not a valid format. It must match ^([a-z]|[1-5]|[\.]){1,12}$`);
@@ -372,8 +354,6 @@ async function checkAccountHandler(request, reply) {
 
         return reply.send(204);
     } catch (e) {
-        Sentry.captureException(e);
-        await Sentry.flush(2500);
         return reply.code(500).send(e.message);
     }
 }

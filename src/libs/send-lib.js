@@ -1,5 +1,4 @@
 const twilio = require('twilio');
-const Sentry = require('@sentry/node');
 const { getKeyBySecretName } = require("./auth-lib");
 const { VoipError } = require('./voip-error');
 
@@ -14,7 +13,6 @@ async function cleanNumberFormat(smsNumber) {
     await client.lookups.phoneNumbers(smsNumber)
         .fetch({ addOns: ['twilio_carrier_info'] })
         .then(phone_number => {
-            Sentry.configureScope(scope => scope.setExtra('Twilio Lookup Result', phone_number));
             cleanNumber = phone_number.phoneNumber;
             numberLookupResult = phone_number;
         });
