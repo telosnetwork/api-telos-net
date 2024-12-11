@@ -8,7 +8,7 @@ const envShared = {
   testnetFaucetSecondaryIndex: 'AccountName',
   testnetFaucetAccount: 'faucet.tf',
   testnetFaucetKey: 'testnet-faucet-key',
-  testnetZkEvmFaucetKey: 'testnet-zkEvm-faucet-key',
+  testnetZkEvmFaucetKey: 'testnet-zkevm-faucet-key',
   testnetZkEvmRpcEndpoint: 'http://34.57.215.93:8123',
   twilioAccountSid: 'tf-twilio-sid',
   twilioAuthToken: 'tf-twilio-auth',
