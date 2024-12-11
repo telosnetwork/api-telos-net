@@ -71,10 +71,10 @@ async function evmFaucetTransfer(evmAddress, quantity) {
  */
 async function testnetZkEvmFaucetTransfer(evmAddress) {
   // Retrieve the private key from secrets
-  const pk = await getKeyBySecretName(process.env.zkEvmFaucetKey);
+  const pk = await getKeyBySecretName(process.env.testnetZkEvmFaucetKey);
 
   // Connect to zkEVM RPC endpoint
-  const provider = new ethers.providers.JsonRpcProvider(process.env.zkEvmRpcEndpoint);
+  const provider = new ethers.providers.JsonRpcProvider(process.env.testnetZkEvmRpcEndpoint);
   const wallet = new ethers.Wallet(pk, provider);
 
   // Define the amount of ETH to send. For example, 0.1 ETH:
