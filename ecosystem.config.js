@@ -9,7 +9,7 @@ const envShared = {
   testnetFaucetAccount: 'faucet.tf',
   testnetFaucetKey: 'testnet-faucet-key',
   testnetZkEvmFaucetKey: 'testnet-zkevm-faucet-key',
-  testnetZkEvmRpcEndpoint: 'http://34.57.215.93:8123',
+  testnetZkEvmRpcEndpoint: 'https://zkrpc.testnet.telos.net',
   twilioAccountSid: 'tf-twilio-sid',
   twilioAuthToken: 'tf-twilio-auth',
   twilioSmsNumber: '+18178356742',
