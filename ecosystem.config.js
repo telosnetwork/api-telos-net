@@ -57,7 +57,7 @@ const envProd = {
   accountCreatorKey: 'tf-account-creator-key-prod',
   marketdataTableName: 'prod-marketdata',
   allowDeleteNumber: 'N',
-  evmProvider:'https://mainnet.telos.net/evm',
+  evmProvider:'https://rpc.telos.net',
   evmHyperionProvider: 'https://mainnet.telos.net/v2/evm',  
   eosioApiEndPoint: 'https://mainnet.telos.net',
   hyperionEndpoint: 'https://mainnet.telos.net',
@@ -66,7 +66,7 @@ const envProd = {
   SERVER_PORT: 4000,
   TIME_SPAN: 10080,
   STLOS_CONTRACT: '0xb4b01216a5bc8f1c8a33cd990a1239030e60c905',
-  NETWORK_EVM_RPC: 'https://mainnet.telos.net/evm',
+  NETWORK_EVM_RPC: 'https://rpc.telos.net',
   EVM_CHAIN_ID: 40,
 };
 
