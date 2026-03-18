@@ -35,7 +35,7 @@ const envDev = {
   accountCreatorKey: 'tf-account-creator-key-dev',
   allowDeleteNumber: 'Y',
   marketdataTableName: 'dev-marketdata',
-  evmProvider:'https://testnet.telos.net/evm',
+  evmProvider:'https://rpc.testnet.telos.net',
   evmHyperionProvider: 'https://testnet.telos.net/v2/evm',  
   eosioApiEndPoint: 'https://testnet.telos.caleos.io',
   hyperionEndpoint: 'https://testnet.telos.caleos.io',
@@ -44,7 +44,7 @@ const envDev = {
   SERVER_PORT: 3000,
   TIME_SPAN: 5,
   STLOS_CONTRACT: '0xa9991e4daa44922d00a78b6d986cdf628d46c4dd',
-  NETWORK_EVM_RPC: 'https://testnet.telos.net/evm',
+  NETWORK_EVM_RPC: 'https://rpc.testnet.telos.net',
   EVM_CHAIN_ID: 41,
   
 };
