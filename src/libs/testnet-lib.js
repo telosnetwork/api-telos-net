@@ -279,6 +279,13 @@ function getRPC() {
   return new JsonRpc(process.env.testnetApiEndPoint, { fetch });
 }
 
+async function assertTestnetApiReady() {
+  const info = await getRPC().get_info();
+  if (info.chain_id !== "1eaa0824707c8c16bd25145493bf062aecddfeb56c736f6ba6397f3195f33c9f") {
+    throw new Error("Testnet API returned an unexpected chain ID");
+  }
+}
+
 function getApi(privateKey) {
   const signatureProvider = new JsSignatureProvider([privateKey]);
   const rpc = getRPC();
@@ -372,5 +379,6 @@ module.exports = {
   evmFaucet,
   testnetZkEvmFaucet,
   validateUserAccount,
+  assertTestnetApiReady,
   accountExists,
 };
