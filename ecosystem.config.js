@@ -1,7 +1,7 @@
 const envShared = {
   accountCreatorAccount: 'accounts.tf',
   accountCreatorContract: 'free.tf',
-  testnetApiEndPoint: 'https://testnet.telos.caleos.io',
+  testnetApiEndPoint: 'https://testnet.telos.net',
   testnetAutorotateAccount: 'autorotate',
   testnetAutorotateKey: 'testnet-autorotate-key',
   testnetFaucetTableName: 'FaucetActivity',

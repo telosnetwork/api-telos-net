@@ -6,6 +6,7 @@ const {
   faucet,
   evmFaucet,
   testnetZkEvmFaucet,
+  assertTestnetApiReady,
   accountExists,
 } = require("../libs/testnet-lib");
 
@@ -66,6 +67,7 @@ const testnetEvmFaucetOpts = {
         evmAddress: {
           description: "TelosEVM address to send the EVM TLOS to",
           type: "string",
+          pattern: "^0x[0-9a-fA-F]{40}$",
         },
       },
       required: ["evmAddress"],
@@ -85,6 +87,8 @@ const testnetEvmFaucetOpts = {
 
 async function testnetEvmFaucetHandler(request, reply) {
   try {
+    // Reject an unavailable or wrong-chain upstream before reserving the daily claim.
+    await assertTestnetApiReady();
     const ipAddress = request.ips.pop();
     const actionAllowed = await validateUserAccount(
       ipAddress,
